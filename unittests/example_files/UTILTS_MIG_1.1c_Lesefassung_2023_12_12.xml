@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<M_UTILTS Versionsnummer="1.1c"
+    Veroeffentlichungsdatum="24.10.2023"
+    Author="BDEW">
+  <S_UNH Name="Nachrichten-Kopfsegment" Description="Dieses Segment dient dazu, eine Nachricht zu eröffnen, zu identifizieren und zu spezifizieren." Counter="0010" Level="0" Number="00001" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="UNH+1+UTILTS:D:18A:UN:1.1c&apos;">
+    <D_0062 Name="Nachrichten-Referenznummer" Description="Eindeutige Nachrichtenreferenz in einer Nachricht des Absenders.&#13;&#10;Nummer der Nachrichten einer Übertragungsdatei im Datenaustausch. Identisch mit DE0062 im UNT, i. d. R. vom sendenden Konverter vergeben." Status_Std="M" Status_Specification="M" Format_Std="an..14" Format_Specification="an..14"/>
+    <C_S009 Name="Nachrichten-Kennung" Description="" Status_Std="M" Status_Specification="M">
+      <D_0065 Name="Nachrichtentyp-Kennung" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..6" Format_Specification="an..6">
+        <Code Name="Netznutzungszeiten-Nachricht" Description="">UTILTS</Code>
+      </D_0065>
+      <D_0052 Name="Versionsnummer des Nachrichtentyps" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="Entwurfs-Version" Description="">D</Code>
+      </D_0052>
+      <D_0054 Name="Freigabenummer des Nachrichtentyps" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="Ausgabe 2018 - A" Description="">18A</Code>
+      </D_0054>
+      <D_0051 Name="Verwaltende Organisation" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..2" Format_Specification="an..2">
+        <Code Name="UN/CEFACT" Description="">UN</Code>
+      </D_0051>
+      <D_0057 Name="Anwendungscode der zuständigen Organisation" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..6" Format_Specification="an..6">
+        <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="">1.1c</Code>
+      </D_0057>
+    </C_S009>
+  </S_UNH>
+  <S_BGM Name="Beginn der Nachricht" Description="Dieses Segment dient dazu, Typ und Funktion anzuzeigen und die Identifikationsnummer zu übermitteln." Counter="0020" Level="0" Number="00002" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="BGM+Z36+MKIDI5422&apos;">
+    <C_C002 Name="Dokumenten-/Nachrichtenname" Description="" Status_Std="C" Status_Specification="R">
+      <D_1001 Name="Dokumentenname, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="Berechnungsformel" Description="">Z36</Code>
+        <Code Name="Ausgerollte Zählzeitdefinition" Description="">Z59</Code>
+        <Code Name="Übersicht Zählzeitdefinitionen" Description="">Z60</Code>
+        <Code Name="Übersicht Schaltzeitdefinitionen" Description="">Z78</Code>
+        <Code Name="Übersicht Leistungskurvendefinitionen" Description="">Z79</Code>
+        <Code Name="Ausgerollte Schaltzeitdefinition" Description="">Z80</Code>
+        <Code Name="Ausgerollte Leistungskurvendefinition" Description="">Z81</Code>
+      </D_1001>
+    </C_C002>
+    <C_C106 Name="Dokumenten-/Nachrichten-Identifikation" Description="" Status_Std="C" Status_Specification="R">
+      <D_1004 Name="Dokumentennummer" Description="EDI-Nachrichtennummer vergeben vom Absender des Dokuments" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..35"/>
+    </C_C106>
+  </S_BGM>
+  <S_DTM Name="Nachrichtendatum" Description="Dieses Segment wird zur Angabe des Dokumentendatums verwendet." Counter="0030" Level="1" Number="00003" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="DTM+137:202106071515?+00:303&apos;">
+    <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+      <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="">137</Code>
+      </D_2005>
+      <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+      <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+      </D_2379>
+    </C_C507>
+  </S_DTM>
+  <G_SG2 Name="MP-ID Absender" Counter="0090" Level="1" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+    <S_NAD Name="MP-ID Absender" Description="DE3039: Zur Identifikation der Marktpartner wird die MP-ID angegeben." Counter="0100" Level="1" Number="00004" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="NAD+MS+9900259000002::293&apos;">
+      <D_3035 Name="Beteiligter, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+        <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="">MS</Code>
+      </D_3035>
+      <C_C082 Name="Identifikation des Beteiligten" Description="" Status_Std="C" Status_Specification="R">
+        <D_3039 Name="MP-ID" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..35" Format_Specification="an..35"/>
+        <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+        <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="GS1" Description="">9</Code>
+          <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="">293</Code>
+        </D_3055>
+      </C_C082>
+    </S_NAD>
+    <G_SG3 Name="Kontaktinformationen" Counter="0130" Level="2" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+      <S_CTA Name="Ansprechpartner" Description="Dieses Segment dient der Identifikation von Ansprechpartnern innerhalb des im vorangegangenen NAD-Segment spezifizierten Unternehmens." Counter="0140" Level="2" Number="00005" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CTA+IC+:Max Mustermann&apos;">
+        <D_3139 Name="Funktion des Ansprechpartners, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="Informationskontakt" Description="">IC</Code>
+        </D_3139>
+        <C_C056 Name="Kontaktangaben" Description="" Status_Std="C" Status_Specification="R">
+          <D_3413 Name="Kontakt, Nummer" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+          <D_3412 Name="Name vom Ansprechpartner" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..256" Format_Specification="an..256"/>
+        </C_C056>
+      </S_CTA>
+      <S_COM Name="Kommunikationsverbindung" Description="Ein Segment zur Angabe von Kommunikationsnummer und -typ des im vorangegangenen CTA-Segments angegebenen Sachbearbeiters oder der Abteilung." Counter="0150" Level="3" Number="00006" MaxRep_Std="9" MaxRep_Specification="5" Status_Std="C" Status_Specification="R" Example="COM+00322227120:TE&apos;" Remark_Example="Die im vorangegangenen Segment genannte Informationsstelle hat die Telefonnummer 003222271020.">
+        <C_C076 Name="Kommunikationsverbindung" Description="" Status_Std="M" Status_Specification="M">
+          <D_3148 Name="Nummer / Adresse" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..512" Format_Specification="an..512"/>
+          <D_3155 Name="Art des Kommunikationsmittels, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Elektronische Post" Description="">EM</Code>
+            <Code Name="Telefax" Description="">FX</Code>
+            <Code Name="Telefon" Description="">TE</Code>
+            <Code Name="weiteres Telefon" Description="">AJ</Code>
+            <Code Name="Handy" Description="">AL</Code>
+          </D_3155>
+        </C_C076>
+      </S_COM>
+    </G_SG3>
+    <G_SG2 Name="MP-ID Empfänger" Counter="0090" Level="1" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+      <S_NAD Name="MP-ID Empfänger" Description="DE3039: Zur Identifikation der Marktpartner wird die MP-ID angegeben." Counter="0100" Level="1" Number="00007" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="NAD+MR+9900259000002::293&apos;">
+        <D_3035 Name="Beteiligter, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="Nachrichtenempfänger" Description="">MR</Code>
+        </D_3035>
+        <C_C082 Name="Identifikation des Beteiligten" Description="" Status_Std="C" Status_Specification="R">
+          <D_3039 Name="MP-ID" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..35" Format_Specification="an..35"/>
+          <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+          <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="GS1" Description="">9</Code>
+            <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="">293</Code>
+          </D_3055>
+        </C_C082>
+      </S_NAD>
+    </G_SG2>
+    <G_SG5 Name="Vorgang" Counter="0200" Level="1" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="R">
+      <S_IDE Name="Vorgang" Description="Dieses Segment dient zur datei- und nachrichtenübergreifenden eindeutigen Identifikation eines einzelnen Vorgangs. Die Nutzung der vollen Zeichenlänge ist nicht notwendig. &#13;&#10;&#13;&#10;Hinweis zu DE7402: &#13;&#10;Es ist zu beachten, dass die Eindeutigkeit nachrichtenübergreifend eingehalten werden muss. Das bedeutet, eine bereits verwendete Vorgangsnummer in dem IDE+24 Segment darf auch in einer später versendeten Nachricht nicht mehr genutzt werden." Counter="0210" Level="1" Number="00008" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="IDE+24+VorgangsId12345&apos;">
+        <D_7495 Name="Objekt, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="Transaktion" Description="">24</Code>
+        </D_7495>
+        <C_C206 Name="Identifikationsnummer" Description="" Status_Std="C" Status_Specification="R">
+          <D_7402 Name="Vorgangsnummer" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..35" Format_Specification="an..35"/>
+        </C_C206>
+      </S_IDE>
+      <S_LOC Name="ID der Marktlokation" Description="In diesem Segment wird die ID der Marktlokation übermittelt." Counter="0220" Level="2" Number="00009" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="LOC+172+57685676748&apos;">
+        <D_3227 Name="Ortsangabe, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="Meldepunkt" Description="">172</Code>
+        </D_3227>
+        <C_C517 Name="Ortsangabe" Description="" Status_Std="C" Status_Specification="R">
+          <D_3225 Name="ID der Marktlokation" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+        </C_C517>
+      </S_LOC>
+      <S_LOC Name="Code der Definition" Description="In diesem Segment wird der Code einer  Definition übermittelt." Counter="0220" Level="2" Number="00010" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="LOC+Z09+ZZ1&apos;">
+        <D_3227 Name="Ortsangabe, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+          <Code Name="Code der Definition" Description="">Z09</Code>
+        </D_3227>
+        <C_C517 Name="Ortsangabe" Description="" Status_Std="C" Status_Specification="R">
+          <D_3225 Name="Code der Definition" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3"/>
+        </C_C517>
+      </S_LOC>
+      <S_DTM Name="Gültig ab" Description="Dieses Segment wird zur Angabe verwendet, zu welchem Zeitpunkt die Berechnungsformel oder die Übersicht einer Definition ihre Gültigkeit erlangt." Counter="0280" Level="2" Number="00011" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+157:202106071515?+00:303&apos;">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Gültigkeit, Beginndatum" Description="">157</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <S_DTM Name="Gültigkeitsbeginn der ausgerollten Definition" Description="Dieses Segment wird zur Angabe des Gültigkeitsbeginn der ausgerollten Definition verwendet." Counter="0280" Level="2" Number="00012" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+Z34:202106071515?+00:303&apos;">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Gültigkeitsbeginn" Description="">Z34</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <S_DTM Name="Gültigkeitsende der ausgerollten Definition" Description="Dieses Segment wird zur Angabe des Gültigkeitsende einer ausgerollten Definition verwendet." Counter="0280" Level="2" Number="00013" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+Z35:202109091515?+00:303&apos;">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Gültigkeitsende" Description="">Z35</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <S_DTM Name="Versionsangabe" Description="Dieses Segment wird zur Angabe der Version der Übersicht einer Definition oder einer ausgerollten Definition verwendet.&#13;&#10;&#13;&#10;Die Versionsangabe vergibt der Absender in seinem IT-System. Ein neue Versionsangabe wird genau dann vergeben, wenn inhaltliche Änderungen in der Übersicht einer Definition oder in der ausgerollten Definition durchgeführt wurden, diese wird gegenüber allen Empfängern verwendet." Counter="0280" Level="2" Number="00014" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+293:20210607151545?+00:304&apos;">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Fertigstellungsdatum/-zeit" Description="">293</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="CCYYMMDDHHMMSSZZZ" Description="">304</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <S_STS Name="Status der Antwort" Description="DE9013 Diesem Datenelement werden Codes aus den Codelisten des Dokumentes „Entscheidungsbaum-Diagramme“ verwendet. Jeder Entscheidungsbaum gilt als Codeliste. Die relevante Codeliste wird im DE1131 angegeben. Somit sind nur die Codes in einem Anwendungsfall möglich, welche in dem zugehörigen Entscheidungsbaum aufgeführt sind. &#13;&#10;&#13;&#10;DE1131 des Segments ist genutzt und enthält die Codes der Entscheidungsbaum-Diagramme bzw. die Codes der im Dokument Entscheidungsbaum-Diagramme enthaltenen Code-Tabellen, die in der Nachricht verwendet werden." Counter="0300" Level="2" Number="00015" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="STS+E01++A01:E_0218&apos;">
+        <C_C601 Name="Statuskategorie" Description="" Status_Std="C" Status_Specification="R">
+          <D_9015 Name="Statuskategorie, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Status der Antwort" Description="">E01</Code>
+          </D_9015>
+        </C_C601>
+        <C_C555 Name="Status" Description="" Status_Std="C" Status_Specification="N">
+          <D_4405 Name="Status, Code" Description="" Status_Std="M" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+        </C_C555>
+        <C_C556 Name="Statusanlaß" Description="" Status_Std="C" Status_Specification="R">
+          <D_9013 Name="Code des Prüfschritts" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3"/>
+          <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..17" Format_Specification="an..17">
+            <Code Name="EBD Nr. E_0218" Description="">E_0218</Code>
+          </D_1131>
+        </C_C556>
+      </S_STS>
+      <S_STS Name="Status der Berechnungsformel" Description="In diesem Segment wird der Status der Berechnungsformel übermittelt." Counter="0300" Level="2" Number="00016" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="STS+Z23+Z33&apos;">
+        <C_C601 Name="Statuskategorie" Description="" Status_Std="C" Status_Specification="R">
+          <D_9015 Name="Statuskategorie, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Status der Berechnungsformel" Description="">Z23</Code>
+          </D_9015>
+        </C_C601>
+        <C_C555 Name="Status" Description="" Status_Std="C" Status_Specification="R">
+          <D_4405 Name="Status, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Berechnungsformel angefügt" Description="Die Berechnungsformel zur Ermittlung der Energiemenge einer Marktlokation ist in diesem Vorgang der UTILTS enthalten">Z33</Code>
+            <Code Name="Berechnungsformel muss beim Absender angefragt werden" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation ist komplex und kann mit der UTILTS nicht übermittelt werden">Z34</Code>
+            <Code Name="Berechnungsformel besitzt keine Rechenoperation" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation besitzt keine Rechenoperation, da es sich um eine 1:1 Beziehung zwischen der Markt- und Messlokation handelt.">Z40</Code>
+            <Code Name="Berechnungsformel nicht erforderlich" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation ist nicht erforderlich, da keine Messlokation der Marktlokation (pauschale Marktlokation) zugeordnet ist.">Z41</Code>
+          </D_4405>
+        </C_C555>
+      </S_STS>
+      <S_STS Name="Status der Nutzung von Definitionen" Description="In diesem Segment wird vom Marktpartner angegeben, ob er Definitionen verwendet." Counter="0300" Level="2" Number="00017" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="STS+Z36+Z45&apos;">
+        <C_C601 Name="Statuskategorie" Description="" Status_Std="C" Status_Specification="R">
+          <D_9015 Name="Statuskategorie, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Nutzung von Definitionen" Description="">Z36</Code>
+          </D_9015>
+        </C_C601>
+        <C_C555 Name="Status" Description="" Status_Std="C" Status_Specification="R">
+          <D_4405 Name="Status, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Definitionen werden verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt Leistungskurvendefinitionen. Die Liste der Leistungskurvendefinitionen enthält somit Leistungskurven.">Z45</Code>
+            <Code Name="Definitionen werden nicht verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB nutzt keine Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit keine Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit keine Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Leistungskurven. Die Liste der Leistungskurvendefinitionen enthält somit keine Leistungskurven.">Z46</Code>
+          </D_4405>
+        </C_C555>
+      </S_STS>
+      <G_SG6 Name="Prüfidentifikator" Counter="0340" Level="2" MaxRep_Std="99999" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+        <S_RFF Name="Prüfidentifikator" Description="Dieses Segment dient zur Übermittlung des Prüfidentifikators." Counter="0350" Level="2" Number="00018" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="RFF+Z13:25001&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Prüfidentifikator" Description="">Z13</Code>
+            </D_1153>
+            <D_1154 Name="Referenz, Identifikation" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="n5">
+              <Code Name="Berechnungsformel" Description="">25001</Code>
+              <Code Name="Ablehnung Berechnungsformel" Description="">25002</Code>
+              <Code Name="Zustimmung Berechnungsformel" Description="">25003</Code>
+              <Code Name="Übersicht Zählzeitdefinitionen" Description="">25004</Code>
+              <Code Name="Ausgerollte Zählzeitdefinition" Description="">25005</Code>
+              <Code Name="Übersicht Schaltzeitdefinitionen" Description="">25006</Code>
+              <Code Name="Übersicht Leistungskurvendefinitionen" Description="">25007</Code>
+              <Code Name="Ausgerollte Schaltzeitdefinition" Description="">25008</Code>
+              <Code Name="Ausgerollte Leistungskurvendefinition" Description="">25009</Code>
+            </D_1154>
+          </C_C506>
+        </S_RFF>
+      </G_SG6>
+      <G_SG6 Name="Referenz auf Reklamation" Counter="0340" Level="2" MaxRep_Std="99999" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+        <S_RFF Name="Referenz auf Reklamation" Description="In diesem Segment wird die Dokumentenummer des Geschäftsvorfalls der Reklamation angegeben." Counter="0350" Level="2" Number="00019" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="RFF+AGI:FGEFW566TTDF123E&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Beantragungsnummer" Description="">AGI</Code>
+            </D_1153>
+            <D_1154 Name="Referenz, Identifikation" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..35"/>
+          </C_C506>
+        </S_RFF>
+      </G_SG6>
+      <G_SG6 Name="Referenz-Vorgangsnummer (aus Berechnungsformel)" Counter="0340" Level="2" MaxRep_Std="99999" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+        <S_RFF Name="Referenz Vorgangsnummer (aus Berechnungsformel)" Description="Dieses Segment dient zur Angabe der Referenz auf die Vorgangsnummer eines vorangegangenen Vorgangs. &#13;&#10;&#13;&#10;Hinweis:&#13;&#10;DE1154: Referenznummer aus dem IDE-Segment eines Vorgangs zur Übermittlung einer Berechnungsformel" Counter="0350" Level="2" Number="00020" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="RFF+TN:NNV12345&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Transaktions-Referenznummer" Description="">TN</Code>
+            </D_1153>
+            <D_1154 Name="Vorgangsnummer" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..35"/>
+          </C_C506>
+        </S_RFF>
+      </G_SG6>
+      <G_SG7 Name="Lieferrichtung" Counter="0370" Level="2" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+        <S_CCI Name="Lieferrichtung" Description="Dieses Segment wird benutzt, um die Lieferrichtung der Marktlokation anzugeben." Counter="0380" Level="2" Number="00021" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z30++Z06&apos;">
+          <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Lieferrichtung" Description="">Z30</Code>
+          </D_7059>
+          <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+            <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+          </C_C502>
+          <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+            <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3">
+              <Code Name="Erzeugung" Description="">Z06</Code>
+              <Code Name="Verbrauch" Description="">Z07</Code>
+            </D_7037>
+          </C_C240>
+        </S_CCI>
+      </G_SG7>
+      <G_SG8 Name="Energiemenge der Marktlokation" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Energiemenge der Marktlokation" Description="" Counter="0410" Level="2" Number="00022" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z36&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Energiemenge der Marktlokation" Description="">Z36</Code>
+          </D_1229>
+        </S_SEQ>
+        <S_RFF Name="Referenz auf einen Rechenschritt" Description="In diesem Segment wird der Rechenschrittidentifikator angegeben, welcher in einer Berechnungsformel den letzten Rechenschritt definiert und somit das Ergebnis der Energiemenge der Marktlokation ergibt." Counter="0430" Level="3" Number="00023" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="RFF+Z23:3&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Rechenschritt" Description="">Z23</Code>
+            </D_1153>
+            <D_1154 Name="Rechenschrittidentifikator" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="n..5"/>
+          </C_C506>
+        </S_RFF>
+        <G_SG9 Name="Verwendungszweck der Werte" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+          <S_CCI Name="Verwendungszweck der Werte" Description="" Counter="0480" Level="3" Number="00024" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="R" Example="CCI+Z27&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Verwendungszweck der Werte" Description="">Z27</Code>
+            </D_7059>
+          </S_CCI>
+          <S_CAV Name="Verwendungszweck der Werte" Description="Mit Hilfe des Verwendungszwecks der Werte wird in der UTILTS beschrieben, für welchen Verwendungszweck das Ergebnis der Berechnungsformel an der Marktlokation zu nutzen ist.&#13;&#10;Werden vom NB nicht alle Verwendungszwecke in der UTILTS aufgelistet, die er zuvor in der Anmeldebestätigung gegenüber dem MSB bzw. LF übermittelt hat oder werden im Rahmen der Stammdatenänderung Verwendungszwecke übermittelt für die eine Berechnungsformel nicht gültig ist, muss der MSB bzw. ab 1.10.2020 der LF die Berechnungsformel beim NB bilateral anfragen." Counter="0490" Level="4" Number="00025" MaxRep_Std="99" MaxRep_Specification="4" Status_Std="C" Status_Specification="R" Example="CAV+Z84&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Netznutzungsabrechnung" Description="">Z84</Code>
+                <Code Name="Bilanzkreisabrechnung" Description="">Z85</Code>
+                <Code Name="Mehrmindermengenabrechnung" Description="">Z86</Code>
+                <Code Name="Übermittlung an das HKNR" Description="">Z92</Code>
+                <Code Name="Endkundenabrechnung" Description="">Z47</Code>
+              </D_7111>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+      </G_SG8>
+      <G_SG8 Name="Bestandteil des Rechenschritts" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Bestandteil des Rechenschritts" Description="In dieser Segmentgruppe wird ein Bestandteil des in DE1050 genannten Reschenschritts definiert. Alle Bestandteile, die zu einem Rechenschritt gehören, müssen den gleichen Rechenschrittidentifikator haben. &#13;&#10;&#13;&#10;Hinweise zum Rechenschrittidentifikator:&#13;&#10; - Der Rechenschrittidentifkator ist ausschließlich als positive natürliche Zahl anzugeben. &#13;&#10; - Der Rechenschrittidentifikator ist pro Rechenschritt eindeutig. &#13;&#10; - Der Rechenschrittidentifikator identifiziert einen Rechenschritt im Vorgang, dementsprechend können mehrere SEQ+Z37 in einem Vorgang den identischen Rechenschrittidentifikator haben." Counter="0410" Level="2" Number="00026" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z37+1&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Bestandteil des Rechenschritts" Description="">Z37</Code>
+          </D_1229>
+          <C_C286 Name="Information über eine Folge" Description="" Status_Std="C" Status_Specification="R">
+            <D_1050 Name="Rechenschrittidentifikator" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..10" Format_Specification="n..5"/>
+          </C_C286>
+        </S_SEQ>
+        <S_RFF Name="Referenz auf die ID einer Messlokation" Description="In diesem Segment wird die ID einer Messlokation übermittelt." Counter="0430" Level="3" Number="00027" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="RFF+Z19:DE00014545768S0000000000000003054&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Messlokation" Description="">Z19</Code>
+            </D_1153>
+            <D_1154 Name="ID einer Messlokation" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..70"/>
+          </C_C506>
+        </S_RFF>
+        <S_RFF Name="Referenz auf einen Rechenschritt" Description="In diesem Segment wird die Referenz auf einen anderen Rechenschritt durch die Angabe des Rechenschrittidentifikators übermittelt. &#13;&#10;&#13;&#10;Hinweis zum Rechenschrittidentifikator:&#13;&#10;Der hier angegebene Rechenschrittidentifikator muss ein anderer sein als der im SEQ+Z37 DE1050 genannte, der die SG8 eröffnet, in der dieses RFF Referenz auf einen Rechenschritt enthalten ist." Counter="0430" Level="3" Number="00028" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="RFF+Z23:1&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Rechenschritt" Description="">Z23</Code>
+            </D_1153>
+            <D_1154 Name="Rechenschrittidentifikator" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="n..5"/>
+          </C_C506>
+        </S_RFF>
+        <G_SG9 Name="Mathematischer Operator" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+          <S_CCI Name="Mathematischer Operator" Description="Dieses Segment dient zur Angabe des anzuwendenden mathematischen Operators oder der mathematischen Operation." Counter="0480" Level="3" Number="00029" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+++Z86&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..17">
+                <Code Name="Mathematischer Operator" Description="">Z86</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Operator / Operation" Description="Dieses Segment dient zur Angabe des anzuwendenden mathematischen Operators oder der mathematischen Operation.&#13;&#10;&#13;&#10;Mathematische Beschreibung des Operators Positivwert:&#13;&#10;Mit Positivwert (x) ist eine reellwertige Funktion gemeint, für die gilt:&#13;&#10;Positivwert (x) = x, wenn x ≥ 0 &#13;&#10;                         = 0, sonst.&#13;&#10;&#13;&#10;Auf die Messwerte der Messlokation sind erst der Verlustfaktor des Transformators und der Verlustfaktor der Leitung, jeweils multiplikativ anzuwenden. Das Ergebnis wird anschließend in der Operation des Bestandteils des Rechenschritts verwendet. &#13;&#10;&#13;&#10;Regeln:&#13;&#10;In einem Rechenschritt dürfen beliebig viele CAV+Z69 (Addition) und CAV+Z70 (Subtraktion) vorkommen, es darf aber in diesem Rechenschritt kein CAV+Z80 (Divisor) und kein CAV+Z81 (Dividend) und kein CAV+Z82 (Faktor) und kein CAV+Z83 (Positivwert) vorkommen.&#13;&#10;&#13;&#10;In einem Rechenschritt, in dem CAV+Z80 (Divisor) vorkommt, darf dieses CAV-Segment genau einmal vorkommen und es muss in diesem Rechenschritt auch CAV+Z81 (Dividend) genau einmal vorkommen. Auch CAV+Z81 (Dividend) darf in einem Rechenschritt nur einmal vorkommen und erfordert zwingend genau ein CAV+Z80 (Divisor) im gleichen Rechenschritt.&#13;&#10;Weitere CAV-Segmente der SG9 Mathematischer Operator sind in diesem Rechenschritt nicht erlaubt.&#13;&#10;&#13;&#10;In einem Rechenschritt dürfen beliebig viele CAV+Z82 (Faktor) vorkommen, es darf aber in diesem Rechenschritt kein CAV+Z69 (Addition) und kein CAV+Z70 (Subtraktion) und kein CAV+Z80 (Divisor) und kein CAV+Z81 (Dividend) und kein CAV+Z83 (Positivwert) vorkommen.&#13;&#10;&#13;&#10;In einem Rechenschritt, in dem CAV+Z83 (Positivwert) vorkommt, darf dieses CAV-Segment genau einmal vorkommen. Weitere CAV-Segmente der SG9 Mathematischer Operator sind in diesem Rechenschritt nicht erlaubt." Counter="0490" Level="4" Number="00030" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+Z69&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Addition" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts wird in diesem Rechenschritt mittels Addition berücksichtigt.&#13;&#10;">Z69</Code>
+                <Code Name="Subtraktion" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts wird in diesem Rechenschritt mittels Subtraktion berücksichtigt.&#13;&#10;">Z70</Code>
+                <Code Name="Divisor" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts ist in diesem Rechenschritt der Divisor (Nenner des Bruchs).">Z80</Code>
+                <Code Name="Dividend" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts ist in diesem Rechenschritt der Dividend (Zähler des Bruchs).">Z81</Code>
+                <Code Name="Faktor" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des Rechenschritts wird in diesem Rechenschritt als ein Faktor einer Multiplikation berücksichtigt.">Z82</Code>
+                <Code Name="Positivwert" Description="Auf das Ergebnis des referenzierten Rechenschritts ist die Funktion Positivwert anzuwenden (d. h. ist das Ergebnis des referenzierten Rechenschritts ein negativer Wert, so ergibt sich durch das Anwenden der Funktion Positivwert der Wert 0">Z83</Code>
+              </D_7111>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG9 Name="Energieflussrichtung" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Energieflussrichtung" Description="Dieses Segment dient zur Angabe der verwendeten Energieflussrichtung der in dem Bestandteil des Rechenschritts genannten Messlokation." Counter="0480" Level="3" Number="00031" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+++Z87&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..17">
+                <Code Name="Energieflussrichtung" Description="">Z87</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Energieflussrichtung" Description="Dieses Segment dient zur Angabe der benutzten Energieflussrichtung im Bestandteil des Rechenschritts. Die Energieflussrichtung gibt an, ob die gemessene Energie an der Messlokation zum Netz fließt (Erzeugung) oder vom Netz wegfließt (Verbrauch). Entsprechend dieser Aussage sind die zuvor durch die UTILMD ausgetauschten Register der Messlokation in der Berechnungsformel zu verwenden." Counter="0490" Level="4" Number="00032" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+Z71&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Verbrauch" Description="">Z71</Code>
+                <Code Name="Erzeugung" Description="">Z72</Code>
+              </D_7111>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG9 Name="Verlustfaktor Trafo" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Verlustfaktor Trafo" Description="Diese Segmentgruppe von CCI CAV dient zur Darstellung von Verlustfaktoren an der Messlokation. &#13;&#10;&#13;&#10;Bei einer Messlokation, die aufgrund der vertraglichen Regelungen die Energiemenge auf der Oberspannungsseite des Transformators zu erfassen hat, jedoch die Energiemenge auf der Unterspannungsseite des Transformators erfasst, ist die Angabe des Verlustfaktors des Transformators nötig. Dies ist der Fall, wenn die Spannungsebene der Marktlokation höher ist als die der Messlokation.&#13;&#10;&#13;&#10;Hinweis: &#13;&#10;„Verlustfaktor Trafo“ entspricht im NN-Vertrag dem Korrekturfaktor." Counter="0480" Level="3" Number="00033" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+++Z16&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..17">
+                <Code Name="Verlustfaktor Trafo" Description="">Z16</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Verlustfaktor Trafo" Description="Dieses Segment dient zur Angabe des Verlustfaktors des Transformators. &#13;&#10;&#13;&#10;Abhängig von der Anschlusssituation, der Energieflussrichtung und Lage der Messung ist der Verlustfaktor Trafo vom Sender als „Zu- oder Abschlag“ (größer oder kleiner 1) anzugeben.&#13;&#10;Der Verlustfaktor Trafo ist immer multiplikativ anzuwenden." Counter="0490" Level="4" Number="00034" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+Z28:::1.04&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Verlustfaktor" Description="">Z28</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Verlustfaktor Trafo" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="n..35"/>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG9 Name="Verlustfaktor Leitung" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Verlustfaktor Leitung" Description="Dieses Segment dient zur Angabe des Verlustfaktors der Leitung. &#13;&#10;&#13;&#10;Bei einer räumlichen Entfernung des Anschlusspunktes der Marktlokation und der für die Ermittlung der Energiemenge zuständigen Messlokation, kommt es zu nicht gemessenen Energiemengen, die aufgrund des Anschlusspunktes der Marktlokation und der Messlokation entstanden sind. Diese in den Leitungen/Kabeln verursachten Verluste werden mit dem Verlustfaktor Leitung berücksichtigt." Counter="0480" Level="3" Number="00035" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+++ZB2&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..17">
+                <Code Name="Verlustfaktor Leitung" Description="">ZB2</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Verlustfaktor Leitung" Description="Dieses Segment dient zur Angabe des Verlustfaktors der Leitung. &#13;&#10;&#13;&#10;Abhängig von der Anschlusssituation, der Energieflussrichtung und Lage der Messung ist der Verlustfaktor der Leitung vom Sender als „Zu- oder Abschlag“ (größer oder kleiner 1) anzugeben. &#13;&#10;Der Verlustfaktors der Leitung ist immer multiplikativ anzuwenden." Counter="0490" Level="4" Number="00036" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+Z28:::1.04&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Verlustfaktor" Description="">Z28</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Verlustfaktor Leitung" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="n..35"/>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG9 Name="Aufteilungsfaktor Energiemenge" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Aufteilungsfaktor Energiemenge" Description="Dieses Segment dient zur Angabe des Aufteilungsfaktors der Energiemenge.&#13;&#10;&#13;&#10;Im Referentenentwurf zum Gesetz zur Änderung des Erneuerbare-Energien-Gesetzes und weiterer energiewirtschaftsrechtlicher Vorschriften zur Steigerung des Ausbaus photovoltaischer Energieerzeugung ist im § 42b EnWG die gemeinschaftliche Gebäudeversorgung mittels einer PV-Anlage geregelt:&#13;&#10;„Ein Letztverbraucher kann elektrische Energie, die durch den Einsatz einer Gebäudestromanlage erzeugt wurde, die in, an oder auf demselben Gebäude installiert ist, in dem der Letztverbraucher Mieter von Räumen, Wohnungseigentümer im Sinne des § 1 Absatz 1 des Wohnungseigentumsgesetzes oder sonst Eigentümer von Räumen ist, nutzen, wenn &#13;&#10;1. die Nutzung ohne Durchleitung durch ein Netz erfolgt,&#13;&#10;2. die Strombezugsmengen des Letztverbrauchers viertelstündlich gemessen werden und &#13;&#10;3. der Letztverbraucher einen Gebäudestromnutzungsvertrag nach Maßgabe der folgenden Absätze mit dem Betreiber der Gebäudestromanlage geschlossen hat (teilnehmender Letztverbraucher).&quot;&#13;&#10;&#13;&#10;Mit dem Aufteilungsfaktor Energiemenge kann die durch das Gesetz benötigte Verteilung der durch eine erzeugende Marktlokation erzeugte Energiemenge auf verbrauchende Marktlokationen übermittelt werden. Die erzeugte Energiemenge wird durch eine oder mehrere Messlokationen gemessen über diese die Verteilung erfolgt." Counter="0480" Level="3" Number="00037" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+++ZG6&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..17">
+                <Code Name="Aufteilungsfaktor Energiemenge" Description="">ZG6</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Aufteilungsfaktor Energiemenge" Description="Dieses Segment dient zur Angabe des Aufteilungsfaktor einer Energiemenge." Counter="0490" Level="4" Number="00038" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZH6:::20&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Aufteilungsfaktor Energiemenge" Description="">ZH6</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Aufteilungsfaktor Energiemenge" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="n..35"/>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+      </G_SG8>
+      <G_SG8 Name="Zählzeitdefinition" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Zählzeitdefinition" Description="In dieser Segmentgruppe werden die Eigenschaften der Zählzeitdefinition und einer ausgerollten Zählzeitdefinition definiert." Counter="0410" Level="2" Number="00039" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z43&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Zählzeitdefinition" Description="">Z42</Code>
+            <Code Name="Ausgerollte Zählzeitdefinition" Description="">Z43</Code>
+          </D_1229>
+        </S_SEQ>
+        <S_DTM Name="Zählzeitänderungszeitpunkt" Description="Angabe eines Zeitpunktes, zu dem der Wechsel auf ein neues aktives Zählzeitregister erfolgt." Counter="0420" Level="3" Number="00040" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+Z33:202110070605?+00:303&apos;">
+          <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+            <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Zählzeitänderungszeitpunkt" Description="">Z33</Code>
+            </D_2005>
+            <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+            <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+              <Code Name="HHMM" Description="">401</Code>
+            </D_2379>
+          </C_C507>
+        </S_DTM>
+        <S_RFF Name="Zählendes Register" Description="Angabe des Registers, welches ab dem Zählzeitänderungszeitpunkt aktiv ist." Counter="0430" Level="3" Number="00041" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="RFF+Z28:RZ1&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code des zählenden Registers" Description="">Z28</Code>
+            </D_1153>
+            <D_1154 Name="Code des zählenden Registers" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..3"/>
+          </C_C506>
+        </S_RFF>
+        <G_SG9 Name="Zählzeitdefinition" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Code der Zählzeitdefinition" Description="In diesem Segment wird der Code der Zählzeitdefinition übermittelt." Counter="0480" Level="3" Number="00042" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z39++ZZ1&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code der Zählzeitdefinition" Description="">Z39</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Code der Zählzeitdefinition" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3"/>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Häufigkeit der Übermittlung" Description="In diesem Segment wird angegeben, ob die Zählzeitdefinition jährlich oder nur einmalig zu übermitteln ist." Counter="0490" Level="4" Number="00043" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZE0:::Z33&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Häufigkeit der Übermittlung" Description="">ZE0</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Zählzeitdefinition mit einem Zählzeitänderungszeitpunkt an allen Tagen je Zählzeitregister über den gesamten Gültigkeitszeitraum. Diese Zählzeitdefinition einmalig ausgerollt und übermittelt werden.">Z33</Code>
+                <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Zählzeitdefinition mit unterschiedlichen Zählzeitänderungszeitpunkt je Zählzeitregister an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Zählzeitdefinition muss jedes Jahr ausgerollt und übermittelt werden.">Z34</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Übermittelbarkeit der ausgerollten Zählzeitdefinition" Description="In diesem Segment wird der Status der Übermittelbarkeit der ausgerollten Zählzeitdefinition übermittelt." Counter="0490" Level="4" Number="00044" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZD5:::Z23&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="">ZD5</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Zählzeitdefinition per EDIFACT mit dem Nachrichtenformat UTILTS.">Z23</Code>
+                <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw.NB übermittelt die ausgerollte Zählzeitdefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben.">Z24</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Ermittlung des Leistungsmaximums bei atypischer Netznutzung" Description="In diesem Segment wird angegeben, ob der Netzbetreiber zur Ermittlung des Leistungsmaximums bei atypsicher Netznutzung das Hochlastzeitfenster nutzt." Counter="0490" Level="4" Number="00045" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="CAV+ZD4:::Z25&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Ermittlung des Leistungsmaximums bei atypischer Netznutzung" Description="">ZD4</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="Verwendung des Hochlastzeitfensters" Description="">Z25</Code>
+                <Code Name="keine Verwendung des Hochlastzeitfensters" Description="">Z26</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Bestellbarkeit der Zählzeitdefinition" Description="In diesem Segment wird die Bestellbarkeit der Zählzeitdefinition übermittelt." Counter="0490" Level="4" Number="00046" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="CAV+ZD7:::Z27&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Bestellbarkeit der Zählzeitdefinition" Description="">ZD7</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="Zählzeitdefinition ist bestellbar" Description="">Z27</Code>
+                <Code Name="Zählzeitdefinition ist nicht bestellbar" Description="">Z28</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Zählzeitdefinitionstyp" Description="In diesem Segment wird der Zählzeitdefinitionstyp übermittelt." Counter="0490" Level="4" Number="00047" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="CAV+ZD3:::Z32:Beschreibungstext&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Zählzeitdefinitionstyp" Description="">ZD3</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="Wärmepumpe" Description="">Z29</Code>
+                <Code Name="Nachtspeicherheizung" Description="">Z30</Code>
+                <Code Name="Schwachlastzeitfenster" Description="">Z31</Code>
+                <Code Name="sonstiger Zählzeitdefinitionstyp" Description="">Z32</Code>
+                <Code Name="Hochlastzeitfenster" Description="">Z35</Code>
+              </D_7110>
+              <D_7110 Name="Beschreibung Zählzeitdefinitionstyp" Description="" Status_Std="C" Status_Specification="D" Format_Std="an..35" Format_Specification="an..35"/>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+      </G_SG8>
+      <G_SG8 Name="Register der Zählzeitdefinition" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Register der Zählzeitdefinition" Description="In dieser Segmentgruppe werden die Eigenschaften der Register einer Zählzeitdefinition übermittelt." Counter="0410" Level="2" Number="00048" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z41&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="Register der Zählzeitdefinition" Description="">Z41</Code>
+          </D_1229>
+        </S_SEQ>
+        <S_RFF Name="Referenz auf eine Zählzeitdefinition" Description="In diesem Segment wird der Code der Zählzeitdefinition übermittelt um das Register einer Zählzeitdefinition zuzuordnen." Counter="0430" Level="3" Number="00049" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="RFF+Z27:ZZ1&apos;">
+          <C_C506 Name="Referenz" Description="" Status_Std="M" Status_Specification="M">
+            <D_1153 Name="Referenz, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code der Zählzeitdefinition" Description="">Z27</Code>
+            </D_1153>
+            <D_1154 Name="Code der Zählzeitdefinition" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..70" Format_Specification="an..3"/>
+          </C_C506>
+        </S_RFF>
+        <G_SG9 Name="Register" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R">
+          <S_CCI Name="Code des Zählzeitregister" Description="In diesem Segment wird der Code des Zählzeitregisters übermittelt." Counter="0480" Level="3" Number="00050" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z38++RZ1&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code des Zählzeitregisters" Description="">Z38</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Code des Zählzeitregisters" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3"/>
+            </C_C240>
+          </S_CCI>
+        </G_SG9>
+        <G_SG9 Name="Schwachlastfähigkeit" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Schwachlastfähigkeit" Description="Dieses Segment dient zur Identifizierung und Beschreibung der Schwachlastfähigkeit eines Registers.&#13;&#10;Hier wird übermittelt ob eine Schwachlast-Fähigkeit für die Konzessionsabgabe benötigt wird." Counter="0480" Level="3" Number="00051" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z10++Z59&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Schwachlastfähigkeit" Description="">Z10</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3">
+                <Code Name="Nicht-Schwachlast fähig" Description="">Z59</Code>
+                <Code Name="Schwachlast fähig" Description="">Z60</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+        </G_SG9>
+      </G_SG8>
+      <G_SG8 Name="Schaltzeitdefinition" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Schaltzeitdefinition" Description="In dieser Segmentgruppe werden die Eigenschaften der Schaltdefinition und einer ausgerollten Schaltzeitdefinitionen definiert." Counter="0410" Level="2" Number="00052" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z69&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="" Description=""></Code>
+            <Code Name="Schaltzeitdefinition" Description="">Z69</Code>
+            <Code Name="Ausgerollte Schaltzeitdefinition" Description="">Z73</Code>
+          </D_1229>
+        </S_SEQ>
+        <S_DTM Name="Schaltzeitänderungszeitpunkt" Description="Angabe eines Zeitpunktes, zu dem eine Schalthandlung stattfindet." Counter="0420" Level="3" Number="00053" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+Z44:202110070605?+00:303&apos;">
+          <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+            <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="" Description=""></Code>
+              <Code Name="Schaltzeitänderungszeitpunkt" Description="">Z44</Code>
+            </D_2005>
+            <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+            <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+              <Code Name="HHMM" Description="">401</Code>
+            </D_2379>
+          </C_C507>
+        </S_DTM>
+        <G_SG9 Name="Schaltzeitdefinition" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Code der Schaltzeitdefinition" Description="In diesem Segment wird der Code der Schaltzeitdefinition übermittelt." Counter="0480" Level="3" Number="00054" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z52++EDF&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code der Schaltzeitdefinition" Description="">Z52</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Code der Schaltzeitdefinition" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3"/>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Häufigkeit der Übermittlung" Description="In diesem Segment wird angegeben, ob die Schaltzeitdefinition jährlich oder nur einmalig zu übermitteln ist." Counter="0490" Level="4" Number="00055" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZE0:::Z33&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Häufigkeit der Übermittlung" Description="">ZE0</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Schaltzeitdefinition mit identischen Schaltzeitänderungszeitpunkten an allen Tagen über den gesamten Gültigkeitszeitraum. Diese Schaltzeitdefinitiont wird einmalig ausgerollt und übermittelt.">Z33</Code>
+                <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Schaltzeitdefinition mit unterschiedlichen Schaltzeitänderungszeitpunkten an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Schaltzeitdefinition muss jedes Jahr ausgerollt und übermittelt werden.">Z34</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Übermittelbarkeit der ausgerollten Schaltzeitdefinition" Description="In diesem Segment wird der Status der Übermittelbarkeit der ausgerollten Schaltzeitdefinition übermittelt." Counter="0490" Level="4" Number="00056" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZD5:::Z23&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="">ZD5</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Schaltzeitdefinition per EDIFACT mit dem Nachrichtenformat UTILTS.">Z23</Code>
+                <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Schaltzeitdefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben.">Z24</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG9 Name="Schalthandlung an der Lokation" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Schalthandlung an der Lokation" Description="Angabe der Schalthandlung zu einem Schaltzeitänderungszeitpunkt." Counter="0480" Level="3" Number="00057" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z58++ZF4&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="" Description=""></Code>
+              <Code Name="Schalthandlung" Description="">Z58</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Merkmal, Code" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3">
+                <Code Name="" Description=""></Code>
+                <Code Name="Leistung an der Lokation an" Description="">ZF4</Code>
+                <Code Name="Leistung an der Lokation aus" Description="">ZF5</Code>
+              </D_7037>
+            </C_C240>
+          </S_CCI>
+        </G_SG9>
+      </G_SG8>
+      <G_SG8 Name="Leistungskurvendefinition" Counter="0400" Level="2" MaxRep_Std="99999" MaxRep_Specification="99999" Status_Std="C" Status_Specification="D">
+        <S_SEQ Name="Leistungskurvendefinition" Description="In dieser Segmentgruppe werden die Eigenschaften der Leistungskurvendefinition und einer ausgerollten Leistungskurvendefinition definiert." Counter="0410" Level="2" Number="00058" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="SEQ+Z70&apos;">
+          <D_1229 Name="Handlung, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+            <Code Name="" Description=""></Code>
+            <Code Name="Leistungskurvendefinition" Description="">Z70</Code>
+            <Code Name="Ausgerollte Leistungskurvendefinition" Description="">Z74</Code>
+          </D_1229>
+        </S_SEQ>
+        <S_DTM Name="Leistungskurvenänderungszeitpunkt" Description="Angabe eines Zeitpunktes, zu dem der obere und/oder der untere Schwellwert einer Leistungskurve geändert wird." Counter="0420" Level="3" Number="00059" MaxRep_Std="9" MaxRep_Specification="1" Status_Std="C" Status_Specification="D" Example="DTM+Z45:202110070605?+00:303&apos;">
+          <C_C507 Name="Datum/Uhrzeit/Zeitspanne" Description="" Status_Std="M" Status_Specification="M">
+            <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="" Description=""></Code>
+              <Code Name="Leistungskurvenänderungszeitpunkt" Description="">Z45</Code>
+            </D_2005>
+            <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..35"/>
+            <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="CCYYMMDDHHMMZZZ" Description="">303</Code>
+              <Code Name="HHMM" Description="">401</Code>
+            </D_2379>
+          </C_C507>
+        </S_DTM>
+        <G_SG9 Name="Leistungskurvendefinition" Counter="0470" Level="3" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_CCI Name="Code der Leistungskurvendefinition" Description="In diesem Segment wird der Code der Leistungskurvendefinition übermittelt." Counter="0480" Level="3" Number="00060" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="CCI+Z53++ES1&apos;">
+            <D_7059 Name="Klassentyp, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+              <Code Name="Code der Leistungskurvendefinition" Description="">Z53</Code>
+            </D_7059>
+            <C_C502 Name="Einzelheiten zu Maßangaben" Description="" Status_Std="C" Status_Specification="N">
+              <D_6313 Name="Gemessene Dimension, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+            </C_C502>
+            <C_C240 Name="Merkmalsbeschreibung" Description="" Status_Std="C" Status_Specification="R">
+              <D_7037 Name="Code der Leistungskurvendefinition" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..17" Format_Specification="an..3"/>
+            </C_C240>
+          </S_CCI>
+          <S_CAV Name="Häufigkeit der Übermittlung" Description="In diesem Segment wird angegeben, ob die Leistungskurvendefinition jährlich oder nur einmalig zu übermitteln ist." Counter="0490" Level="4" Number="00061" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZE0:::Z33&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Häufigkeit der Übermittlung" Description="">ZE0</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Leistungskurvendefinition mit identischen Leistungskurvenänderungszeitpunkten an allen Tagen über den gesamten Gültigkeitszeitraum. Diese Leistungskurvendefinition wird einmalig ausgerollt und übermittelt.">Z33</Code>
+                <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Leistungskurvendefinition mit unterschiedlichen Leistungskurvenänderungszeitpunkten an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Leistungskurvendefinition muss jedes Jahr ausgerollt und übermittelt werden.">Z34</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+          <S_CAV Name="Übermittelbarkeit der ausgerollten Leistungskurvendefinition" Description="In diesem Segment wird der Status der Übermittelbarkeit der ausgerollten Leistungskurvendefinition übermittelt." Counter="0490" Level="4" Number="00062" MaxRep_Std="99" MaxRep_Specification="1" Status_Std="C" Status_Specification="R" Example="CAV+ZD5:::Z23&apos;">
+            <C_C889 Name="Merkmalswert" Description="" Status_Std="M" Status_Specification="M">
+              <D_7111 Name="Merkmalswert, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="">ZD5</Code>
+              </D_7111>
+              <D_1131 Name="Codeliste, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..17" Format_Specification="an..17"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code" Description="" Status_Std="C" Status_Specification="N" Format_Std="an..3" Format_Specification="an..3"/>
+              <D_7110 Name="Merkmalswert" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..35" Format_Specification="an..3">
+                <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Leistungskurvendefinition per EDIFACT mit dem Nachrichtenformat UTILTS.">Z23</Code>
+                <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Leistungskurvendefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben.">Z24</Code>
+              </D_7110>
+            </C_C889>
+          </S_CAV>
+        </G_SG9>
+        <G_SG11 Name="oberer Schwellwert" Counter="0530" Level="3" MaxRep_Std="99999" MaxRep_Specification="1" Status_Std="C" Status_Specification="D">
+          <S_QTY Name="oberer Schwellwert" Description="In diesem Segment wird der oberer Schwellwert der Leistungskurvendefinition angegeben." Counter="0540" Level="3" Number="00063" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="QTY+Z40:70.00:P1&apos;">
+            <C_C186 Name="Mengenangaben" Description="" Status_Std="M" Status_Specification="M">
+              <D_6063 Name="Menge, Qualifier" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..3" Format_Specification="an..3">
+                <Code Name="" Description=""></Code>
+                <Code Name="oberer Schwellwert" Description="">Z40</Code>
+              </D_6063>
+              <D_6060 Name="Mengenangabe in %" Description="" Status_Std="M" Status_Specification="M" Format_Std="an..35" Format_Specification="an..6"/>
+              <D_6411 Name="Maßeinheit, Code" Description="" Status_Std="C" Status_Specification="R" Format_Std="an..8" Format_Specification="an..2">
+                <Code Name="" Description=""></Code>
+                <Code Name="Prozent" Description="">P1</Code>
+              </D_6411>
+            </C_C186>
+          </S_QTY>
+        </G_SG11>
+      </G_SG8>
+    </G_SG5>
+  </G_SG2>
+  <S_UNT Name="Nachrichten-Endesegment" Description="Das UNT-Segment ist ein Muss-Segment in UN/EDIFACT. Es muss immer das letzte Segment in einer Nachricht sein." Counter="0640" Level="0" Number="00064" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="UNT+64+1&apos;">
+    <D_0074 Name="Anzahl der Segmente in einer Nachricht" Description="Hier wird die Gesamtzahl der Segmente einer Nachricht angegeben." Status_Std="M" Status_Specification="M" Format_Std="n..6" Format_Specification="n..6"/>
+    <D_0062 Name="Nachrichten-Referenznummer" Description="Die Referenznummer aus dem UNH-Segment muss hier wiederholt werden." Status_Std="M" Status_Specification="M" Format_Std="an..14" Format_Specification="an..14"/>
+  </S_UNT>
+</M_UTILTS>

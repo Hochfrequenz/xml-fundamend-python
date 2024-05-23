@@ -1,0 +1,2025 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AHB Versionsnummer="1.1c"
+    Veroeffentlichungsdatum="24.10.2023"
+    Author="BDEW">
+  <AWF Pruefidentifikator="25001" Beschreibung="Berechnungsformel" Kommunikation_von="NB an MSB / LF">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00001" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00002" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Berechnungsformel" Description="" AHB_Status="X">Z36</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00003" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00004" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Muss [2]&#13;&#10;Kann">
+          <S_CTA Name="Ansprechpartner" Number="00005" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00006" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00007" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss">
+          <S_IDE Name="Vorgang" Number="00008" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_LOC Name="ID der Marktlokation" Number="00009" AHB_Status="Muss">
+            <D_3227 Name="Ortsangabe, Qualifier">
+              <Code Name="Meldepunkt" Description="" AHB_Status="X">172</Code>
+            </D_3227>
+            <C_C517 Name="Ortsangabe">
+              <D_3225 Name="ID der Marktlokation" AHB_Status="X [950] [501]"/>
+            </C_C517>
+          </S_LOC>
+          <S_DTM Name="Gültig ab" Number="00010" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeit, Beginndatum" Description="" AHB_Status="X">157</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] [500] ∧ [UB1]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_STS Name="Status der Berechnungsformel" Number="00011" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Status der Berechnungsformel" Description="" AHB_Status="X">Z23</Code>
+              </D_9015>
+            </C_C601>
+            <C_C555 Name="Status">
+              <D_4405 Name="Status, Code">
+                <Code Name="Berechnungsformel angefügt" Description="Die Berechnungsformel zur Ermittlung der Energiemenge einer Marktlokation ist in diesem Vorgang der UTILTS enthalten" AHB_Status="X">Z33</Code>
+                <Code Name="Berechnungsformel muss beim Absender angefragt werden" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation ist komplex und kann mit der UTILTS nicht übermittelt werden" AHB_Status="X">Z34</Code>
+                <Code Name="Berechnungsformel besitzt keine Rechenoperation" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation besitzt keine Rechenoperation, da es sich um eine 1:1 Beziehung zwischen der Markt- und Messlokation handelt." AHB_Status="X">Z40</Code>
+                <Code Name="Berechnungsformel nicht erforderlich" Description="Die Berechnungsformel zur Ermittlung der Energiemenge der Marktlokation ist nicht erforderlich, da keine Messlokation der Marktlokation (pauschale Marktlokation) zugeordnet ist." AHB_Status="X [18]">Z41</Code>
+              </D_4405>
+            </C_C555>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00012" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Berechnungsformel" Description="" AHB_Status="X">25001</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG7 Name="Lieferrichtung" AHB_Status="Muss">
+            <S_CCI Name="Lieferrichtung" Number="00013" AHB_Status="Muss">
+              <D_7059 Name="Klassentyp, Code">
+                <Code Name="Lieferrichtung" Description="" AHB_Status="X">Z30</Code>
+              </D_7059>
+              <C_C240 Name="Merkmalsbeschreibung">
+                <D_7037 Name="Merkmal, Code">
+                  <Code Name="Erzeugung" Description="" AHB_Status="X">Z06</Code>
+                  <Code Name="Verbrauch" Description="" AHB_Status="X">Z07</Code>
+                </D_7037>
+              </C_C240>
+            </S_CCI>
+          </G_SG7>
+          <G_SG8 Name="Energiemenge der Marktlokation" AHB_Status="Muss [3]">
+            <S_SEQ Name="Energiemenge der Marktlokation" Number="00014" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Energiemenge der Marktlokation" Description="" AHB_Status="X">Z36</Code>
+              </D_1229>
+            </S_SEQ>
+            <S_RFF Name="Referenz auf einen Rechenschritt" Number="00015" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Rechenschritt" Description="" AHB_Status="X">Z23</Code>
+                </D_1153>
+                <D_1154 Name="Rechenschrittidentifikator" AHB_Status="X [913] [8]"/>
+              </C_C506>
+            </S_RFF>
+            <G_SG9 Name="Verwendungszweck der Werte" AHB_Status="Muss">
+              <S_CCI Name="Verwendungszweck der Werte" Number="00016" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Verwendungszweck der Werte" Description="" AHB_Status="X">Z27</Code>
+                </D_7059>
+              </S_CCI>
+              <S_CAV Name="Verwendungszweck der Werte" Number="00017" AHB_Status="Muss [2000]">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Netznutzungsabrechnung" Description="" AHB_Status="X [1P0..1]">Z84</Code>
+                    <Code Name="Bilanzkreisabrechnung" Description="" AHB_Status="X [1P0..1]">Z85</Code>
+                    <Code Name="Mehrmindermengenabrechnung" Description="" AHB_Status="X [1P0..1]">Z86</Code>
+                    <Code Name="Übermittlung an das HKNR" Description="" AHB_Status="X [1P0..1]">Z92</Code>
+                    <Code Name="Endkundenabrechnung" Description="" AHB_Status="X [1P0..1]">Z47</Code>
+                  </D_7111>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+          </G_SG8>
+          <G_SG8 Name="Bestandteil des Rechenschritts" AHB_Status="Muss [3]">
+            <S_SEQ Name="Bestandteil des Rechenschritts" Number="00018" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Bestandteil des Rechenschritts" Description="" AHB_Status="X">Z37</Code>
+              </D_1229>
+              <C_C286 Name="Information über eine Folge">
+                <D_1050 Name="Rechenschrittidentifikator" AHB_Status="X [913]"/>
+              </C_C286>
+            </S_SEQ>
+            <S_RFF Name="Referenz auf die ID einer Messlokation" Number="00019" AHB_Status="Muss [6]">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Messlokation" Description="" AHB_Status="X">Z19</Code>
+                </D_1153>
+                <D_1154 Name="ID einer Messlokation" AHB_Status="X [951] [502]"/>
+              </C_C506>
+            </S_RFF>
+            <S_RFF Name="Referenz auf einen Rechenschritt" Number="00020" AHB_Status="Muss [5]">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Rechenschritt" Description="" AHB_Status="X">Z23</Code>
+                </D_1153>
+                <D_1154 Name="Rechenschrittidentifikator" AHB_Status="X [913] [8] ∧ [9]"/>
+              </C_C506>
+            </S_RFF>
+            <G_SG9 Name="Mathematischer Operator" AHB_Status="Muss">
+              <S_CCI Name="Mathematischer Operator" Number="00021" AHB_Status="Muss">
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Mathematischer Operator" Description="" AHB_Status="X">Z86</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Operator / Operation" Number="00022" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Addition" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts wird in diesem Rechenschritt mittels Addition berücksichtigt." AHB_Status="X [11] ⊻ [15]">Z69</Code>
+                    <Code Name="Subtraktion" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts wird in diesem Rechenschritt mittels Subtraktion berücksichtigt." AHB_Status="X [11]">Z70</Code>
+                    <Code Name="Divisor" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts ist in diesem Rechenschritt der Divisor (Nenner des Bruchs)." AHB_Status="X [13]">Z80</Code>
+                    <Code Name="Dividend" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des referenzierten Rechenschritts ist in diesem Rechenschritt der Dividend (Zähler des Bruchs)." AHB_Status="X [13]">Z81</Code>
+                    <Code Name="Faktor" Description="Die gemessene Energiemenge der referenzierten Messlokation oder das Ergebnis des Rechenschritts wird in diesem Rechenschritt als ein Faktor einer Multiplikation berücksichtigt." AHB_Status="X [14]">Z82</Code>
+                  </D_7111>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+            <G_SG9 Name="Energieflussrichtung" AHB_Status="Muss [7]">
+              <S_CCI Name="Energieflussrichtung" Number="00023" AHB_Status="Muss">
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Energieflussrichtung" Description="" AHB_Status="X">Z87</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Energieflussrichtung" Number="00024" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Verbrauch" Description="" AHB_Status="X">Z71</Code>
+                    <Code Name="Erzeugung" Description="" AHB_Status="X">Z72</Code>
+                  </D_7111>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+            <G_SG9 Name="Verlustfaktor Trafo" AHB_Status="Soll [10] ∧ [7]">
+              <S_CCI Name="Verlustfaktor Trafo" Number="00025" AHB_Status="Muss">
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Verlustfaktor Trafo" Description="" AHB_Status="X">Z16</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Verlustfaktor Trafo" Number="00026" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Verlustfaktor" Description="" AHB_Status="X">Z28</Code>
+                  </D_7111>
+                  <D_7110 Name="Verlustfaktor Trafo" AHB_Status="X [912] ∧ [914] ∧ [915]"/>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+            <G_SG9 Name="Verlustfaktor Leitung" AHB_Status="Soll [10] ∧ [7]">
+              <S_CCI Name="Verlustfaktor Leitung" Number="00027" AHB_Status="Muss">
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Verlustfaktor Leitung" Description="" AHB_Status="X">ZB2</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Verlustfaktor Leitung" Number="00028" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Verlustfaktor" Description="" AHB_Status="X">Z28</Code>
+                  </D_7111>
+                  <D_7110 Name="Verlustfaktor Leitung" AHB_Status="X [912] ∧ [914] ∧ [915]"/>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+            <G_SG9 Name="Aufteilungsfaktor Energiemenge" AHB_Status="Soll [10] ∧ [7]">
+              <S_CCI Name="Aufteilungsfaktor Energiemenge" Number="00029" AHB_Status="Muss">
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Aufteilungsfaktor Energiemenge" Description="" AHB_Status="X">ZG6</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Aufteilungsfaktor Energiemenge" Number="00030" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Aufteilungsfaktor Energiemenge" Description="" AHB_Status="X">ZH6</Code>
+                  </D_7111>
+                  <D_7110 Name="Aufteilungsfaktor Energiemenge" AHB_Status="X [914] ∧ [969] ∧ [912]"/>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00031" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25002" Beschreibung="Ablehnung Berechnungsformel" Kommunikation_von="MSB an NB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00032" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00033" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Berechnungsformel" Description="" AHB_Status="X">Z36</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00034" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00035" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Muss">
+          <S_CTA Name="Ansprechpartner" Number="00036" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00037" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00038" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss">
+          <S_IDE Name="Vorgang" Number="00039" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_STS Name="Status der Antwort" Number="00040" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Status der Antwort" Description="" AHB_Status="X">E01</Code>
+              </D_9015>
+            </C_C601>
+            <C_C556 Name="Statusanlaß">
+              <D_9013 Name="Code des Prüfschritts" AHB_Status="X [17]"/>
+              <D_1131 Name="Codeliste, Code">
+                <Code Name="EBD Nr. E_0218" Description="" AHB_Status="X">E_0218</Code>
+              </D_1131>
+            </C_C556>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00041" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Ablehnung Berechnungsformel" Description="" AHB_Status="X">25002</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz-Vorgangsnummer (aus Berechnungsformel)" AHB_Status="Muss">
+            <S_RFF Name="Referenz Vorgangsnummer (aus Berechnungsformel)" Number="00042" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Transaktions-Referenznummer" Description="" AHB_Status="X">TN</Code>
+                </D_1153>
+                <D_1154 Name="Vorgangsnummer" AHB_Status="X"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00043" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25003" Beschreibung="Zustimmung Berechnungsformel" Kommunikation_von="MSB an NB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00044" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00045" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Berechnungsformel" Description="" AHB_Status="X">Z36</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00046" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00047" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00048" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00049" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00050" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss">
+          <S_IDE Name="Vorgang" Number="00051" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_STS Name="Status der Antwort" Number="00052" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Status der Antwort" Description="" AHB_Status="X">E01</Code>
+              </D_9015>
+            </C_C601>
+            <C_C556 Name="Statusanlaß">
+              <D_9013 Name="Code des Prüfschritts" AHB_Status="X [16]"/>
+              <D_1131 Name="Codeliste, Code">
+                <Code Name="EBD Nr. E_0218" Description="" AHB_Status="X">E_0218</Code>
+              </D_1131>
+            </C_C556>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00053" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Zustimmung Berechnungsformel" Description="" AHB_Status="X">25003</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz-Vorgangsnummer (aus Berechnungsformel)" AHB_Status="Muss">
+            <S_RFF Name="Referenz Vorgangsnummer (aus Berechnungsformel)" Number="00054" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Transaktions-Referenznummer" Description="" AHB_Status="X">TN</Code>
+                </D_1153>
+                <D_1154 Name="Vorgangsnummer" AHB_Status="X"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00055" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25009" Beschreibung="Übermittlung einer ausgerollten Leistungskurvendefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00056" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00057" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Ausgerollte Leistungskurvendefinition" Description="" AHB_Status="X">Z81</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00058" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00059" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00060" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00061" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00062" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [523]">
+          <S_IDE Name="Vorgang" Number="00063" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_LOC Name="Code der Definition" Number="00064" AHB_Status="Muss">
+            <D_3227 Name="Ortsangabe, Qualifier">
+              <Code Name="Code der Definition" Description="" AHB_Status="X">Z09</Code>
+            </D_3227>
+            <C_C517 Name="Ortsangabe">
+              <D_3225 Name="Code der Definition" AHB_Status="X [526]"/>
+            </C_C517>
+          </S_LOC>
+          <S_DTM Name="Gültigkeitsbeginn der ausgerollten Definition" Number="00065" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsbeginn" Description="" AHB_Status="X">Z34</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Gültigkeitsende der ausgerollten Definition" Number="00066" AHB_Status="Muss [48]&#13;&#10;Soll [49] ∧ [37]">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsende" Description="" AHB_Status="X">Z35</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947] [30]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00067" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00068" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Ausgerollte Leistungskurvendefinition" Description="" AHB_Status="X">25009</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00069" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Leistungskurvendefinition" AHB_Status="Muss [518] ∧ [519] ∧ ([520] ⊻ [521])">
+            <S_SEQ Name="Leistungskurvendefinition" Number="00070" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Ausgerollte Leistungskurvendefinition" Description="" AHB_Status="X">Z74</Code>
+              </D_1229>
+            </S_SEQ>
+            <S_DTM Name="Leistungskurvenänderungszeitpunkt" Number="00071" AHB_Status="Muss">
+              <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+                <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                  <Code Name="Leistungskurvenänderungszeitpunkt" Description="" AHB_Status="X">Z45</Code>
+                </D_2005>
+                <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X ([931] [31] ∧ [32] ∧ [33]) ⊻ (([964] ∧ [965] [34]) ∧ [507])"/>
+                <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                  <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X [50] ∧ [528]">303</Code>
+                  <Code Name="HHMM" Description="" AHB_Status="X [50] ∧ [527]">401</Code>
+                </D_2379>
+              </C_C507>
+            </S_DTM>
+            <G_SG9 Name="Leistungskurvendefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Leistungskurvendefinition" Number="00072">
+                <D_7059 Name="Klassentyp, Code"/>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Leistungskurvendefinition"/>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+            <G_SG11 Name="oberer Schwellwert" AHB_Status="Muss">
+              <S_QTY Name="oberer Schwellwert" Number="00073" AHB_Status="Muss">
+                <C_C186 Name="Mengenangaben">
+                  <D_6063 Name="Menge, Qualifier">
+                    <Code Name="oberer Schwellwert" Description="" AHB_Status="X">Z40</Code>
+                  </D_6063>
+                  <D_6060 Name="Mengenangabe in %" AHB_Status="X [930] ∧ [963]"/>
+                  <D_6411 Name="Maßeinheit, Code">
+                    <Code Name="Prozent" Description="" AHB_Status="X">P1</Code>
+                  </D_6411>
+                </C_C186>
+              </S_QTY>
+            </G_SG11>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00074" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25008" Beschreibung="Übermittlung einer ausgerollten Schaltzeitdefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00075" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00076" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Ausgerollte Schaltzeitdefinition" Description="" AHB_Status="X">Z80</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00077" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00078" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00079" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00080" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00081" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [522]">
+          <S_IDE Name="Vorgang" Number="00082" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_LOC Name="Code der Definition" Number="00083" AHB_Status="Muss">
+            <D_3227 Name="Ortsangabe, Qualifier">
+              <Code Name="Code der Definition" Description="" AHB_Status="X">Z09</Code>
+            </D_3227>
+            <C_C517 Name="Ortsangabe">
+              <D_3225 Name="Code der Definition" AHB_Status="X [525]"/>
+            </C_C517>
+          </S_LOC>
+          <S_DTM Name="Gültigkeitsbeginn der ausgerollten Definition" Number="00084" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsbeginn" Description="" AHB_Status="X">Z34</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Gültigkeitsende der ausgerollten Definition" Number="00085" AHB_Status="Muss [46]&#13;&#10;Soll [47] ∧ [37]">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsende" Description="" AHB_Status="X">Z35</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947] [30]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00086" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00087" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Ausgerollte Schaltzeitdefinition" Description="" AHB_Status="X">25008</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00088" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Schaltzeitdefinition" AHB_Status="Muss [514] ∧ [515] ∧ ([516] ⊻ [517])">
+            <S_SEQ Name="Schaltzeitdefinition" Number="00089" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Ausgerollte Schaltzeitdefinition" Description="" AHB_Status="X">Z73</Code>
+              </D_1229>
+            </S_SEQ>
+            <S_DTM Name="Schaltzeitänderungszeitpunkt" Number="00090" AHB_Status="Muss">
+              <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+                <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                  <Code Name="Schaltzeitänderungszeitpunkt" Description="" AHB_Status="X">Z44</Code>
+                </D_2005>
+                <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X ([931] [31] ∧ [32] ∧ [33]) ⊻ (([964] ∧ [965] [34]) ∧ [507])"/>
+                <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                  <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X [50] ∧ [528]">303</Code>
+                  <Code Name="HHMM" Description="" AHB_Status="X [50] ∧ [527]">401</Code>
+                </D_2379>
+              </C_C507>
+            </S_DTM>
+            <G_SG9 Name="Schaltzeitdefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Schaltzeitdefinition" Number="00091">
+                <D_7059 Name="Klassentyp, Code"/>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Schaltzeitdefinition"/>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+            <G_SG9 Name="Schalthandlung an der Lokation" AHB_Status="Muss">
+              <S_CCI Name="Schalthandlung an der Lokation" Number="00092" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Schalthandlung" Description="" AHB_Status="X">Z58</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Leistung an der Lokation an" Description="" AHB_Status="X">ZF4</Code>
+                    <Code Name="Leistung an der Lokation aus" Description="" AHB_Status="X">ZF5</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00093" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25005" Beschreibung="Übermittlung einer ausgerollten Zählzeitdefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00094" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00095" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Ausgerollte Zählzeitdefinition" Description="" AHB_Status="X">Z59</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00096" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00097" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00098" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00099" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00100" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [505]">
+          <S_IDE Name="Vorgang" Number="00101" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_LOC Name="Code der Definition" Number="00102" AHB_Status="Muss">
+            <D_3227 Name="Ortsangabe, Qualifier">
+              <Code Name="Code der Definition" Description="" AHB_Status="X">Z09</Code>
+            </D_3227>
+            <C_C517 Name="Ortsangabe">
+              <D_3225 Name="Code der Definition" AHB_Status="X [524]"/>
+            </C_C517>
+          </S_LOC>
+          <S_DTM Name="Gültigkeitsbeginn der ausgerollten Definition" Number="00103" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsbeginn" Description="" AHB_Status="X">Z34</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Gültigkeitsende der ausgerollten Definition" Number="00104" AHB_Status="Muss [29]&#13;&#10;Soll [36] ∧ [37]">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeitsende" Description="" AHB_Status="X">Z35</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] ∧ [947] [30]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00105" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00106" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Ausgerollte Zählzeitdefinition" Description="" AHB_Status="X">25005</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00107" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Zählzeitdefinition" AHB_Status="Muss [510] ∧ [511] ∧ ([512] ⊻ [513])">
+            <S_SEQ Name="Zählzeitdefinition" Number="00108" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Ausgerollte Zählzeitdefinition" Description="" AHB_Status="X">Z43</Code>
+              </D_1229>
+            </S_SEQ>
+            <S_DTM Name="Zählzeitänderungszeitpunkt" Number="00109" AHB_Status="Muss">
+              <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+                <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                  <Code Name="Zählzeitänderungszeitpunkt" Description="" AHB_Status="X">Z33</Code>
+                </D_2005>
+                <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X ([931] [31] ∧ [32] ∧ [33]) ⊻ (([964] ∧ [965]) [34] ∧ [507])"/>
+                <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                  <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X [50] ∧ [528]">303</Code>
+                  <Code Name="HHMM" Description="" AHB_Status="X [50] ∧ [527]">401</Code>
+                </D_2379>
+              </C_C507>
+            </S_DTM>
+            <S_RFF Name="Zählendes Register" Number="00110" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Code des zählenden Registers" Description="" AHB_Status="X">Z28</Code>
+                </D_1153>
+                <D_1154 Name="Code des zählenden Registers" AHB_Status="X"/>
+              </C_C506>
+            </S_RFF>
+            <G_SG9 Name="Zählzeitdefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Zählzeitdefinition" Number="00111">
+                <D_7059 Name="Klassentyp, Code"/>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Zählzeitdefinition"/>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00112" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25007" Beschreibung="Übermittlung Übersicht Leistungskurvendefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00113" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00114" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Übersicht Leistungskurvendefinitionen" Description="" AHB_Status="X">Z79</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00115" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00116" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00117" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00118" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00119" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [2001]">
+          <S_IDE Name="Vorgang" Number="00120" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_DTM Name="Gültig ab" Number="00121" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeit, Beginndatum" Description="" AHB_Status="X">157</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] [509] ∧ [UB1]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00122" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_STS Name="Status der Nutzung von Definitionen" Number="00123" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Nutzung von Definitionen" Description="" AHB_Status="X">Z36</Code>
+              </D_9015>
+            </C_C601>
+            <C_C555 Name="Status">
+              <D_4405 Name="Status, Code">
+                <Code Name="Definitionen werden verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt Leistungskurvendefinitionen. Die Liste der Leistungskurvendefinitionen enthält somit Leistungskurven." AHB_Status="X">Z45</Code>
+                <Code Name="Definitionen werden nicht verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB nutzt keine Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit keine Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit keine Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Leistungskurven. Die Liste der Leistungskurvendefinitionen enthält somit keine Leistungskurven." AHB_Status="X">Z46</Code>
+              </D_4405>
+            </C_C555>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00124" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Übersicht Leistungskurvendefinitionen" Description="" AHB_Status="X">25007</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00125" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Leistungskurvendefinition" AHB_Status="Muss [24]">
+            <S_SEQ Name="Leistungskurvendefinition" Number="00126" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Leistungskurvendefinition" Description="" AHB_Status="X">Z70</Code>
+              </D_1229>
+            </S_SEQ>
+            <G_SG9 Name="Leistungskurvendefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Leistungskurvendefinition" Number="00127" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Code der Leistungskurvendefinition" Description="" AHB_Status="X">Z53</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Leistungskurvendefinition" AHB_Status="X [43]"/>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Häufigkeit der Übermittlung" Number="00128" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Häufigkeit der Übermittlung" Description="" AHB_Status="X">ZE0</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Leistungskurvendefinition mit identischen Leistungskurvenänderungszeitpunkten an allen Tagen über den gesamten Gültigkeitszeitraum. Diese Leistungskurvendefinition wird einmalig ausgerollt und übermittelt." AHB_Status="X">Z33</Code>
+                    <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Leistungskurvendefinition mit unterschiedlichen Leistungskurvenänderungszeitpunkten an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Leistungskurvendefinition muss jedes Jahr ausgerollt und übermittelt werden." AHB_Status="X">Z34</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Übermittelbarkeit der ausgerollten Leistungskurvendefinition" Number="00129" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="" AHB_Status="X">ZD5</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Leistungskurvendefinition per EDIFACT mit dem Nachrichtenformat UTILTS." AHB_Status="X">Z23</Code>
+                    <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Leistungskurvendefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben." AHB_Status="X">Z24</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00130" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25006" Beschreibung="Übermittlung Übersicht Schaltzeitdefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00131" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00132" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Übersicht Schaltzeitdefinitionen" Description="" AHB_Status="X">Z78</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00133" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00134" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00135" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00136" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00137" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [2001]">
+          <S_IDE Name="Vorgang" Number="00138" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_DTM Name="Gültig ab" Number="00139" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeit, Beginndatum" Description="" AHB_Status="X">157</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] [508] ∧ [UB1]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00140" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_STS Name="Status der Nutzung von Definitionen" Number="00141" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Nutzung von Definitionen" Description="" AHB_Status="X">Z36</Code>
+              </D_9015>
+            </C_C601>
+            <C_C555 Name="Status">
+              <D_4405 Name="Status, Code">
+                <Code Name="Definitionen werden verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt Leistungskurvendefinitionen. Die Liste der Leistungskurvendefinitionen enthält somit Leistungskurven." AHB_Status="X">Z45</Code>
+                <Code Name="Definitionen werden nicht verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB nutzt keine Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit keine Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit keine Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Leistungskurven. Die Liste der Leistungskurvendefinitionen enthält somit keine Leistungskurven." AHB_Status="X">Z46</Code>
+              </D_4405>
+            </C_C555>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00142" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Übersicht Schaltzeitdefinitionen" Description="" AHB_Status="X">25006</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00143" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Schaltzeitdefinition" AHB_Status="Muss [24]">
+            <S_SEQ Name="Schaltzeitdefinition" Number="00144" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Schaltzeitdefinition" Description="" AHB_Status="X">Z69</Code>
+              </D_1229>
+            </S_SEQ>
+            <G_SG9 Name="Schaltzeitdefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Schaltzeitdefinition" Number="00145" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Code der Schaltzeitdefinition" Description="" AHB_Status="X">Z52</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Schaltzeitdefinition" AHB_Status="X [42]"/>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Häufigkeit der Übermittlung" Number="00146" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Häufigkeit der Übermittlung" Description="" AHB_Status="X">ZE0</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Schaltzeitdefinition mit identischen Schaltzeitänderungszeitpunkten an allen Tagen über den gesamten Gültigkeitszeitraum. Diese Schaltzeitdefinitiont wird einmalig ausgerollt und übermittelt." AHB_Status="X">Z33</Code>
+                    <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Schaltzeitdefinition mit unterschiedlichen Schaltzeitänderungszeitpunkten an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Schaltzeitdefinition muss jedes Jahr ausgerollt und übermittelt werden." AHB_Status="X">Z34</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Übermittelbarkeit der ausgerollten Schaltzeitdefinition" Number="00147" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="" AHB_Status="X">ZD5</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Schaltzeitdefinition per EDIFACT mit dem Nachrichtenformat UTILTS." AHB_Status="X">Z23</Code>
+                    <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Schaltzeitdefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben." AHB_Status="X">Z24</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00148" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <AWF Pruefidentifikator="25004" Beschreibung="Übermittlung Übersicht Zählzeitdefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an MSB">
+    <M_UTILTS>
+      <S_UNH Name="Nachrichten-Kopfsegment" Number="00149" AHB_Status="Muss">
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+        <C_S009 Name="Nachrichten-Kennung">
+          <D_0065 Name="Nachrichtentyp-Kennung">
+            <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
+          </D_0065>
+          <D_0052 Name="Versionsnummer des Nachrichtentyps">
+            <Code Name="Entwurfs-Version" Description="" AHB_Status="X">D</Code>
+          </D_0052>
+          <D_0054 Name="Freigabenummer des Nachrichtentyps">
+            <Code Name="Ausgabe 2018 - A" Description="" AHB_Status="X">18A</Code>
+          </D_0054>
+          <D_0051 Name="Verwaltende Organisation">
+            <Code Name="UN/CEFACT" Description="" AHB_Status="X">UN</Code>
+          </D_0051>
+          <D_0057 Name="Anwendungscode der zuständigen Organisation">
+            <Code Name="Versionsnummer der zugrundeliegenden BDEW-Nachrichtenbeschreibung" Description="" AHB_Status="X">1.1c</Code>
+          </D_0057>
+        </C_S009>
+      </S_UNH>
+      <S_BGM Name="Beginn der Nachricht" Number="00150" AHB_Status="Muss">
+        <C_C002 Name="Dokumenten-/Nachrichtenname">
+          <D_1001 Name="Dokumentenname, Code">
+            <Code Name="Übersicht Zählzeitdefinitionen" Description="" AHB_Status="X">Z60</Code>
+          </D_1001>
+        </C_C002>
+        <C_C106 Name="Dokumenten-/Nachrichten-Identifikation">
+          <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
+        </C_C106>
+      </S_BGM>
+      <S_DTM Name="Nachrichtendatum" Number="00151" AHB_Status="Muss">
+        <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+          <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtendatum/-zeit" Description="" AHB_Status="X">137</Code>
+          </D_2005>
+          <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931][494]"/>
+          <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+            <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+          </D_2379>
+        </C_C507>
+      </S_DTM>
+      <G_SG2 Name="MP-ID Absender" AHB_Status="Muss">
+        <S_NAD Name="MP-ID Absender" Number="00152" AHB_Status="Muss">
+          <D_3035 Name="Beteiligter, Qualifier">
+            <Code Name="Dokumenten-/Nachrichtenaussteller bzw. -absender" Description="" AHB_Status="X">MS</Code>
+          </D_3035>
+          <C_C082 Name="Identifikation des Beteiligten">
+            <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+            <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+              <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+              <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+            </D_3055>
+          </C_C082>
+        </S_NAD>
+        <G_SG3 Name="Kontaktinformationen" AHB_Status="Kann">
+          <S_CTA Name="Ansprechpartner" Number="00153" AHB_Status="Muss">
+            <D_3139 Name="Funktion des Ansprechpartners, Code">
+              <Code Name="Informationskontakt" Description="" AHB_Status="X">IC</Code>
+            </D_3139>
+            <C_C056 Name="Kontaktangaben">
+              <D_3412 Name="Name vom Ansprechpartner" AHB_Status="X"/>
+            </C_C056>
+          </S_CTA>
+          <S_COM Name="Kommunikationsverbindung" Number="00154" AHB_Status="Muss">
+            <C_C076 Name="Kommunikationsverbindung">
+              <D_3148 Name="Nummer / Adresse" AHB_Status="X"/>
+              <D_3155 Name="Art des Kommunikationsmittels, Code">
+                <Code Name="Elektronische Post" Description="" AHB_Status="X [1P0..1]">EM</Code>
+                <Code Name="Telefax" Description="" AHB_Status="X [1P0..1]">FX</Code>
+                <Code Name="Telefon" Description="" AHB_Status="X [1P0..1]">TE</Code>
+                <Code Name="weiteres Telefon" Description="" AHB_Status="X [1P0..1]">AJ</Code>
+                <Code Name="Handy" Description="" AHB_Status="X [1P0..1]">AL</Code>
+              </D_3155>
+            </C_C076>
+          </S_COM>
+        </G_SG3>
+        <G_SG2 Name="MP-ID Empfänger" AHB_Status="Muss">
+          <S_NAD Name="MP-ID Empfänger" Number="00155" AHB_Status="Muss">
+            <D_3035 Name="Beteiligter, Qualifier">
+              <Code Name="Nachrichtenempfänger" Description="" AHB_Status="X">MR</Code>
+            </D_3035>
+            <C_C082 Name="Identifikation des Beteiligten">
+              <D_3039 Name="MP-ID" AHB_Status="X [1]"/>
+              <D_3055 Name="Verantwortliche Stelle für die Codepflege, Code">
+                <Code Name="GS1" Description="" AHB_Status="X">9</Code>
+                <Code Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)" Description="" AHB_Status="X">293</Code>
+              </D_3055>
+            </C_C082>
+          </S_NAD>
+        </G_SG2>
+        <G_SG5 Name="Vorgang" AHB_Status="Muss [2001]">
+          <S_IDE Name="Vorgang" Number="00156" AHB_Status="Muss">
+            <D_7495 Name="Objekt, Qualifier">
+              <Code Name="Transaktion" Description="" AHB_Status="X">24</Code>
+            </D_7495>
+            <C_C206 Name="Identifikationsnummer">
+              <D_7402 Name="Vorgangsnummer" AHB_Status="X"/>
+            </C_C206>
+          </S_IDE>
+          <S_DTM Name="Gültig ab" Number="00157" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Gültigkeit, Beginndatum" Description="" AHB_Status="X">157</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931] [506] ∧ [UB1]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMZZZ" Description="" AHB_Status="X">303</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_DTM Name="Versionsangabe" Number="00158" AHB_Status="Muss">
+            <C_C507 Name="Datum/Uhrzeit/Zeitspanne">
+              <D_2005 Name="Datums- oder Uhrzeit- oder Zeitspannen-Funktion, Qualifier">
+                <Code Name="Fertigstellungsdatum/-zeit" Description="" AHB_Status="X">293</Code>
+              </D_2005>
+              <D_2380 Name="Datum oder Uhrzeit oder Zeitspanne, Wert" AHB_Status="X [931]"/>
+              <D_2379 Name="Datums- oder Uhrzeit- oder Zeitspannen-Format, Code">
+                <Code Name="CCYYMMDDHHMMSSZZZ" Description="" AHB_Status="X">304</Code>
+              </D_2379>
+            </C_C507>
+          </S_DTM>
+          <S_STS Name="Status der Nutzung von Definitionen" Number="00159" AHB_Status="Muss">
+            <C_C601 Name="Statuskategorie">
+              <D_9015 Name="Statuskategorie, Code">
+                <Code Name="Nutzung von Definitionen" Description="" AHB_Status="X">Z36</Code>
+              </D_9015>
+            </C_C601>
+            <C_C555 Name="Status">
+              <D_4405 Name="Status, Code">
+                <Code Name="Definitionen werden verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt Leistungskurvendefinitionen. Die Liste der Leistungskurvendefinitionen enthält somit Leistungskurven." AHB_Status="X">Z45</Code>
+                <Code Name="Definitionen werden nicht verwendet" Description="Bei Zählzeitdefinitionen:&#13;&#10;Der NB nutzt keine Zählzeitdefinitionen für die Tarifierung von Werten. Die Liste der Zählzeitdefinitionen enthält somit keine Zählzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Schaltzeitdefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Schaltzeitdefinitionen. Die Liste der Schaltzeitdefinitionen enthält somit keine Schaltzeitdefinitionen.&#13;&#10;&#13;&#10;Bei Leistungskurvendefinitionen:&#13;&#10;Der NB bzw. LF nutzt keine Leistungskurven. Die Liste der Leistungskurvendefinitionen enthält somit keine Leistungskurven." AHB_Status="X">Z46</Code>
+              </D_4405>
+            </C_C555>
+          </S_STS>
+          <G_SG6 Name="Prüfidentifikator" AHB_Status="Muss">
+            <S_RFF Name="Prüfidentifikator" Number="00160" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Prüfidentifikator" Description="" AHB_Status="X">Z13</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation">
+                  <Code Name="Übersicht Zählzeitdefinitionen" Description="" AHB_Status="X">25004</Code>
+                </D_1154>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG6 Name="Referenz auf Reklamation" AHB_Status="Soll [26]">
+            <S_RFF Name="Referenz auf Reklamation" Number="00161" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Beantragungsnummer" Description="" AHB_Status="X">AGI</Code>
+                </D_1153>
+                <D_1154 Name="Referenz, Identifikation" AHB_Status="X [504]"/>
+              </C_C506>
+            </S_RFF>
+          </G_SG6>
+          <G_SG8 Name="Zählzeitdefinition" AHB_Status="Muss [24]">
+            <S_SEQ Name="Zählzeitdefinition" Number="00162" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Zählzeitdefinition" Description="" AHB_Status="X">Z42</Code>
+              </D_1229>
+            </S_SEQ>
+            <G_SG9 Name="Zählzeitdefinition" AHB_Status="Muss">
+              <S_CCI Name="Code der Zählzeitdefinition" Number="00163" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Code der Zählzeitdefinition" Description="" AHB_Status="X">Z39</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code der Zählzeitdefinition" AHB_Status="X [44]"/>
+                </C_C240>
+              </S_CCI>
+              <S_CAV Name="Häufigkeit der Übermittlung" Number="00164" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Häufigkeit der Übermittlung" Description="" AHB_Status="X">ZE0</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="einmalig zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Zählzeitdefinition mit einem Zählzeitänderungszeitpunkt an allen Tagen je Zählzeitregister über den gesamten Gültigkeitszeitraum. Diese Zählzeitdefinition einmalig ausgerollt und übermittelt werden." AHB_Status="X">Z33</Code>
+                    <Code Name="jährlich zu übermittelnde ausgerollte Definition" Description="Es handelt sich um eine Zählzeitdefinition mit unterschiedlichen Zählzeitänderungszeitpunkt je Zählzeitregister an den einzelnen Tagen über den gesamten Gültigkeitszeitraum. Diese Zählzeitdefinition muss jedes Jahr ausgerollt und übermittelt werden." AHB_Status="X">Z34</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Übermittelbarkeit der ausgerollten Zählzeitdefinition" Number="00165" AHB_Status="Muss">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Übermittelbarkeit der ausgerollten Definition" Description="" AHB_Status="X">ZD5</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="elektronisch übermittelbar" Description="Der LF bzw. NB übermittelt die ausgerollte Zählzeitdefinition per EDIFACT mit dem Nachrichtenformat UTILTS." AHB_Status="X">Z23</Code>
+                    <Code Name="elektronisch nicht übermittelbar" Description="Der LF bzw.NB übermittelt die ausgerollte Zählzeitdefinition auf einem bilateral vereinbarten Weg. Dieser Weg wird hier nicht weiter beschrieben." AHB_Status="X">Z24</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Ermittlung des Leistungsmaximums bei atypischer Netznutzung" Number="00166" AHB_Status="Muss [22]">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Ermittlung des Leistungsmaximums bei atypischer Netznutzung" Description="" AHB_Status="X">ZD4</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="Verwendung des Hochlastzeitfensters" Description="" AHB_Status="X">Z25</Code>
+                    <Code Name="keine Verwendung des Hochlastzeitfensters" Description="" AHB_Status="X">Z26</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Bestellbarkeit der Zählzeitdefinition" Number="00167" AHB_Status="Muss [22] ∧ [25]">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Bestellbarkeit der Zählzeitdefinition" Description="" AHB_Status="X">ZD7</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="Zählzeitdefinition ist bestellbar" Description="" AHB_Status="X">Z27</Code>
+                    <Code Name="Zählzeitdefinition ist nicht bestellbar" Description="" AHB_Status="X">Z28</Code>
+                  </D_7110>
+                </C_C889>
+              </S_CAV>
+              <S_CAV Name="Zählzeitdefinitionstyp" Number="00168" AHB_Status="Muss [22] ∧ [27]">
+                <C_C889 Name="Merkmalswert">
+                  <D_7111 Name="Merkmalswert, Code">
+                    <Code Name="Zählzeitdefinitionstyp" Description="" AHB_Status="X">ZD3</Code>
+                  </D_7111>
+                  <D_7110 Name="Merkmalswert">
+                    <Code Name="Wärmepumpe" Description="" AHB_Status="X">Z29</Code>
+                    <Code Name="Nachtspeicherheizung" Description="" AHB_Status="X">Z30</Code>
+                    <Code Name="Schwachlastzeitfenster" Description="" AHB_Status="X">Z31</Code>
+                    <Code Name="sonstiger Zählzeitdefinitionstyp" Description="" AHB_Status="X">Z32</Code>
+                    <Code Name="Hochlastzeitfenster" Description="" AHB_Status="X">Z35</Code>
+                  </D_7110>
+                  <D_7110 Name="Beschreibung Zählzeitdefinitionstyp" AHB_Status="X [21]"/>
+                </C_C889>
+              </S_CAV>
+            </G_SG9>
+          </G_SG8>
+          <G_SG8 Name="Register der Zählzeitdefinition" AHB_Status="Muss [41] ∧ [2002]">
+            <S_SEQ Name="Register der Zählzeitdefinition" Number="00169" AHB_Status="Muss">
+              <D_1229 Name="Handlung, Code">
+                <Code Name="Register der Zählzeitdefinition" Description="" AHB_Status="X">Z41</Code>
+              </D_1229>
+            </S_SEQ>
+            <S_RFF Name="Referenz auf eine Zählzeitdefinition" Number="00170" AHB_Status="Muss">
+              <C_C506 Name="Referenz">
+                <D_1153 Name="Referenz, Qualifier">
+                  <Code Name="Code der Zählzeitdefinition" Description="" AHB_Status="X">Z27</Code>
+                </D_1153>
+                <D_1154 Name="Code der Zählzeitdefinition" AHB_Status="X"/>
+              </C_C506>
+            </S_RFF>
+            <G_SG9 Name="Register" AHB_Status="Muss">
+              <S_CCI Name="Code des Zählzeitregister" Number="00171" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Code des Zählzeitregisters" Description="" AHB_Status="X">Z38</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Code des Zählzeitregisters" AHB_Status="X"/>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+            <G_SG9 Name="Schwachlastfähigkeit" AHB_Status="Muss [22]">
+              <S_CCI Name="Schwachlastfähigkeit" Number="00172" AHB_Status="Muss">
+                <D_7059 Name="Klassentyp, Code">
+                  <Code Name="Schwachlastfähigkeit" Description="" AHB_Status="X">Z10</Code>
+                </D_7059>
+                <C_C240 Name="Merkmalsbeschreibung">
+                  <D_7037 Name="Merkmal, Code">
+                    <Code Name="Nicht-Schwachlast fähig" Description="" AHB_Status="X">Z59</Code>
+                    <Code Name="Schwachlast fähig" Description="" AHB_Status="X">Z60</Code>
+                  </D_7037>
+                </C_C240>
+              </S_CCI>
+            </G_SG9>
+          </G_SG8>
+        </G_SG5>
+      </G_SG2>
+      <S_UNT Name="Nachrichten-Endesegment" Number="00173" AHB_Status="Muss">
+        <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
+        <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
+      </S_UNT>
+    </M_UTILTS>
+  </AWF>
+  <Bedingungen>
+    <Bedingung Nummer="[1]">Nur MP-ID aus Sparte Strom</Bedingung>
+    <Bedingung Nummer="[2]">Wenn SG5 STS+Z23+Z34 (Formel muss beim Absender angefragt werden) in einem SG5 IDE vorhanden</Bedingung>
+    <Bedingung Nummer="[3]">Wenn SG5 STS+Z23+Z33 (Formel angefügt) vorhanden</Bedingung>
+    <Bedingung Nummer="[5]">Wenn das SG8 RFF+Z19 (Referenz auf eine Messlokation) in derselben SG8 SEQ+Z37 nicht vorhanden</Bedingung>
+    <Bedingung Nummer="[6]">Wenn das SG8 RFF+Z23 (Referenz auf Rechenschritt) in derselben SG8 SEQ+Z37 nicht vorhanden</Bedingung>
+    <Bedingung Nummer="[7]">Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden</Bedingung>
+    <Bedingung Nummer="[8]">Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24</Bedingung>
+    <Bedingung Nummer="[9]">Der hier angegebene Rechenschrittidentifikator darf nicht identisch mit dem Rechenschrittidentifikator aus diesem SG8 SEQ+Z37 DE1050 sein</Bedingung>
+    <Bedingung Nummer="[10]">wenn vorhanden</Bedingung>
+    <Bedingung Nummer="[11]">Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen</Bedingung>
+    <Bedingung Nummer="[13]">Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z80/Z81 (Divisor / Dividend) vorhanden, muss in diesem Vorgang genau eine zweite SG8 SEQ+Z37 mit identischen Rechenschrittidentifikator vorhanden sein, sodass das eine SG8 SEQ+Z37 den Operator Z80 (Divisor) und das andere SG8 SEQ+Z37 den Operator Z81 (Dividend) enthält</Bedingung>
+    <Bedingung Nummer="[14]">Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z82 (Faktor) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich CAV+Z82 enthalten</Bedingung>
+    <Bedingung Nummer="[15]">Wenn in einem SG5 IDE+24 nur eine SEQ+Z37 mit einer SG8 RFF+Z19 (Messlokation) vorhanden ist</Bedingung>
+    <Bedingung Nummer="[16]">Der hier angegebene Code des Prüfschritt muss im EBD dem Cluster Zustimmung zugeordnet sein</Bedingung>
+    <Bedingung Nummer="[17]">Der hier angegebene Code des Prüfschritt muss im EBD dem Cluster Ablehnung zugeordnet sein</Bedingung>
+    <Bedingung Nummer="[18]">Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF</Bedingung>
+    <Bedingung Nummer="[21]">Wenn in dieser CAV+ZD3 der Wert im DE7110 mit Z32 (sonstiger Zählzeitdefinitionstyp) vorhanden ist</Bedingung>
+    <Bedingung Nummer="[22]">Wenn MP-ID in SG2 NAD+MS (Nachrichtenabsender) in der Rolle NB</Bedingung>
+    <Bedingung Nummer="[24]">Wenn SG5 STS+Z36+Z45 (Definitionen werden verwendet) vorhanden</Bedingung>
+    <Bedingung Nummer="[25]">Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF</Bedingung>
+    <Bedingung Nummer="[26]">sofern per ORDERS reklamiert</Bedingung>
+    <Bedingung Nummer="[27]">Wenn in SG9 CAV+ZD4+Z26 (keine Verwendung des Hochlastzeitfensters) vorhanden</Bedingung>
+    <Bedingung Nummer="[29]">Wenn in SG8 SEQ+Z43 DTM+Z33 (Zählzeitänderungszeitpunkt) im DE2379 der Code 303 vorhanden</Bedingung>
+    <Bedingung Nummer="[30]">Der Wert von CCYY in diesem DE muss genau um eins höher sein, als der Wert CCYY des SG5 DTM+Z34 (Gültigkeitsbeginn) DE2380</Bedingung>
+    <Bedingung Nummer="[31]">Wenn im DE2379 dieses Segments der Code 303 vorhanden</Bedingung>
+    <Bedingung Nummer="[32]">Der Zeitpunkt in diesem DE muss ≥ dem Zeitpunkt aus dem DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein</Bedingung>
+    <Bedingung Nummer="[33]">Der Zeitpunkt in diesem DE muss ≤ dem Zeitpunkt aus dem DE2380 des Gültigkeitsende der ausgerollten Definition (SG5 DTM+Z35) sein</Bedingung>
+    <Bedingung Nummer="[34]">Wenn im DE2379 dieses Segments der Code 401 vorhanden</Bedingung>
+    <Bedingung Nummer="[36]">Wenn in SG8 SEQ+Z43 DTM+Z33 (Zählzeitänderungszeitpunkt) im DE2379 der Code 401 vorhanden</Bedingung>
+    <Bedingung Nummer="[37]">Wenn ein Gültigkeitsende bereits angegeben werden kann.</Bedingung>
+    <Bedingung Nummer="[41]">Wenn SG8 SEQ+Z42 (Zählzeitdefinition) vorhanden</Bedingung>
+    <Bedingung Nummer="[42]">Der in diesem Datenlement angegebene Code der Schaltzeitdefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.</Bedingung>
+    <Bedingung Nummer="[43]">Der in diesem Datenlement angegebene Code der Leistungskurvendefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.</Bedingung>
+    <Bedingung Nummer="[44]">Der in diesem Datenlement angegebene Code der Zählzeitdefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.</Bedingung>
+    <Bedingung Nummer="[46]">Wenn in SG8 SEQ+Z73 DTM+Z44 (Schaltzeitänderungszeitpunkt) im DE2379 der Code 303 vorhanden</Bedingung>
+    <Bedingung Nummer="[47]">Wenn in SG8 SEQ+Z73 DTM+Z44 (Schaltzeitänderungszeitpunkt) im DE2379 der Code 401 vorhanden</Bedingung>
+    <Bedingung Nummer="[48]">Wenn in SG8 SEQ+Z74 DTM+Z45 (Leistungskurvenänderungszeitpunkt) im DE2379 der Code 303 vorhanden</Bedingung>
+    <Bedingung Nummer="[49]">Wenn in SG8 SEQ+Z74 DTM+Z45 (Leistungskurvenänderungszeitpunkt) im DE2379 der Code 401 vorhanden</Bedingung>
+    <Bedingung Nummer="[50]">In jedem DE2379 dieses DTM-Segments innerhalb eines IDE+24 (Vorgangs) muss der gleiche Code angegeben werden</Bedingung>
+    <Bedingung Nummer="[490]">wenn Wert in diesem DE, an der Stelle CCYYMMDD ein Datum aus dem angegeben Zeitraum der Tabelle Kapitel 3.5 „Prozesszeitpunkt bei MESZ mit UTC“ ist</Bedingung>
+    <Bedingung Nummer="[491]">wenn Wert in diesem DE, an der Stelle CCYYMMDD ein Datum aus dem angegeben Zeitraum der Tabelle Kapitel 3.6 „Prozesszeitpunkt bei MEZ mit UTC“ ist</Bedingung>
+    <Bedingung Nummer="[494]">Das hier genannte Datum muss der Zeitpunkt sein, zu dem das Dokument erstellt wurde, oder ein Zeitpunkt, der davor liegt.</Bedingung>
+    <Bedingung Nummer="[500]">Hinweis: Zeitpunkt, ab dem die Berechnungsformel anzuwenden ist</Bedingung>
+    <Bedingung Nummer="[501]">Hinweis: Verwendung der ID der Marktlokation</Bedingung>
+    <Bedingung Nummer="[502]">Hinweis: Verwendung der ID der Messlokation</Bedingung>
+    <Bedingung Nummer="[504]">Hinweis: Wert aus BGM+Z55 DE1004 der ORDERS mit der die Reklamation einer Definition erfolgt ist</Bedingung>
+    <Bedingung Nummer="[505]">Hinweis: Jede ausgerollte Zählzeitdefinition ist in einem eigenen IDE anzugeben</Bedingung>
+    <Bedingung Nummer="[506]">Hinweis: Zeitpunkt, ab dem die Übersicht der Zählzeitdefinitionen gültig ist</Bedingung>
+    <Bedingung Nummer="[507]">Hinweis: Es ist die Zeit nach der deutschen gesetzlichen Zeit anzugeben</Bedingung>
+    <Bedingung Nummer="[508]">Hinweis: Zeitpunkt, ab dem die Übersicht der Schaltzeitdefinitionen gültig ist</Bedingung>
+    <Bedingung Nummer="[509]">Hinweis: Zeitpunkt, ab dem die Übersicht der Leistungskurvendefinition gültig ist</Bedingung>
+    <Bedingung Nummer="[510]">Hinweis: Für jeden Zählzeitänderungszeitpunkt (SG8 DTM+Z33) ist diese Sementgruppe einmal anzugeben</Bedingung>
+    <Bedingung Nummer="[511]">Hinweis: Der Zählzeitänderungszeitpunkt (SG8DTM+Z33) dieser SG8 darf in keiner anderen SG8 „Zählzeitdefinition“ wiederholt werden</Bedingung>
+    <Bedingung Nummer="[512]">Hinweis: Wenn der Code 303 im DE2379 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) genutzt wird, muss genau ein Wert im DE2380 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein</Bedingung>
+    <Bedingung Nummer="[513]">Hinweis: Wenn der Code 401 im DE2379 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) genutzt wird, muss genau ein Wert = 0000 im DE2380 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) sein</Bedingung>
+    <Bedingung Nummer="[514]">Hinweis: Für jeden Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) ist diese Sementgruppe einmal anzugeben</Bedingung>
+    <Bedingung Nummer="[515]">Hinweis: Kein Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) darf mehrfach vorkommen</Bedingung>
+    <Bedingung Nummer="[516]">Hinweis: Wenn der Code 303 im DE2379 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) genutzt wird, muss genau ein Wert im DE2380 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein</Bedingung>
+    <Bedingung Nummer="[517]">Hinweis: Wenn der Code 401 im DE2379 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) genutzt wird, muss genau ein Wert = 0000 im DE2380 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) sein</Bedingung>
+    <Bedingung Nummer="[518]">Hinweis: Für jeden Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) ist diese Sementgruppe einmal anzugeben</Bedingung>
+    <Bedingung Nummer="[519]">Hinweis: Kein Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) darf mehrfach vorkommen</Bedingung>
+    <Bedingung Nummer="[520]">Hinweis: Wenn der Code 303 im DE2379 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) genutzt wird, muss genau ein Wert im DE2380 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein</Bedingung>
+    <Bedingung Nummer="[521]">Hinweis: Wenn der Code 401 im DE2379 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45)</Bedingung>
+    <Bedingung Nummer="[522]">Hinweis: Jede ausgerollte Schaltzeitdefinition ist in einem eigenen IDE anzugeben</Bedingung>
+    <Bedingung Nummer="[523]">Hinweis: Jede ausgerollte Leistungskurvendefinition ist in einem eigenen IDE anzugeben</Bedingung>
+    <Bedingung Nummer="[524]">Hinweis: Es ist der Code einer Zählzeitdefinition anzugeben</Bedingung>
+    <Bedingung Nummer="[525]">Hinweis: Es ist der Code einer Schaltzeitdefinition anzugeben</Bedingung>
+    <Bedingung Nummer="[526]">Hinweis: Es ist der Code einer Leistungskurvendefinition anzugeben</Bedingung>
+    <Bedingung Nummer="[527]">Hinweis: Dieser Code ist anzugeben, wenn es sich um eine einmalig zu übermittelnde Definition handelt</Bedingung>
+    <Bedingung Nummer="[528]">Hinweis: Dieser Code ist anzugeben, wenn es sich um eine jährlich zu übermittelnde Definition handelt</Bedingung>
+    <Bedingung Nummer="[912]">Format: Wert kann mit maximal 6 Nachkommastellen angegeben werden</Bedingung>
+    <Bedingung Nummer="[913]">Format: Mögliche Werte: 1 bis 99999</Bedingung>
+    <Bedingung Nummer="[914]">Format: Möglicher Wert: &gt; 0</Bedingung>
+    <Bedingung Nummer="[915]">Format: Möglicher Wert: ≠ 1</Bedingung>
+    <Bedingung Nummer="[930]">Format: max. 2 Nachkommastellen</Bedingung>
+    <Bedingung Nummer="[931]">Format: ZZZ = +00</Bedingung>
+    <Bedingung Nummer="[932]">Format: HHMM = 2200</Bedingung>
+    <Bedingung Nummer="[933]">Format: HHMM = 2300</Bedingung>
+    <Bedingung Nummer="[947]">Format: MMDDHHMM = 12312300</Bedingung>
+    <Bedingung Nummer="[950]">Format: Marktlokations-ID</Bedingung>
+    <Bedingung Nummer="[951]">Format: Zählpunktbezeichnung</Bedingung>
+    <Bedingung Nummer="[963]">Format: Möglicher Wert: ≤ 100</Bedingung>
+    <Bedingung Nummer="[964]">Format: HHMM ≥ 0000</Bedingung>
+    <Bedingung Nummer="[965]">Format: HHMM ≤ 2359</Bedingung>
+    <Bedingung Nummer="[969]">Format: Möglicher Wer: ≤ 1</Bedingung>
+    <Bedingung Nummer="[2000]">Segment ist bis zu viermal je SG9 CCI+Z27 anzugeben</Bedingung>
+    <Bedingung Nummer="[2001]">Segment bzw. Segmentgruppe ist genau einmal anzugeben</Bedingung>
+    <Bedingung Nummer="[2002]">Für jeden Code der Zählzeit aus SG8 SEQ+Z42 (Zählzeitdefinition) SG9 CCI+Z39 (Code der Zählzeitdefinition) sind mindestens zwei Register anzugeben, bei denen in dieser SG8 das SG8 RFF+Z27 mit diesem Code gefüllt ist</Bedingung>
+  </Bedingungen>
+  <UB_Bedingungen>
+    <UB_Bedingung Nummer="[UB1]">([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])</UB_Bedingung>
+  </UB_Bedingungen>
+  <Pakete>
+    <Paket Nummer="[1P]">--</Paket>
+  </Pakete>
+</AHB>
