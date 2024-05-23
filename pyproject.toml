@@ -1,10 +1,10 @@
 [project]
-name = "your-favourite-package-name"
-description = "Description of your package"
+name = "bamx"
+description = "Python interface XML documents for MIG and AHBs, published by BDEW "
 license = { text = "MIT" }
 requires-python = ">=3.11"
-authors = [{ name = "your name", email = "your@email.address" }]
-keywords = ["your", "important", "keywords"]
+authors = [{ name = "Hochfrequenz Unternehmensberatung GmbH", email = "info+github@hochfrequenz.de" }]
+keywords = ["BDEW", "XML", "AHB", "MIG", "Marktkommunikation"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -20,8 +20,8 @@ dependencies = []     # add all the dependencies here
 dynamic = ["readme", "version"]
 
 [project.urls]
-Changelog = "https://github.com/Hochfrequenz/python_template_repository/releases"
-Homepage = "https://github.com/Hochfrequenz/python_template_repository"
+Changelog = "https://github.com/Hochfrequenz/bdew_ahb_mig_xml-python/releases"
+Homepage = "https://github.com/Hochfrequenz/bdew_ahb_mig_xml-python"
 
 [tool.black]
 line-length = 120
@@ -38,7 +38,7 @@ max-line-length = 120
 truethy-bool = true
 
 [tool.mypy]
-disable_error_code = ["no-untyped-def", "no-untyped-call"]
+disable_error_code = []
 
 [build-system]
 requires = ["hatchling>=1.8.0", "hatch-vcs", "hatch-fancy-pypi-readme"]
@@ -52,7 +52,7 @@ fragments = [{ path = "README.md" }]
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/_your_package_version.py"
+version-file = "src/_bamx_version.py"
 template = '''
 version = "{version}"
 '''
