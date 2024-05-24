@@ -20,8 +20,8 @@ dependencies = []     # add all the dependencies here
 dynamic = ["readme", "version"]
 
 [project.urls]
-Changelog = "https://github.com/Hochfrequenz/xml-fundamend/releases"
-Homepage = "https://github.com/Hochfrequenz/xml-fundamend"
+Changelog = "https://github.com/Hochfrequenz/xml-fundamend-python/releases"
+Homepage = "https://github.com/Hochfrequenz/xml-fundamend-python"
 
 [tool.black]
 line-length = 120
