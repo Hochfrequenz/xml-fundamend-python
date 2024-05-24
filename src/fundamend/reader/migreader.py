@@ -1,0 +1,212 @@
+"""
+the MigReader class in this module parses MIG XMLs and binds them to the data model
+"""
+
+import xml.etree.ElementTree as ET
+from datetime import date, datetime
+from pathlib import Path
+
+from fundamend.models.messageimplementationguide import (
+    Code,
+    DataElement,
+    DataElementGroup,
+    MessageImplementationGuide,
+    MigStatus,
+    Segment,
+    SegmentGroup,
+)
+
+
+def _is_segment_group(element: ET.Element) -> bool:
+    """
+    returns True if the given element is a segment group
+    """
+    return element.tag.startswith("G_SG")
+
+
+def _is_segment(element: ET.Element) -> bool:
+    """
+    returns True if the given element is a segment
+    """
+    return element.tag.startswith("S_")
+
+
+def _is_data_element_group(element: ET.Element) -> bool:
+    """
+    returns True if the given element is a data element group
+    """
+    return element.tag.startswith("C_")
+
+
+def _is_data_element(element: ET.Element) -> bool:
+    """
+    returns True if the given element is a data element
+    """
+    return element.tag.startswith("D_")
+
+
+def _is_code(element: ET.Element) -> bool:
+    """
+    returns True if the given element is a code
+    """
+    return element.tag == "Code"
+
+
+def _to_code(element: ET.Element) -> Code:
+    assert _is_code(element)
+    return Code(name=element.attrib["Name"], description=element.attrib["Description"] or None, value=element.text)
+
+
+def _to_data_element(element: ET.Element) -> DataElement:
+    assert _is_data_element(element)
+    codes = []
+    for child in element:
+        if _is_code(child):
+            codes.append(_to_code(child))
+        else:
+            raise ValueError(f"unexpected element: {child.tag}")
+    return DataElement(
+        id=element.tag,
+        name=element.attrib["Name"],
+        description=element.attrib["Description"] or None,
+        status_std=MigStatus(element.attrib["Status_Std"]),
+        status_specification=MigStatus(element.attrib["Status_Specification"]),
+        format_std=element.attrib["Format_Std"],
+        format_specification=element.attrib["Format_Specification"],
+        codes=codes,
+    )
+
+
+def _to_data_element_group(element: ET.Element) -> DataElementGroup:
+    assert _is_data_element_group(element)
+    data_elements = []
+    for child in element:
+        if _is_data_element(child):
+            data_elements.append(_to_data_element(child))
+        else:
+            raise ValueError(f"unexpected element: {child.tag}")
+    return DataElementGroup(
+        id=element.tag,
+        name=element.attrib["Name"],
+        description=element.attrib["Description"] or None,
+        status_std=MigStatus(element.attrib["Status_Std"]),
+        status_specification=MigStatus(element.attrib["Status_Specification"]),
+        data_elements=data_elements,
+    )
+
+
+def _to_segment(element: ET.Element) -> Segment:
+    assert _is_segment(element)
+    data_elements: list[DataElement | DataElementGroup] = []
+    for child in element:
+        if _is_data_element_group(child):
+            data_elements.append(_to_data_element_group(child))
+        elif _is_data_element(child):
+            data_elements.append(_to_data_element(child))
+        else:
+            raise ValueError(f"unexpected element: {child.tag}")
+    return Segment(
+        id=element.tag.lstrip("S_"),
+        name=element.attrib["Name"],
+        description=element.attrib["Description"] or None,
+        counter=element.attrib["Counter"],
+        level=int(element.attrib["Level"]),
+        max_rep_std=int(element.attrib["MaxRep_Std"]),
+        max_rep_specification=int(element.attrib["MaxRep_Specification"]),
+        status_std=MigStatus(element.attrib["Status_Std"]),
+        status_specification=MigStatus(element.attrib["Status_Specification"]),
+        example=element.attrib["Example"] or None,
+        number=element.attrib["Number"],
+        data_elements=data_elements,
+    )
+
+
+def _to_segment_group(element: ET.Element) -> SegmentGroup:
+    assert _is_segment_group(element)
+    segments_and_groups: list[SegmentGroup | Segment] = []
+    for child in element:
+        if _is_segment_group(child):
+            segments_and_groups.append(_to_segment_group(child))
+        elif _is_segment(child):
+            segments_and_groups.append(_to_segment(child))
+        else:
+            raise ValueError(f"unexpected element: {child.tag}")
+    return SegmentGroup(
+        id=element.tag.lstrip("G_SG"),
+        name=element.attrib["Name"],
+        status_std=MigStatus(element.attrib["Status_Std"]),
+        status_specification=MigStatus(element.attrib["Status_Specification"]),
+        counter=element.attrib["Counter"],
+        level=int(element.attrib["Level"]),
+        max_rep_std=int(element.attrib["MaxRep_Std"]),
+        max_rep_specification=int(element.attrib["MaxRep_Specification"]),
+        segments=[s for s in segments_and_groups if isinstance(s, Segment)],
+        segment_groups=[sg for sg in segments_and_groups if isinstance(sg, SegmentGroup)],
+    )
+
+
+class MigReader:
+    """
+    Accesses information from an XML based message implementation guide
+    """
+
+    def __init__(self, xml_path: Path):
+        """
+        initialize by providing the path to the XML file
+        """
+        self._xml_path = xml_path
+        self._element_tree = ET.parse(self._xml_path)
+
+    def get_publishing_date(self) -> date:
+        """
+        returns the publishing date of the message implementation guide
+        """
+        raw_value = self._element_tree.getroot().attrib["Veroeffentlichungsdatum"]  # e.g. '24.10.2023'
+        result = datetime.strptime(raw_value, "%d.%m.%Y").date()
+        return result
+
+    def get_author(self) -> str:
+        """
+        returns the author of the message implementation guide
+        """
+        return self._element_tree.getroot().attrib["Author"]
+
+    def get_version(self) -> str:
+        """
+        returns the version of the message implementation guide
+        """
+        return self._element_tree.getroot().attrib["Versionsnummer"]
+
+    def get_format(self) -> str:
+        """returns the format of the message implementation guide, e.g. 'UTILTS'"""
+        root_tag: str = self._element_tree.getroot().tag
+        return root_tag.lstrip("M_")  # converts 'M_UTILTS' to 'UTILTS'
+
+    def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
+        """recursive function that builds a list of all segments and segment groups"""
+        result: list[Segment | SegmentGroup] = []
+        if _is_segment_group(element):
+            result.append(_to_segment_group(element))
+        elif _is_segment(element):
+            result.append(_to_segment(element))
+        return result
+
+    def read(self) -> MessageImplementationGuide:
+        """
+        read the entire file and convert it to a MessageImplementationGuid instance
+        """
+        segments_and_groups = []
+        for index, element in enumerate(self._element_tree.getroot()):
+            if index == 0:
+                continue
+            segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
+
+        result = MessageImplementationGuide(
+            veroeffentlichungsdatum=self.get_publishing_date(),
+            autor=self.get_author(),
+            versionsnummer=self.get_version(),
+            format=self.get_format(),
+            segments=[s for s in segments_and_groups if isinstance(s, Segment)],
+            segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
+        )
+        return result
