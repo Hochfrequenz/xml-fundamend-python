@@ -14,7 +14,7 @@ Dieses Repository enthält das Python-Paket `fundamend`.
 Seit 2024 bietet der BDEW (endlich) maschinenlesbare MIG- und AHB-Spezifikationen an, wo zuvor nur PDF oder Word-Dateien veröffentlicht wurden.
 Das ist ein wichtiger Schritt für eine echte Digitalisierung der Marktkommunikation im deutschen Energiemarkt.
 
-Die nun maschinenlesbaren Informationen über den Aufgabe von EDIFACT-Nachrichten sind XML-basiert.
+Die nun maschinenlesbaren Informationen über den Aufbau von EDIFACT-Nachrichten sind XML-basiert.
 
 Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
 Das ist alles.
