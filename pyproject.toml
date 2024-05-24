@@ -1,6 +1,6 @@
 [project]
-name = "bamx"
-description = "Python interface XML documents for MIG and AHBs, published by BDEW "
+name = "fundamend"
+description = "XML basierte Formate und DatemModelle für die Energiewirtschaft in Deutschland"
 license = { text = "MIT" }
 requires-python = ">=3.11"
 authors = [{ name = "Hochfrequenz Unternehmensberatung GmbH", email = "info+github@hochfrequenz.de" }]
@@ -20,8 +20,8 @@ dependencies = []     # add all the dependencies here
 dynamic = ["readme", "version"]
 
 [project.urls]
-Changelog = "https://github.com/Hochfrequenz/bdew_ahb_mig_xml-python/releases"
-Homepage = "https://github.com/Hochfrequenz/bdew_ahb_mig_xml-python"
+Changelog = "https://github.com/Hochfrequenz/xml-fundamend/releases"
+Homepage = "https://github.com/Hochfrequenz/xml-fundamend"
 
 [tool.black]
 line-length = 120
@@ -52,7 +52,7 @@ fragments = [{ path = "README.md" }]
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/_bamx_version.py"
+version-file = "src/_fundamend_version.py"
 template = '''
 version = "{version}"
 '''

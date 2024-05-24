@@ -3,7 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from bamx.reader import MigReader
+from fundamend.models.messageimplementationguide import MessageImplementationGuide
+from fundamend.reader import MigReader
+
+from .example_migs import utilts_mig_11c, utilts_mig_11d
 
 
 @pytest.mark.parametrize(
@@ -51,4 +54,39 @@ def test_get_author(mig_xml_file_path: Path, expected: str) -> None:
 def test_get_version(mig_xml_file_path: Path, expected: str) -> None:
     reader = MigReader(mig_xml_file_path)
     actual = reader.get_version()
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "mig_xml_file_path, expected",
+    [
+        pytest.param(Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml", "UTILTS"),
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml", "UTILTS"
+        ),
+    ],
+)
+def test_get_format(mig_xml_file_path: Path, expected: str) -> None:
+    reader = MigReader(mig_xml_file_path)
+    actual = reader.get_format()
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "mig_xml_file_path, expected",
+    [
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml", utilts_mig_11c
+        ),
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
+            utilts_mig_11d,
+        ),
+    ],
+)
+def test_read_mig(mig_xml_file_path: Path, expected: MessageImplementationGuide) -> None:
+    reader = MigReader(mig_xml_file_path)
+    actual = reader.read()
+    assert actual is not None
+    assert isinstance(actual, MessageImplementationGuide)
     assert actual == expected
