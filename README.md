@@ -16,7 +16,7 @@ Das ist ein wichtiger Schritt für eine echte Digitalisierung der Marktkommunika
 
 Die nun maschinenlesbaren Informationen über den Aufgabe von EDIFACT-Nachrichten sind XML-basiert.
 
-Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
+Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
 Das ist alles.
 
 ## Installation und Verwendung
