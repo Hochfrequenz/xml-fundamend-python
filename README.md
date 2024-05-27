@@ -42,6 +42,7 @@ mig = reader.read()
 assert isinstance(mig, MessageImplementationGuide)
 assert mig.format == "UTILTS"
 ```
+Das vollständige Beispiel findet sich in den [unittests](unittests).
 
 Aktuell (Version 0.1) können nur MIGs gelesen werden.
 Der AHB-Teil soll aber folgen.
