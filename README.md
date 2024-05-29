@@ -1,6 +1,6 @@
 # FUNDAMEND - Formate und DAtenModelle für die ENergiewirtschaft in Deutschland
 
-Dieses Repository enthält das Python-Paket `fundamend`.
+Dieses Repository enthält das Python-Paket `fundamend`, das XML-basierte MIGs und AHBs als Python-Objekte einliest.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Python Versions (officially) supported](https://img.shields.io/pypi/pyversions/fundamend.svg)
@@ -18,6 +18,8 @@ Die nun maschinenlesbaren Informationen über den Aufbau von EDIFACT-Nachrichten
 
 Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
 Das ist alles.
+
+Hochfrequenz stellt mit [migmose](https://github.com/Hochfrequenz/migmose) auch ein Tool bereit, das maschinenlesbare MIGs aus `.docx`-Dateien scraped.
 
 ## Installation und Verwendung
 Das Paket ist auf PyPI verfügbar und kann mit pip installiert werden:
