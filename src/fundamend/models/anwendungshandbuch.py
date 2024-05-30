@@ -129,6 +129,8 @@ class Anwendungsfall:
     beschreibung: str  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
     format: str  #: e.g. 'UTILTS'
+    segments: list[Segment]
+    segment_groups: list[SegmentGroup]
 
 
 @dataclass(kw_only=True, eq=True)
