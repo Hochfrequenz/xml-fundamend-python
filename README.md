@@ -110,7 +110,7 @@ Das Ergebnis sieht dann so aus:
       "pruefidentifikator": "25001",
       "beschreibung": "Berechnungsformel",
       "kommunikation_von": "NB an MSB / LF",
-      "format": "AWF",
+      "format": "UTILTS",
       "segments": [
         {
           "id": "UNH",

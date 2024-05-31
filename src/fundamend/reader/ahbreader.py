@@ -237,7 +237,7 @@ class AhbReader:
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
-            format=original_element.tag.lstrip("M_"),
+            format=original_element[0].tag.lstrip("M_"),
             segments=[s for s in segments_and_groups if isinstance(s, Segment)],
             segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
         )
