@@ -88,6 +88,8 @@ pip install fundamend[pydantic]
 ```
 mit installiert wird, dann sind Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, automatisch pydantic Objekte.
 
+### JSON Schemas
+Das fundamend Datenmodell ist auch als JSON Schema verfügbar: [`json_schemas`](json_schemas).
 
 ## Verwendung und Mitwirken
 Der Code ist MIT-lizenziert und kann daher frei verwendet werden.
