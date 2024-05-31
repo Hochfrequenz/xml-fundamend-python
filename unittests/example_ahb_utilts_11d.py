@@ -23,7 +23,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25001",
             beschreibung="Berechnungsformel",
             kommunikation_von="NB an MSB / LF",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -6683,7 +6683,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25002",
             beschreibung="Ablehnung Berechnungsformel",
             kommunikation_von="MSB an NB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -13343,7 +13343,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25003",
             beschreibung="Zustimmung Berechnungsformel",
             kommunikation_von="MSB an NB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -20003,7 +20003,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25009",
             beschreibung="Übermittlung einer ausgerollten Leistungskurvendefinition",
             kommunikation_von="NB an LF / MSB\r\nLF an NB, MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -26663,7 +26663,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25008",
             beschreibung="Übermittlung einer ausgerollten Schaltzeitdefinition",
             kommunikation_von="NB an LF / MSB\r\nLF an NB, MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -33323,7 +33323,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25005",
             beschreibung="Übermittlung einer ausgerollten Zählzeitdefinition",
             kommunikation_von="NB an LF / MSB\r\nLF an MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -39983,7 +39983,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25007",
             beschreibung="Übermittlung Übersicht Leistungskurvendefinitionen",
             kommunikation_von="NB an LF / MSB\r\nLF an NB, MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -46643,7 +46643,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25006",
             beschreibung="Übermittlung Übersicht Schaltzeitdefinitionen",
             kommunikation_von="NB an LF / MSB\r\nLF an NB, MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
@@ -53303,7 +53303,7 @@ ahb_utilts_11d = Anwendungshandbuch(
             pruefidentifikator="25004",
             beschreibung="Übermittlung Übersicht Zählzeitdefinitionen",
             kommunikation_von="NB an LF / MSB\r\nLF an MSB",
-            format="AWF",
+            format="UTILTS",
             segments=[
                 Segment(
                     id="UNH",
