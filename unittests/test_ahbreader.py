@@ -3,8 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from fundamend.models.anwendungshandbuch import Anwendungsfall, Bedingung, Paket, UbBedingung
+from fundamend.models.anwendungshandbuch import Anwendungsfall, Anwendungshandbuch, Bedingung, Paket, UbBedingung
 from fundamend.reader import AhbReader
+
+from .example_ahb_utilts_11c import ahb_utilts_11c
+from .example_ahb_utilts_11d import ahb_utilts_11d
 
 
 @pytest.mark.parametrize(
@@ -127,3 +130,24 @@ def test_get_anwendungsfall(ahb_xml_file_path: Path, pruefidentifikator: str, ex
         assert actual.pruefidentifikator == pruefidentifikator
     else:
         assert actual is None
+
+
+@pytest.mark.parametrize(
+    "ahb_xml_file_path, expected",
+    [
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml",
+            ahb_utilts_11c,
+        ),
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml",
+            ahb_utilts_11d,
+        ),
+    ],
+)
+def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshandbuch) -> None:
+    reader = AhbReader(ahb_xml_file_path)
+    actual = reader.read()
+    assert actual is not None
+    assert isinstance(actual, Anwendungshandbuch)
+    assert actual == expected

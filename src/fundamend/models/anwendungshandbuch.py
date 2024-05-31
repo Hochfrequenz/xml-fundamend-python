@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class Code:
     """
     a single code element inside an AHB DataElement
@@ -15,14 +15,14 @@ class Code:
 
     # Example:
     # <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
-    # properties are similar to MIG data model, still we like to keep them separat instead of inheriting
+    # properties are similar to MIG data model, still we like to keep them separate instead of inheriting
     name: str  # e.g. 'Netznutzungszeiten-Nachricht'
     description: str | None = None  # e.g. ''
     value: str | None  # e.g. 'UTILTS'
     ahb_status: str  #: e.g. 'X' # new for AHB
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class DataElement:
     """
     A single data element inside a AHB Segment.
@@ -38,7 +38,7 @@ class DataElement:
     codes: list[Code]
 
 
-@dataclass(eq=True, kw_only=True)
+@dataclass(eq=True, kw_only=True, frozen=True)
 class DataElementGroup:
     """
     a group of data elements, German 'Datenelementgruppe' inside the AHB
@@ -62,7 +62,7 @@ class DataElementGroup:
     data_elements: list[DataElement]
 
 
-@dataclass(frozen=True, eq=True, order=True, unsafe_hash=True, kw_only=True)
+@dataclass(frozen=True, eq=True, unsafe_hash=True, kw_only=True)
 class Segment:
     """
     a segment inside an AHB
@@ -83,11 +83,11 @@ class Segment:
     id: str  #: e.g. 'BGM'
     name: str  #: e.g. 'Beginn der Nachricht'
     number: str  #: e.g. '00002'
-    ahb_status: str  #: e.g. 'Muss'
+    ahb_status: str | None  #: e.g. 'Muss'
     data_elements: list[DataElement | DataElementGroup]
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class SegmentGroup:
     """
     a "Segmentgruppe" inside an AHB
@@ -106,14 +106,14 @@ class SegmentGroup:
     #     </C_C506>
     #   </S_RFF>
     #  </G_SG6>
-    id: str  # e.g. 'SG6'
-    name: str  # e.g. 'Prüfidentifikator'
-    ahb_status: str  #:e.g. 'Muss'
+    id: str  #: e.g. 'SG6'
+    name: str  #: e.g. 'Prüfidentifikator'
+    ahb_status: str | None  #: e.g. 'Muss'
     segments: list[Segment]
     segment_groups: list["SegmentGroup"]
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class Anwendungsfall:
     """One Anwendungsfall "AWF" corresponds to one Prüfidentifikator or Type of Message"""
 
@@ -133,7 +133,7 @@ class Anwendungsfall:
     segment_groups: list[SegmentGroup]
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class Bedingung:
     """Ein ConditionKeyConditionText Mapping"""
 
@@ -141,7 +141,7 @@ class Bedingung:
     text: str  #: e.g. 'Nur MP-ID aus Sparte Strom'
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class UbBedingung:
     """Eine UB-Bedingung"""
 
@@ -151,7 +151,7 @@ class UbBedingung:
     text: str  #: e.g. '([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])'
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class Paket:
     """Ein Bedingungspaket/PackageKeyConditionText Mapping"""
 
@@ -161,7 +161,7 @@ class Paket:
     text: str  #: e.g. '--'
 
 
-@dataclass(kw_only=True, eq=True)
+@dataclass(kw_only=True, eq=True, frozen=True)
 class Anwendungshandbuch:
     """
     Ein Anwendungshandbuch bündelt verschiedene Nachrichtentypen/Anwendungsfälle im selben Format oder mit der selben

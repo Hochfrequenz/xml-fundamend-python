@@ -36,3 +36,13 @@ def _is_code(element: ET.Element) -> bool:
     returns True if the given element is a code
     """
     return element.tag == "Code"
+
+
+def _is_format(element: ET.Element) -> bool:
+    """returns true if element is wrapper around an anwendungsfall"""
+    return element.tag.startswith("M_")
+
+
+def _is_anwendungsfall(element: ET.Element) -> bool:
+    """returns true iff the element is an AHB anwendungsfall"""
+    return element.tag == "AWF"

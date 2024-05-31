@@ -20,9 +20,11 @@ from fundamend.models.anwendungshandbuch import (
     UbBedingung,
 )
 from fundamend.reader.element_distinction import (
+    _is_anwendungsfall,
     _is_code,
     _is_data_element,
     _is_data_element_group,
+    _is_format,
     _is_segment,
     _is_segment_group,
 )
@@ -33,27 +35,32 @@ from fundamend.reader.element_distinction import (
 
 def _to_code(element: ET.Element) -> Code:
     assert _is_code(element)
-    return Code(name=element.attrib["Name"], description=element.attrib["Description"] or None, value=element.text)
+    return Code(
+        name=element.attrib["Name"],
+        description=element.attrib["Description"] or None,
+        value=element.text,
+        ahb_status=element.attrib["AHB_Status"],
+    )
 
 
 def _to_bedingung(element: ET.Element) -> Bedingung:
-    return Bedingung(nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"), text=element.text.strip())
+    return Bedingung(
+        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        text=element.text.strip(),  # type:ignore[union-attr]
+    )
 
 
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
-    return UbBedingung(nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"), text=element.text.strip())
+    return UbBedingung(
+        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        text=element.text.strip(),  # type:ignore[union-attr]
+    )
 
 
 def _to_paket(element: ET.Element) -> Paket:
-    return Paket(nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"), text=element.text.strip())
-
-
-def _to_anwendungsfall(element: ET.Element) -> Anwendungsfall:
-    return Anwendungsfall(
-        pruefidentifikator=element.attrib["Pruefidentifikator"],
-        beschreibung=element.attrib["Beschreibung"],
-        kommunikation_von=element.attrib["Kommunikation_von"],
-        format=element.tag.lstrip("M_"),
+    return Paket(
+        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        text=element.text.strip(),  # type:ignore[union-attr]
     )
 
 
@@ -111,10 +118,14 @@ def _to_segment(element: ET.Element) -> Segment:
             data_elements.append(_to_data_element(child))
         else:
             raise ValueError(f"unexpected element: {child.tag}")
+    ahb_status: str | None = None
+    if "AHB_Status" in element.attrib and element.attrib["AHB_Status"].strip():
+        ahb_status = element.attrib["AHB_Status"]
     return Segment(
         id=element.tag.lstrip("S_"),
         name=element.attrib["Name"],
         number=element.attrib["Number"],
+        ahb_status=ahb_status,
         data_elements=data_elements,
     )
 
@@ -132,6 +143,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
     return SegmentGroup(
         id=element.tag.lstrip("G_SG"),
         name=element.attrib["Name"],
+        ahb_status=element.attrib["AHB_Status"],
         segments=[s for s in segments_and_groups if isinstance(s, Segment)],
         segment_groups=[sg for sg in segments_and_groups if isinstance(sg, SegmentGroup)],
     )
@@ -171,15 +183,17 @@ class AhbReader:
 
     def get_bedingungen(self) -> list[Bedingung]:
         """returns the plain bedingungen"""
-        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]
+        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]  # type:ignore[union-attr]
 
     def get_ub_bedingungen(self) -> list[UbBedingung]:
         """returns the UB Bedingungen"""
-        return [_to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")]
+        return [
+            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")
+        ]  # type:ignore[union-attr]
 
     def get_pakete(self) -> list[Paket]:
         """returns the package definitions"""
-        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]
+        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]  # type:ignore[union-attr]
 
     def get_anwendungsfall(self, pruefidentifikator: str) -> Anwendungsfall | None:
         """find the anwendungsfall matching the pruefidentifikator or return None"""
@@ -194,9 +208,21 @@ class AhbReader:
                 return self._read_anwendungsfall(element)
         return None
 
+    def get_anwendungsfaelle(self) -> list[Anwendungsfall]:
+        """finds all anwendungsfaelle in the XML file"""
+        result: list[Anwendungsfall] = []
+        for element in self._element_tree.getroot():
+            if element.tag != "AWF":
+                continue
+            result.append(self._read_anwendungsfall(element))
+        return result
+
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
         result: list[Segment | SegmentGroup] = []
+        if _is_anwendungsfall(element) or _is_format(element):
+            for sub_element in element:
+                result.extend(self._iter_segments_and_segment_groups(sub_element))
         if _is_segment_group(element):
             result.append(_to_segment_group(element))
         elif _is_segment(element):
@@ -205,9 +231,7 @@ class AhbReader:
 
     def _read_anwendungsfall(self, original_element: ET.Element) -> Anwendungsfall:
         segments_and_groups = []
-        for index, element in enumerate(self._element_tree.getroot()):
-            if index == 0:
-                continue
+        for element in self._element_tree.getroot():
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
@@ -230,5 +254,6 @@ class AhbReader:
             bedingungen=self.get_bedingungen(),
             ub_bedingungen=self.get_ub_bedingungen(),
             pakete=self.get_pakete(),
+            anwendungsfaelle=self.get_anwendungsfaelle(),
         )
         return result
