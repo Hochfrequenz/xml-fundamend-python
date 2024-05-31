@@ -129,7 +129,7 @@ def test_get_anwendungsfall(ahb_xml_file_path: Path, pruefidentifikator: str, ex
         assert isinstance(actual, Anwendungsfall)
         assert actual.pruefidentifikator == pruefidentifikator
         if "UTILTS" in str(ahb_xml_file_path):
-            assert actual.format=="UTILTS"
+            assert actual.format == "UTILTS"
     else:
         assert actual is None
 
