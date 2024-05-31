@@ -123,7 +123,6 @@ Das Ergebnis sieht dann so aus:
               "name": "Nachrichten-Referenznummer",
               "codes": []
             },
-            ...
 ```
 
 ### JSON Schemas
