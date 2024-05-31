@@ -16,8 +16,13 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = []     # add all the dependencies here
+dependencies = [] # add all the fundamend dependencies here, None so far
 dynamic = ["readme", "version"]
+
+[project.optional-dependencies]
+pydantic = ["pydantic>=2"] # if you install fundamend[pydantic], the dataclasses from pydantic will be used
+
+
 
 [project.urls]
 Changelog = "https://github.com/Hochfrequenz/xml-fundamend-python/releases"

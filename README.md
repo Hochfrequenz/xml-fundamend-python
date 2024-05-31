@@ -79,6 +79,15 @@ assert {awf.pruefidentifikator for awf in ahb.anwendungsfaelle} == {
 
 Die vollständigen Beispiele finden sich in den [unittests](unittests).
 
+### Verwendung mit Pydantic
+Per default verwendet fundamend die [dataclasses aus der Python-Standardlibrary](https://docs.python.org/3/library/dataclasses.html).
+Es lässt sich aber auch direkt mit [Pydantic](https://docs.pydantic.dev/latest/) und den [Pydantic dataclasses](https://docs.pydantic.dev/2.7/concepts/dataclasses/) verwenden.
+Wenn entweder pydantic schon installiert ist, oder mittels
+```bash
+pip install fundamend[pydantic]
+```
+mit installiert wird, dann sind Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, automatisch pydantic Objekte.
+
 
 ## Verwendung und Mitwirken
 Der Code ist MIT-lizenziert und kann daher frei verwendet werden.

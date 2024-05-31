@@ -3,8 +3,9 @@
 # pylint:disable=duplicate-code
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
 
-from dataclasses import dataclass
 from datetime import date
+
+from ._dataclass_wrapper import dataclass
 
 
 @dataclass(kw_only=True, eq=True, frozen=True)
