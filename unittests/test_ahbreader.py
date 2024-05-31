@@ -151,3 +151,15 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshan
     assert actual is not None
     assert isinstance(actual, Anwendungshandbuch)
     assert actual == expected
+    assert len(actual.anwendungsfaelle) == 9
+    assert {awf.pruefidentifikator for awf in actual.anwendungsfaelle} == {
+        "25001",
+        "25002",
+        "25003",
+        "25004",
+        "25005",
+        "25006",
+        "25007",
+        "25008",
+        "25009",
+    }
