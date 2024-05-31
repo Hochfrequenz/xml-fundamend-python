@@ -188,8 +188,8 @@ class AhbReader:
     def get_ub_bedingungen(self) -> list[UbBedingung]:
         """returns the UB Bedingungen"""
         return [
-            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")
-        ]  # type:ignore[union-attr]
+            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type:ignore[union-attr]
+        ]
 
     def get_pakete(self) -> list[Paket]:
         """returns the package definitions"""
