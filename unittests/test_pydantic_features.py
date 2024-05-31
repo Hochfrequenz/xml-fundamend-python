@@ -30,7 +30,7 @@ def test_json_dump(model: Anwendungshandbuch | MessageImplementationGuide) -> No
     if isinstance(model, Anwendungshandbuch):
         root_model = RootModel[Anwendungshandbuch](model)
     elif isinstance(model, MessageImplementationGuide):
-        root_model = RootModel[MessageImplementationGuide](model)
+        root_model = RootModel[MessageImplementationGuide](model)  # type:ignore[assignment]
     else:
         raise ValueError(f"Unexpected type: {model}")
     json_dict = root_model.model_dump(mode="json")
