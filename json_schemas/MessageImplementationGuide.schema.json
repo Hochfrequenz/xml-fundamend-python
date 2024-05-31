@@ -1,0 +1,356 @@
+{
+    "$defs": {
+        "Code": {
+            "description": "a single code element inside a MIG Dataelement",
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string"
+                },
+                "value": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Value"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ],
+            "title": "Code",
+            "type": "object"
+        },
+        "DataElement": {
+            "description": "A single data element inside a MIG Segment.\nThis models both the 'Datenelement' and the 'Gruppendatenelement'",
+            "properties": {
+                "codes": {
+                    "items": {
+                        "$ref": "#/$defs/Code"
+                    },
+                    "title": "Codes",
+                    "type": "array"
+                },
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "format_specification": {
+                    "title": "Format Specification",
+                    "type": "string"
+                },
+                "format_std": {
+                    "title": "Format Std",
+                    "type": "string"
+                },
+                "id": {
+                    "title": "Id",
+                    "type": "string"
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string"
+                },
+                "status_specification": {
+                    "$ref": "#/$defs/MigStatus"
+                },
+                "status_std": {
+                    "$ref": "#/$defs/MigStatus"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "status_std",
+                "status_specification",
+                "format_std",
+                "format_specification",
+                "codes"
+            ],
+            "title": "DataElement",
+            "type": "object"
+        },
+        "DataElementGroup": {
+            "description": "a group of data elements, German 'Datenelementgruppe'.",
+            "properties": {
+                "data_elements": {
+                    "items": {
+                        "$ref": "#/$defs/DataElement"
+                    },
+                    "title": "Data Elements",
+                    "type": "array"
+                },
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "id": {
+                    "title": "Id",
+                    "type": "string"
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string"
+                },
+                "status_specification": {
+                    "$ref": "#/$defs/MigStatus"
+                },
+                "status_std": {
+                    "$ref": "#/$defs/MigStatus"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "status_std",
+                "status_specification",
+                "data_elements"
+            ],
+            "title": "DataElementGroup",
+            "type": "object"
+        },
+        "MigStatus": {
+            "description": "status of a MIG element",
+            "enum": [
+                "M",
+                "C",
+                "R",
+                "N",
+                "D"
+            ],
+            "title": "MigStatus",
+            "type": "string"
+        },
+        "Segment": {
+            "description": "a segment inside a MIG",
+            "properties": {
+                "counter": {
+                    "title": "Counter",
+                    "type": "string"
+                },
+                "data_elements": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/DataElement"
+                            },
+                            {
+                                "$ref": "#/$defs/DataElementGroup"
+                            }
+                        ]
+                    },
+                    "title": "Data Elements",
+                    "type": "array"
+                },
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "example": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Example"
+                },
+                "id": {
+                    "title": "Id",
+                    "type": "string"
+                },
+                "level": {
+                    "title": "Level",
+                    "type": "integer"
+                },
+                "max_rep_specification": {
+                    "title": "Max Rep Specification",
+                    "type": "integer"
+                },
+                "max_rep_std": {
+                    "title": "Max Rep Std",
+                    "type": "integer"
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string"
+                },
+                "number": {
+                    "title": "Number",
+                    "type": "string"
+                },
+                "status_specification": {
+                    "$ref": "#/$defs/MigStatus"
+                },
+                "status_std": {
+                    "$ref": "#/$defs/MigStatus"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "counter",
+                "level",
+                "number",
+                "max_rep_std",
+                "max_rep_specification",
+                "status_std",
+                "status_specification",
+                "example",
+                "data_elements"
+            ],
+            "title": "Segment",
+            "type": "object"
+        },
+        "SegmentGroup": {
+            "description": "a \"Segtmentgruppe\"",
+            "properties": {
+                "counter": {
+                    "title": "Counter",
+                    "type": "string"
+                },
+                "id": {
+                    "title": "Id",
+                    "type": "string"
+                },
+                "level": {
+                    "title": "Level",
+                    "type": "integer"
+                },
+                "max_rep_specification": {
+                    "title": "Max Rep Specification",
+                    "type": "integer"
+                },
+                "max_rep_std": {
+                    "title": "Max Rep Std",
+                    "type": "integer"
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string"
+                },
+                "segment_groups": {
+                    "items": {
+                        "$ref": "#/$defs/SegmentGroup"
+                    },
+                    "title": "Segment Groups",
+                    "type": "array"
+                },
+                "segments": {
+                    "items": {
+                        "$ref": "#/$defs/Segment"
+                    },
+                    "title": "Segments",
+                    "type": "array"
+                },
+                "status_specification": {
+                    "$ref": "#/$defs/MigStatus"
+                },
+                "status_std": {
+                    "$ref": "#/$defs/MigStatus"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "counter",
+                "level",
+                "max_rep_std",
+                "max_rep_specification",
+                "status_std",
+                "status_specification",
+                "segments",
+                "segment_groups"
+            ],
+            "title": "SegmentGroup",
+            "type": "object"
+        }
+    },
+    "description": "message implementation guide (MIG)",
+    "properties": {
+        "autor": {
+            "title": "Autor",
+            "type": "string"
+        },
+        "format": {
+            "title": "Format",
+            "type": "string"
+        },
+        "segment_groups": {
+            "items": {
+                "$ref": "#/$defs/SegmentGroup"
+            },
+            "title": "Segment Groups",
+            "type": "array"
+        },
+        "segments": {
+            "items": {
+                "$ref": "#/$defs/Segment"
+            },
+            "title": "Segments",
+            "type": "array"
+        },
+        "veroeffentlichungsdatum": {
+            "format": "date",
+            "title": "Veroeffentlichungsdatum",
+            "type": "string"
+        },
+        "versionsnummer": {
+            "title": "Versionsnummer",
+            "type": "string"
+        }
+    },
+    "required": [
+        "veroeffentlichungsdatum",
+        "autor",
+        "versionsnummer",
+        "format",
+        "segments",
+        "segment_groups"
+    ],
+    "title": "MessageImplementationGuide",
+    "type": "object"
+}

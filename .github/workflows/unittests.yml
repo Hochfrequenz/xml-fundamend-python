@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
+        pydantic: [true, false]
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +22,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox
+      - name: install pydantic if requested
+        if: matrix.run_step == 'true'
+        run: pip install -r dev_requirements/requirements-pydantic.txt
       - name: Run the Unit Tests via Tox
         run: |
           tox -e tests

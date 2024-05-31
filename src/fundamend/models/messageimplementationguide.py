@@ -1,8 +1,9 @@
 """classes that represent MIGs"""
 
-from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
+
+from ._dataclass_wrapper import dataclass
 
 # I didn't invent the data model ;)
 # pylint:disable=too-many-instance-attributes
