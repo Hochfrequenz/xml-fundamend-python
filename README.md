@@ -88,6 +88,44 @@ pip install fundamend[pydantic]
 ```
 mit installiert wird, dann sind Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, automatisch pydantic Objekte.
 
+Mit Pydantic können die Ergebnisse auch leicht bspw. als JSON exportiert werden:
+```python
+from pathlib import Path
+
+from pydantic import RootModel
+from fundamend import Anwendungshandbuch, AhbReader
+
+ahb = AhbReader(Path("UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml")).read()
+ahb_json = RootModel[Anwendungshandbuch](ahb).model_dump(mode="json")
+```
+
+Das Ergebnis sieht dann so aus:
+```json
+{
+  "veroeffentlichungsdatum": "2024-04-02",
+  "autor": "BDEW",
+  "versionsnummer": "1.1d",
+  "anwendungsfaelle": [
+    {
+      "pruefidentifikator": "25001",
+      "beschreibung": "Berechnungsformel",
+      "kommunikation_von": "NB an MSB / LF",
+      "format": "AWF",
+      "segments": [
+        {
+          "id": "UNH",
+          "name": "Nachrichten-Kopfsegment",
+          "number": "00001",
+          "ahb_status": "Muss",
+          "data_elements": [
+            {
+              "id": "D_0062",
+              "name": "Nachrichten-Referenznummer",
+              "codes": []
+            },
+            ...
+```
+
 ### JSON Schemas
 Das fundamend Datenmodell ist auch als JSON Schema verfügbar: [`json_schemas`](json_schemas).
 
