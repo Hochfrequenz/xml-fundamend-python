@@ -19,7 +19,7 @@ Die nun maschinenlesbaren Informationen über den Aufbau von EDIFACT-Nachrichten
 Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
 Das ist alles.
 
-Hochfrequenz stellt mit [migmose](https://github.com/Hochfrequenz/migmose) auch ein Tool bereit, das maschinenlesbare MIGs aus `.docx`-Dateien scraped.
+Hochfrequenz stellt mit [migmose](https://github.com/Hochfrequenz/migmose) und [kohlrahbi](https://github.com/Hochfrequenz/kohlrahbi) auch Tools bereit, um maschinenlesbare MIGs bzw. AHBs aus `.docx`-Dateien zu scrapen.
 
 ## Installation und Verwendung
 Das Paket ist auf PyPI verfügbar und kann mit pip installiert werden:
