@@ -6,7 +6,7 @@
 #
 annotated-types==0.7.0
     # via pydantic
-pydantic==2.7.3
+pydantic==2.7.4
     # via -r dev_requirements/requirements-pydantic.in
 pydantic-core==2.18.4
     # via pydantic
