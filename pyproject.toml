@@ -29,7 +29,7 @@ formatting = [
     "isort==5.13.2"
 ]
 linting = [
-    "pylint==3.3.0"
+    "pylint==3.3.1"
 ]
 pydantic = [
     "pydantic>=2"
@@ -74,6 +74,9 @@ disable_error_code = []
 [build-system]
 requires = ["hatchling>=1.8.0", "hatch-vcs", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
+
+[tool.hatch.envs.default]
+python="3.12"
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
