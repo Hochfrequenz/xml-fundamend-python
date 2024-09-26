@@ -24,7 +24,7 @@ jobs:
           pip install tox
       - name: install pydantic if requested
         if: matrix.run_step == 'true'
-        run: pip install -r dev_requirements/requirements-pydantic.txt
+        run: pip install .[pydantic]
       - name: Run the Unit Tests via Tox
         run: |
           tox -e tests
