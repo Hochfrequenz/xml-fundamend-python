@@ -19,6 +19,7 @@ class MigStatus(StrEnum):
     R = "R"
     N = "N"
     D = "D"
+    O = "O"
 
 
 @dataclass(kw_only=True, eq=True)
