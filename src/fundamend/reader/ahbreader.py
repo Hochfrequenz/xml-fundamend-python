@@ -60,7 +60,7 @@ def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
 def _to_paket(element: ET.Element) -> Paket:
     return Paket(
         nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
-        text=element.text.strip(),  # type:ignore[union-attr]
+        text=(element.text or "").strip(),
     )
 
 
