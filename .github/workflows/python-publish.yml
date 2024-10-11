@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ "3.12" ]
+        python-version: [ "3.13" ]
         os: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ "3.12" ]
+        python-version: [ "3.13" ]
         os: [ ubuntu-latest ]
         # Specifying a GitHub environment, # Specifying a GitHub environment, which is strongly recommended by
         #PyPI: https://docs.pypi.org/trusted-publishers/adding-a-publisher/
