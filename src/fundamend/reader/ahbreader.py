@@ -36,10 +36,13 @@ from fundamend.reader.element_distinction import (
 
 def _to_code(element: ET.Element) -> Code:
     assert _is_code(element)
+    value = element.text
+    if value is not None:
+        value = value.strip()
     return Code(
         name=element.attrib["Name"],
         description=element.attrib["Description"] or None,
-        value=element.text.strip(),
+        value=value,
         ahb_status=element.attrib["AHB_Status"],
     )
 
