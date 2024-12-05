@@ -52,3 +52,7 @@ def main(xml_in_path: Path) -> None:
             _convert_to_json_file(xml_path)
     else:
         _convert_to_json_file(xml_in_path)
+
+def cli() -> None:
+    """entry point of the script defined in pyproject.toml"""
+    main()
