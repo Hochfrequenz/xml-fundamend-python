@@ -35,6 +35,10 @@ pydantic = [
     "pydantic>=2"
     # if you install fundamend[pydantic], the dataclasses from pydantic will be used
 ]
+cli = [
+    "fundamend[pydantic]",
+    "typer" # if you install fundamend[cli], the cli commands are available via typer
+]
 spellcheck = [
     "codespell==2.3.0"
 ]
@@ -64,6 +68,12 @@ profile = "black"
 
 [tool.pylint."MESSAGES CONTROL"]
 max-line-length = 120
+
+[project.scripts]
+xml2json = "fundamend.cli:main"
+# fundamend is the package in the src directory
+# .cli means the cli.py module inside the fundamend package
+# :main means the def main() function inside the cli.py module
 
 [mypy]
 truethy-bool = true
