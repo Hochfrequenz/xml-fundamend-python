@@ -224,7 +224,8 @@ class AhbReader:
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
         result: list[Segment | SegmentGroup] = []
-        if _is_anwendungsfall(element) or _is_format(element) or _is_uebertragungsdatei(element):
+        should_go_deeper = _is_anwendungsfall(element) or _is_format(element) or _is_uebertragungsdatei(element)
+        if should_go_deeper:
             for sub_element in element:
                 result.extend(self._iter_segments_and_segment_groups(sub_element))
         if _is_segment_group(element):
@@ -235,14 +236,16 @@ class AhbReader:
 
     def _read_anwendungsfall(self, original_element: ET.Element) -> Anwendungsfall:
         segments_and_groups = []
-        root = self._element_tree.getroot()
-        for element in root:
+        for element in original_element:
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
+        format_element = original_element[0]
+        if _is_uebertragungsdatei(format_element):
+            format_element = original_element[0][0]
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
-            format=original_element[0].tag.lstrip("M_"),
+            format=format_element.tag.lstrip("M_"),
             segments=[s for s in segments_and_groups if isinstance(s, Segment)],
             segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
         )

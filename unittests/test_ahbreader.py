@@ -158,8 +158,6 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshan
     actual = reader.read()
     assert actual is not None
     assert isinstance(actual, Anwendungshandbuch)
-    assert actual.anwendungsfaelle[0].segment_groups == expected.anwendungsfaelle[0].segment_groups
-    assert actual == expected
     assert len(actual.anwendungsfaelle) == 9
     assert {awf.pruefidentifikator for awf in actual.anwendungsfaelle} == {
         "25001",
@@ -172,3 +170,7 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshan
         "25008",
         "25009",
     }
+    for awf in actual.anwendungsfaelle:
+        assert any(awf.segments)
+        assert any(awf.segment_groups)
+    assert actual == expected
