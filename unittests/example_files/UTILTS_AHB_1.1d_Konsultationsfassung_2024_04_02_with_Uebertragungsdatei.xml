@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- this file has been created by copying "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml" and replacing `<M_UTILTS>` with `<M_UTILTS><Uebertragungsdatei>` -->
+<!-- this file has been created by copying "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml" and replacing `<M_UTILTS>` with `<Uebertragungsdatei><M_UTILTS>` -->
 <AHB Versionsnummer="1.1d"
     Veroeffentlichungsdatum="02.04.2024"
     Author="BDEW">
   <AWF Pruefidentifikator="25001" Beschreibung="Berechnungsformel" Kommunikation_von="NB an MSB / LF">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00001" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -298,10 +298,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25002" Beschreibung="Ablehnung Berechnungsformel" Kommunikation_von="MSB an NB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00030" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -454,10 +454,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25003" Beschreibung="Zustimmung Berechnungsformel" Kommunikation_von="MSB an NB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00043" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -598,10 +598,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25009" Beschreibung="Übermittlung einer ausgerollten Leistungskurvendefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00055" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -810,10 +810,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25008" Beschreibung="Übermittlung einer ausgerollten Schaltzeitdefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00074" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -1022,10 +1022,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25005" Beschreibung="Übermittlung einer ausgerollten Zählzeitdefinition" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00093" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -1229,10 +1229,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25007" Beschreibung="Übermittlung Übersicht Leistungskurvendefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00112" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -1434,10 +1434,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25006" Beschreibung="Übermittlung Übersicht Schaltzeitdefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an NB, MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00130" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -1639,10 +1639,10 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <AWF Pruefidentifikator="25004" Beschreibung="Übermittlung Übersicht Zählzeitdefinitionen" Kommunikation_von="NB an LF / MSB&#13;&#10;LF an MSB">
-    <M_UTILTS><Uebertragungsdatei>
+    <Uebertragungsdatei><M_UTILTS>
       <S_UNH Name="Nachrichten-Kopfsegment" Number="00148" AHB_Status="Muss">
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
         <C_S009 Name="Nachrichten-Kennung">
@@ -1919,7 +1919,7 @@
         <D_0074 Name="Anzahl der Segmente in einer Nachricht" AHB_Status="X"/>
         <D_0062 Name="Nachrichten-Referenznummer" AHB_Status="X"/>
       </S_UNT>
-    </Uebertragungsdatei></M_UTILTS>
+    </M_UTILTS></Uebertragungsdatei>
   </AWF>
   <Bedingungen>
     <Bedingung Nummer="[1]">Nur MP-ID aus Sparte Strom</Bedingung>
