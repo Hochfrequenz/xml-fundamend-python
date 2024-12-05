@@ -3,11 +3,11 @@
 import json
 import sys
 from pathlib import Path
-from typing_extensions import Annotated
 
 import typer
 from pydantic import RootModel
 from rich.console import Console
+from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
@@ -41,14 +41,19 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
 
 
 @app.command()
-def main(xml_path: Annotated[Path, typer.Option(
+def main(
+    xml_path: Annotated[
+        Path,
+        typer.Option(
             exists=True,
             file_okay=True,
             dir_okay=True,
             writable=True,
             readable=True,
             resolve_path=True,
-        )]) -> None:
+        ),
+    ]
+) -> None:
     """
     converts the xml file from xml_in_path to a json file next to the .xml
     """
@@ -60,6 +65,7 @@ def main(xml_path: Annotated[Path, typer.Option(
             _convert_to_json_file(xml_path)
     else:
         _convert_to_json_file(xml_path)
+
 
 def cli() -> None:
     """entry point of the script defined in pyproject.toml"""
