@@ -61,8 +61,8 @@ def main(
         err_console.print(f"The path {xml_path.absolute()} does not exist")
         sys.exit(1)
     if xml_path.is_dir():
-        for xml_path in xml_path.rglob("*.xml"):
-            _convert_to_json_file(xml_path)
+        for _xml_path in xml_path.rglob("*.xml"):
+            _convert_to_json_file(_xml_path)
     else:
         _convert_to_json_file(xml_path)
 
