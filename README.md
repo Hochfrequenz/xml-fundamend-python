@@ -124,6 +124,20 @@ Das Ergebnis sieht dann so aus:
               "codes": []
             },
 ```
+### CLI Tool
+Mit
+```bash
+pip install fundamend[cli]
+```
+Kann ein CLI-Tool in der entsprechenden venv installiert werden, das einzelne MIG- und AHB-XML-Dateien in entsprechende JSONs konvertiert:
+```bash
+(myvenv): xml2json path/to/mig.xml
+```
+erzeugt `path/to/mig.json`. Und
+```bash
+(myvenv): xml2json path/to/my/directory
+```
+konvertiert alle XML-Dateien im entsprechenden Verzeichnis.
 
 ### JSON Schemas
 Das fundamend Datenmodell ist auch als JSON Schema verfügbar: [`json_schemas`](json_schemas).
