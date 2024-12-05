@@ -1,7 +1,6 @@
 """contains the entrypoint for the command line interface"""
 
 import json
-import sys
 from pathlib import Path
 
 import typer
@@ -57,7 +56,7 @@ def main(
     """
     converts the xml file from xml_in_path to a json file next to the .xml
     """
-    assert xml_path.exists()
+    assert xml_path.exists()  # ensured by typer
     if xml_path.is_dir():
         for _xml_path in xml_path.rglob("*.xml"):
             _convert_to_json_file(_xml_path)
