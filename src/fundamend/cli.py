@@ -24,11 +24,11 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
         raise ValueError(f"Cannot detect if {xml_file_path} is an AHB or MIG")
     root_model: RootModel[Anwendungshandbuch] | RootModel[MessageImplementationGuide]
     if is_ahb:
-        model = AhbReader(xml_file_path).read()
-        root_model = RootModel[Anwendungshandbuch](model)
+        ahb_model = AhbReader(xml_file_path).read()
+        root_model = RootModel[Anwendungshandbuch](ahb_model)
     elif is_mig:
-        model = MigReader(xml_file_path).read()
-        root_model = RootModel[MessageImplementationGuide](model)
+        mig_model = MigReader(xml_file_path).read()
+        root_model = RootModel[MessageImplementationGuide](mig_model)
     else:
         raise ValueError(f"Seems like {xml_file_path} is neither an AHB nor a MIG")
     out_dict = root_model.model_dump(mode="json")
