@@ -175,9 +175,6 @@ class MigReader:
 
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
-        if _is_uebertragungsdatei(element):
-            root = _get_first_tag_starting_with_m(element)
-            return self._iter_segments_and_segment_groups(root)
         result: list[Segment | SegmentGroup] = []
         if _is_segment_group(element):
             result.append(_to_segment_group(element))
