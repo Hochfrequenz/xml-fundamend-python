@@ -11,7 +11,7 @@ from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
-app = typer.Typer(help="Convert XML(s) by BDEW to JSON(s)")
+app = typer.Typer(name="xml2json", help="Convert XML(s) by BDEW to JSON(s)")
 err_console = Console(stderr=True)  # https://typer.tiangolo.com/tutorial/printing/#printing-to-standard-error
 
 
@@ -57,9 +57,7 @@ def main(
     """
     converts the xml file from xml_in_path to a json file next to the .xml
     """
-    if not xml_path.exists():
-        err_console.print(f"The path {xml_path.absolute()} does not exist")
-        sys.exit(1)
+    assert xml_path.exists()
     if xml_path.is_dir():
         for _xml_path in xml_path.rglob("*.xml"):
             _convert_to_json_file(_xml_path)
@@ -70,3 +68,7 @@ def main(
 def cli() -> None:
     """entry point of the script defined in pyproject.toml"""
     typer.run(main)
+
+
+if __name__ == "__main__":
+    app()

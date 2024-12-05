@@ -6,6 +6,7 @@ _SKIP_TESTS = False
 try:
     from typer.testing import CliRunner
 
+    runner = CliRunner()
     from fundamend.cli import app
 except ImportError:
     _SKIP_TESTS = True
@@ -23,8 +24,8 @@ def test_cli_single_file_mig(tmp_path: Path) -> None:
     original_mig_file = Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
     tmp_mig_path = tmp_path / "my_mig.xml"
     _copy_xml_file(original_mig_file, tmp_mig_path)
-    runner = CliRunner()
-    runner.invoke(app, [str(tmp_mig_path)])
+    result = runner.invoke(app, ["--xml-path", str(tmp_mig_path.absolute())])
+    assert result.exit_code == 0
     assert (tmp_path / "my_mig.json").exists()
 
 
@@ -34,8 +35,8 @@ def test_cli_single_file_ahb(tmp_path: Path) -> None:
     original_ahb_file = Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"
     tmp_ahb_path = tmp_path / "my_ahb.xml"
     _copy_xml_file(original_ahb_file, tmp_ahb_path)
-    runner = CliRunner()
-    runner.invoke(app, [str(tmp_ahb_path)])
+    result = runner.invoke(app, ["--xml-path", str(tmp_ahb_path)])
+    assert result.exit_code == 0
     assert (tmp_path / "my_ahb.json").exists()
 
 
@@ -48,7 +49,7 @@ def test_cli_directory(tmp_path: Path) -> None:
     tmp_ahb_path = tmp_path / "my_ahb.xml"
     _copy_xml_file(original_ahb_file, tmp_ahb_path)
     _copy_xml_file(original_mig_file, tmp_mig_path)
-    runner = CliRunner()
-    runner.invoke(app, [str(tmp_path)])
+    result = runner.invoke(app, ["--xml-path", str(tmp_path)])
+    assert result.exit_code == 0
     assert (tmp_path / "my_mig.json").exists()
     assert (tmp_path / "my_ahb.json").exists()
