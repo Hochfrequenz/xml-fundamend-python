@@ -124,7 +124,7 @@ Das Ergebnis sieht dann so aus:
               "codes": []
             },
 ```
-### CLI Tool
+### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash
 pip install fundamend[cli]
