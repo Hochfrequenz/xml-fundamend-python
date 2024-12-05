@@ -131,11 +131,11 @@ pip install fundamend[cli]
 ```
 Kann ein CLI-Tool in der entsprechenden venv installiert werden, das einzelne MIG- und AHB-XML-Dateien in entsprechende JSONs konvertiert:
 ```bash
-(myvenv): xml2json path/to/mig.xml
+(myvenv): xml2json --xml-path path/to/mig.xml
 ```
 erzeugt `path/to/mig.json`. Und
 ```bash
-(myvenv): xml2json path/to/my/directory
+(myvenv): xml2json --xml-path path/to/my/directory
 ```
 konvertiert alle XML-Dateien im entsprechenden Verzeichnis.
 

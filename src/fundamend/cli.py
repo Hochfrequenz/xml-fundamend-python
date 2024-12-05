@@ -1,16 +1,16 @@
 """contains the entrypoint for the command line interface"""
 
 import json
-import sys
 from pathlib import Path
 
 import typer
 from pydantic import RootModel
 from rich.console import Console
+from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
-app = typer.Typer(help="Convert XML(s) by BDEW to JSON(s)")
+app = typer.Typer(name="xml2json", help="Convert XML(s) by BDEW to JSON(s)")
 err_console = Console(stderr=True)  # https://typer.tiangolo.com/tutorial/printing/#printing-to-standard-error
 
 
@@ -40,15 +40,34 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
 
 
 @app.command()
-def main(xml_in_path: Path) -> None:
+def main(
+    xml_path: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=True,
+            writable=True,
+            readable=True,
+            resolve_path=True,
+        ),
+    ]
+) -> None:
     """
     converts the xml file from xml_in_path to a json file next to the .xml
     """
-    if not xml_in_path.exists():
-        err_console.print(f"The path {xml_in_path.absolute()} does not exist")
-        sys.exit(1)
-    if xml_in_path.is_dir():
-        for xml_path in xml_in_path.rglob("*.xml"):
-            _convert_to_json_file(xml_path)
+    assert xml_path.exists()  # ensured by typer
+    if xml_path.is_dir():
+        for _xml_path in xml_path.rglob("*.xml"):
+            _convert_to_json_file(_xml_path)
     else:
-        _convert_to_json_file(xml_in_path)
+        _convert_to_json_file(xml_path)
+
+
+def cli() -> None:
+    """entry point of the script defined in pyproject.toml"""
+    typer.run(main)
+
+
+if __name__ == "__main__":
+    app()
