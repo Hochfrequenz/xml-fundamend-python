@@ -137,12 +137,6 @@ class MigReader:
         self._xml_path = xml_path
         self._element_tree = ET.parse(self._xml_path)
 
-    def _get_format_root(self) -> ET.Element:
-        actual_root = self._element_tree.getroot()
-        if actual_root.tag == "Uebertragungsdatei":
-            return actual_root.find("//*[starts-with(name(), 'M_')][1]")
-        return actual_root
-
     def get_publishing_date(self) -> date:
         """
         returns the publishing date of the message implementation guide
