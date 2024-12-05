@@ -27,6 +27,7 @@ from fundamend.reader.element_distinction import (
     _is_format,
     _is_segment,
     _is_segment_group,
+    _is_uebertragungsdatei,
 )
 
 # pylint:disable=duplicate-code
@@ -38,7 +39,7 @@ def _to_code(element: ET.Element) -> Code:
     return Code(
         name=element.attrib["Name"],
         description=element.attrib["Description"] or None,
-        value=element.text,
+        value=element.text.strip(),
         ahb_status=element.attrib["AHB_Status"],
     )
 
@@ -220,7 +221,7 @@ class AhbReader:
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
         result: list[Segment | SegmentGroup] = []
-        if _is_anwendungsfall(element) or _is_format(element):
+        if _is_anwendungsfall(element) or _is_format(element) or _is_uebertragungsdatei(element):
             for sub_element in element:
                 result.extend(self._iter_segments_and_segment_groups(sub_element))
         if _is_segment_group(element):
@@ -231,7 +232,8 @@ class AhbReader:
 
     def _read_anwendungsfall(self, original_element: ET.Element) -> Anwendungsfall:
         segments_and_groups = []
-        for element in self._element_tree.getroot():
+        root = self._element_tree.getroot()
+        for element in root:
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
