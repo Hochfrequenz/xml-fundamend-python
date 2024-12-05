@@ -238,11 +238,14 @@ class AhbReader:
         segments_and_groups = []
         for element in original_element:
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
+        format_element = original_element[0]
+        if _is_uebertragungsdatei(format_element):
+            format_element = original_element[0][0]
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
-            format=original_element[0].tag.lstrip("M_"),
+            format=format_element.tag.lstrip("M_"),
             segments=[s for s in segments_and_groups if isinstance(s, Segment)],
             segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
         )

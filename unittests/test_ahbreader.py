@@ -173,4 +173,4 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshan
     for awf in actual.anwendungsfaelle:
         assert any(awf.segments)
         assert any(awf.segment_groups)
-    #assert actual == expected
+    assert actual == expected
