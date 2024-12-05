@@ -77,7 +77,9 @@ assert {awf.pruefidentifikator for awf in ahb.anwendungsfaelle} == {
 }
 ```
 
-Die vollständigen Beispiele finden sich in den [unittests](unittests).
+Die vollständigen Beispiele finden sich in den [unittests](unittests):
+- Beispiel [AHB UTILTS](unittests/example_ahb_utilts_11d.py)
+- Beispiel [MIG UTILTS](https://github.com/Hochfrequenz/xml-fundamend-python/blob/main/unittests/example_migs.py)
 
 ### Verwendung mit Pydantic
 Per default verwendet fundamend die [dataclasses aus der Python-Standardlibrary](https://docs.python.org/3/library/dataclasses.html).
@@ -88,7 +90,7 @@ pip install fundamend[pydantic]
 ```
 mit installiert wird, dann sind Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, automatisch pydantic Objekte.
 
-Mit Pydantic können die Ergebnisse auch leicht bspw. als JSON exportiert werden:
+Mit Pydantic können die Ergebnisse auch leicht bspw. als JSON exportiert werden (was auch über ein CLI-Tool im nächsten Abschnitt) noch einfacher möglich ist.
 ```python
 from pathlib import Path
 
