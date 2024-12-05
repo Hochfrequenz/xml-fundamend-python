@@ -3,6 +3,7 @@
 import json
 import sys
 from pathlib import Path
+from typing_extensions import Annotated
 
 import typer
 from pydantic import RootModel
@@ -40,19 +41,26 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
 
 
 @app.command()
-def main(xml_in_path: Path) -> None:
+def main(xml_path: Annotated[Path, typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=True,
+            writable=True,
+            readable=True,
+            resolve_path=True,
+        )]) -> None:
     """
     converts the xml file from xml_in_path to a json file next to the .xml
     """
-    if not xml_in_path.exists():
-        err_console.print(f"The path {xml_in_path.absolute()} does not exist")
+    if not xml_path.exists():
+        err_console.print(f"The path {xml_path.absolute()} does not exist")
         sys.exit(1)
-    if xml_in_path.is_dir():
-        for xml_path in xml_in_path.rglob("*.xml"):
+    if xml_path.is_dir():
+        for xml_path in xml_path.rglob("*.xml"):
             _convert_to_json_file(xml_path)
     else:
-        _convert_to_json_file(xml_in_path)
+        _convert_to_json_file(xml_path)
 
 def cli() -> None:
     """entry point of the script defined in pyproject.toml"""
-    main()
+    typer.run(main)
