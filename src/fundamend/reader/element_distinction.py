@@ -46,3 +46,8 @@ def _is_format(element: ET.Element) -> bool:
 def _is_anwendungsfall(element: ET.Element) -> bool:
     """returns true iff the element is an AHB anwendungsfall"""
     return element.tag == "AWF"
+
+
+def _is_uebertragungsdatei(element: ET.Element) -> bool:
+    """returns true iff the element is an Uebertragsdatei element (usually below the format level)"""
+    return element.tag == "Uebertragungsdatei"

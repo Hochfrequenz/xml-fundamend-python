@@ -82,6 +82,12 @@ def test_get_format(mig_xml_file_path: Path, expected: str) -> None:
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
             utilts_mig_11d,
         ),
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            utilts_mig_11d,
+        ),
     ],
 )
 def test_read_mig(mig_xml_file_path: Path, expected: MessageImplementationGuide) -> None:

@@ -21,6 +21,7 @@ from fundamend.reader.element_distinction import (
     _is_data_element_group,
     _is_segment,
     _is_segment_group,
+    _is_uebertragungsdatei,
 )
 
 
@@ -117,6 +118,13 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
     )
 
 
+def _get_first_tag_starting_with_m(element: ET.Element) -> ET.Element:
+    for elem in element.iter():
+        if elem.tag.startswith("M_"):
+            return elem
+    raise ValueError("No element starting with M_ found")
+
+
 class MigReader:
     """
     Accesses information from an XML based message implementation guide
@@ -133,7 +141,8 @@ class MigReader:
         """
         returns the publishing date of the message implementation guide
         """
-        raw_value = self._element_tree.getroot().attrib["Veroeffentlichungsdatum"]  # e.g. '24.10.2023'
+        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
+        raw_value = root.attrib["Veroeffentlichungsdatum"]  # e.g. '24.10.2023'
         result = datetime.strptime(raw_value, "%d.%m.%Y").date()
         return result
 
@@ -141,18 +150,22 @@ class MigReader:
         """
         returns the author of the message implementation guide
         """
-        return self._element_tree.getroot().attrib["Author"]
+        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
+        return root.attrib["Author"]
 
     def get_version(self) -> str:
         """
         returns the version of the message implementation guide
         """
-        return self._element_tree.getroot().attrib["Versionsnummer"]
+        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
+        return root.attrib["Versionsnummer"]
 
     def get_format(self) -> str:
         """returns the format of the message implementation guide, e.g. 'UTILTS'"""
-        root_tag: str = self._element_tree.getroot().tag
-        return root_tag.lstrip("M_")  # converts 'M_UTILTS' to 'UTILTS'
+        root = self._element_tree.getroot()
+        if _is_uebertragungsdatei(root):
+            root = _get_first_tag_starting_with_m(root)
+        return root.tag.lstrip("M_")  # converts 'M_UTILTS' to 'UTILTS'
 
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
@@ -168,7 +181,13 @@ class MigReader:
         read the entire file and convert it to a MessageImplementationGuid instance
         """
         segments_and_groups = []
-        for index, element in enumerate(self._element_tree.getroot()):
+        root = self._element_tree.getroot()
+        if _is_uebertragungsdatei(root):
+            for elem in root.iter():
+                if elem.tag.startswith("M_"):
+                    root = elem
+                    break
+        for index, element in enumerate(root):
             if index == 0:
                 continue
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
