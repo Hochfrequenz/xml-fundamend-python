@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 try:
@@ -5,11 +7,20 @@ try:
 except ImportError:
     pytest.skip("Only available with pydantic", allow_module_level=True)
 
-from fundamend import Anwendungshandbuch, MessageImplementationGuide
+from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
-from .example_ahb_utilts_11c import ahb_utilts_11c
-from .example_ahb_utilts_11d import ahb_utilts_11d
-from .example_migs import utilts_mig_11c, utilts_mig_11d
+ahb_utilts_11c = AhbReader(
+    Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"
+).read()
+ahb_utilts_11d = AhbReader(
+    Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"
+).read()
+utilts_mig_11c = MigReader(
+    Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
+).read()
+utilts_mig_11d = MigReader(
+    Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml"
+).read()
 
 
 def test_json_schema_export_mig() -> None:
