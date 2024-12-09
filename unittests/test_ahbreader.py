@@ -2,12 +2,10 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from fundamend.models.anwendungshandbuch import Anwendungsfall, Anwendungshandbuch, Bedingung, Paket, UbBedingung
 from fundamend.reader import AhbReader
-
-from .example_ahb_utilts_11c import ahb_utilts_11c
-from .example_ahb_utilts_11d import ahb_utilts_11d
 
 
 @pytest.mark.parametrize(
@@ -134,26 +132,24 @@ def test_get_anwendungsfall(ahb_xml_file_path: Path, pruefidentifikator: str, ex
         assert actual is None
 
 
+@pytest.mark.snapshot
 @pytest.mark.parametrize(
-    "ahb_xml_file_path, expected",
+    "ahb_xml_file_path",
     [
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml",
-            ahb_utilts_11c,
         ),
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml",
-            ahb_utilts_11d,
         ),
         pytest.param(
             Path(__file__).parent
             / "example_files"
-            / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
-            ahb_utilts_11d,
+            / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml"
         ),
     ],
 )
-def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshandbuch) -> None:
+def test_get_anwendungshandbuch(ahb_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
     reader = AhbReader(ahb_xml_file_path)
     actual = reader.read()
     assert actual is not None
@@ -173,4 +169,4 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, expected: Anwendungshan
     for awf in actual.anwendungsfaelle:
         assert any(awf.segments)
         assert any(awf.segment_groups)
-    assert actual == expected
+    snapshot.assert_match(actual)

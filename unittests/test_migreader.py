@@ -2,11 +2,10 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from fundamend.models.messageimplementationguide import MessageImplementationGuide
 from fundamend.reader import MigReader
-
-from .example_migs import utilts_mig_11c, utilts_mig_11d
 
 
 @pytest.mark.parametrize(
@@ -72,27 +71,24 @@ def test_get_format(mig_xml_file_path: Path, expected: str) -> None:
     assert actual == expected
 
 
+@pytest.mark.snapshot
 @pytest.mark.parametrize(
-    "mig_xml_file_path, expected",
+    "mig_xml_file_path",
     [
-        pytest.param(
-            Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml", utilts_mig_11c
-        ),
+        pytest.param(Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"),
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
-            utilts_mig_11d,
         ),
         pytest.param(
             Path(__file__).parent
             / "example_files"
             / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
-            utilts_mig_11d,
         ),
     ],
 )
-def test_read_mig(mig_xml_file_path: Path, expected: MessageImplementationGuide) -> None:
+def test_read_mig(mig_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
     reader = MigReader(mig_xml_file_path)
     actual = reader.read()
     assert actual is not None
     assert isinstance(actual, MessageImplementationGuide)
-    assert actual == expected
+    snapshot.assert_match(actual)
