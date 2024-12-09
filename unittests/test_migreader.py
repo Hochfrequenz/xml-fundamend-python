@@ -75,14 +75,19 @@ def test_get_format(mig_xml_file_path: Path, expected: str) -> None:
 @pytest.mark.parametrize(
     "mig_xml_file_path",
     [
-        pytest.param(Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"),
+        pytest.param(
+            Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml",
+            id="UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml",
+        ),
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
+            id="UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
         ),
         pytest.param(
             Path(__file__).parent
             / "example_files"
             / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            id="UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
         ),
     ],
 )
