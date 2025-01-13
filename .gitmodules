@@ -1,0 +1,3 @@
+[submodule "xml-migs-and-ahbs"]
+	path = xml-migs-and-ahbs
+	url = https://github.com/Hochfrequenz/xml-migs-and-ahbs/
