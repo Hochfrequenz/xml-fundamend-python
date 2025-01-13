@@ -106,10 +106,10 @@ def test_read_ahb_xml(ahb_xml_file_path: Path, expected_date: date) -> None:
             data_path / "APERAK" / "APERAK_MIG_2_1h_ausserordentliche_2024_07_26_2022_10_01.xml",
             date(2024, 7, 26),
         ),
-        # pytest.param(
-        #     data_path / "CONTRL" / "CONTRL_MIG_2_0b_ausserordentliche_2024_07_26_2022_10_01xml",
-        #     date(2024, 7, 26),
-        # ),
+        pytest.param(
+            data_path / "CONTRL" / "CONTRL_MIG_2_0b_ausserordentliche_2024_07_26_2022_10_01.xml",
+            date(2024, 7, 26),
+        ),
         pytest.param(
             data_path / "IFTSTA" / "IFTSTA_MIG_2_0e_auserordentliche_2024_07_26_2024_03_11.xml",
             date(2024, 7, 26),
