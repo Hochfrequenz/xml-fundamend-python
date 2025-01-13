@@ -5,7 +5,9 @@ import pytest
 
 from fundamend.reader import AhbReader, MigReader
 
-data_path: Path = Path(__file__).parent.parent/ "xml-migs-and-ahbs"
+data_path: Path = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+
+
 @pytest.mark.parametrize(
     "ahb_xml_file_path, expected_date",
     [
@@ -95,6 +97,7 @@ def test_read_ahb_xml(ahb_xml_file_path: Path, expected_date: date) -> None:
     reader = AhbReader(ahb_xml_file_path)
     actual = reader.get_publishing_date()
     assert actual == expected_date
+
 
 @pytest.mark.parametrize(
     "mig_xml_file_path, expected_date",
