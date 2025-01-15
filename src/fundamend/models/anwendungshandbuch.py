@@ -170,8 +170,8 @@ class Paket:
 @dataclass(kw_only=True, eq=True, frozen=True)
 class Anwendungshandbuch:
     """
-    Ein Anwendungshandbuch, indicated by the `<AHB´ tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im selben Format oder mit der selben
-    regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
+    Ein Anwendungshandbuch, indicated by the `<AHB´ tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im
+    selben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
     """
 
     # Example:
