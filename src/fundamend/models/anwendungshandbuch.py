@@ -11,7 +11,7 @@ from ._dataclass_wrapper import dataclass
 @dataclass(kw_only=True, eq=True, frozen=True)
 class Code:
     """
-    a single code element inside an AHB DataElement
+    a single code element inside an AHB DataElement, indicated by the ´<Code´ tag.
     """
 
     # Example:
@@ -26,8 +26,8 @@ class Code:
 @dataclass(kw_only=True, eq=True, frozen=True)
 class DataElement:
     """
-    A single data element inside a AHB Segment.
-    This models both the 'Datenelement' and the 'Gruppendatenelement'
+    A single data element inside a AHB Segment, indicated by the ´<D_xxxx´ tag.
+    This elment can contain a single or multiple Code elements.
     """
 
     # Example:
@@ -42,7 +42,8 @@ class DataElement:
 @dataclass(eq=True, kw_only=True, frozen=True)
 class DataElementGroup:
     """
-    a group of data elements, German 'Datenelementgruppe' inside the AHB
+    a group of data elements, German 'Datenelementgruppe' inside the AHB, indicated by the ´<C_xxxx´ tag.
+    This model can contain both the 'Datenelement' and the 'Gruppendatenelement'
     """
 
     # "Die Datenelementgruppe C0829 enthält mehrere Gruppendatenelemente. Diese Datenelementgruppe enthält das
@@ -66,7 +67,8 @@ class DataElementGroup:
 @dataclass(frozen=True, eq=True, unsafe_hash=True, kw_only=True)
 class Segment:
     """
-    a segment inside an AHB
+    A segment inside an AHB, indicated by the ´<S_xxxx´ tag.
+    This model can contain both data elements and data element groups.
     """
 
     # Example:
@@ -91,7 +93,8 @@ class Segment:
 @dataclass(kw_only=True, eq=True, frozen=True)
 class SegmentGroup:
     """
-    a "Segmentgruppe" inside an AHB
+    A "Segmentgruppe" inside an AHB, indicated by the ´<G_xxxx´ tag.
+    This model can contain both Segments and segment groups.
     """
 
     # Example:
@@ -116,7 +119,9 @@ class SegmentGroup:
 
 @dataclass(kw_only=True, eq=True, frozen=True)
 class Anwendungsfall:
-    """One Anwendungsfall "AWF" corresponds to one Prüfidentifikator or Type of Message"""
+    """
+    One Anwendungsfall, indicated by "<AWF" tag, corresponds to one Prüfidentifikator or Type of Message
+    """
 
     # Example:
     # <AWF Pruefidentifikator="25001" Beschreibung="Berechnungsformel" Kommunikation_von="NB an MSB / LF">
@@ -165,7 +170,7 @@ class Paket:
 @dataclass(kw_only=True, eq=True, frozen=True)
 class Anwendungshandbuch:
     """
-    Ein Anwendungshandbuch bündelt verschiedene Nachrichtentypen/Anwendungsfälle im selben Format oder mit der selben
+    Ein Anwendungshandbuch, indicated by the `<AHB´ tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im selben Format oder mit der selben
     regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
     """
 
