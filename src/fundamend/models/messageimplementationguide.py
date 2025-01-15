@@ -25,7 +25,7 @@ class MigStatus(StrEnum):
 @dataclass(kw_only=True, eq=True)
 class Code:
     """
-    a single code element inside a MIG Dataelement, indicated by the ´<Code´ tag.
+    A single code element inside a MIG Dataelement, indicated by the ´<Code´ tag.
     """
 
     # Example:
@@ -128,7 +128,7 @@ class Segment:
 @dataclass(kw_only=True, eq=True)
 class SegmentGroup:
     """
-    A "Segtmentgruppe" inside a MIG, indicated by the ´<G_xxxx´ tag. A segment contains segements and segments groups.
+    A "Segtmentgruppe" inside a MIG, indicated by the ´<G_xxxx´ tag. A segment contains segments and segments groups.
     """
 
     # pylint:disable=line-too-long

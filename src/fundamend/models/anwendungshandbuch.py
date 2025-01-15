@@ -11,7 +11,7 @@ from ._dataclass_wrapper import dataclass
 @dataclass(kw_only=True, eq=True, frozen=True)
 class Code:
     """
-    a single code element inside an AHB DataElement, indicated by the ´<Code´ tag.
+    A single code element inside an AHB DataElement, indicated by the ´<Code´ tag.
     """
 
     # Example:
@@ -26,8 +26,8 @@ class Code:
 @dataclass(kw_only=True, eq=True, frozen=True)
 class DataElement:
     """
-    A single data element inside a AHB Segment, indicated by the ´<D_xxxx´ tag.
-    This elment can contain a single or multiple Code elements.
+    A single data element, German 'Datenelement' inside an AHB Segment, indicated by the ´<D_xxxx´ tag.
+    This element can contain a single or multiple Code elements.
     """
 
     # Example:
@@ -42,7 +42,7 @@ class DataElement:
 @dataclass(eq=True, kw_only=True, frozen=True)
 class DataElementGroup:
     """
-    a group of data elements, German 'Datenelementgruppe' inside the AHB, indicated by the ´<C_xxxx´ tag.
+    A group of data elements, German 'Datenelementgruppe' inside the AHB, indicated by the ´<C_xxxx´ tag.
     This model can contain both the 'Datenelement' and the 'Gruppendatenelement'
     """
 
