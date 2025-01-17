@@ -148,8 +148,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         id=element.tag.lstrip("G_SG"),
         name=element.attrib["Name"],
         ahb_status=element.attrib["AHB_Status"],
-        segments=[s for s in segments_and_groups if isinstance(s, Segment)],
-        segment_groups=[sg for sg in segments_and_groups if isinstance(sg, SegmentGroup)],
+        elements=list(segments_and_groups),
     )
 
 
@@ -246,8 +245,7 @@ class AhbReader:
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
             format=format_element.tag.lstrip("M_"),
-            segments=[s for s in segments_and_groups if isinstance(s, Segment)],
-            segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
+            elements=list(segments_and_groups),
         )
 
     def read(self) -> Anwendungshandbuch:

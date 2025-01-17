@@ -4,6 +4,7 @@
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
 
 from datetime import date
+from typing import Union
 
 from ._dataclass_wrapper import dataclass
 
@@ -110,8 +111,7 @@ class SegmentGroup:
     id: str  #: e.g. 'SG6'
     name: str  #: e.g. 'Prüfidentifikator'
     ahb_status: str | None  #: e.g. 'Muss'
-    segments: list[Segment]
-    segment_groups: list["SegmentGroup"]
+    elements: list[Union[Segment, "SegmentGroup"]]
 
 
 @dataclass(kw_only=True, eq=True, frozen=True)
@@ -130,8 +130,7 @@ class Anwendungsfall:
     beschreibung: str  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
     format: str  #: e.g. 'UTILTS'
-    segments: list[Segment]
-    segment_groups: list[SegmentGroup]
+    elements: list[Union[Segment, SegmentGroup]]
 
 
 @dataclass(kw_only=True, eq=True, frozen=True)
