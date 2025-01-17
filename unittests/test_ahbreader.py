@@ -170,6 +170,5 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, snapshot: SnapshotAsser
         "25009",
     }
     for awf in actual.anwendungsfaelle:
-        assert any(awf.segments)
-        assert any(awf.segment_groups)
+        assert any(awf.elements)
     snapshot.assert_match(actual)
