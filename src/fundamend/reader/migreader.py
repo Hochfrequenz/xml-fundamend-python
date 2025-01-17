@@ -181,16 +181,26 @@ class MigReader:
         read the entire file and convert it to a MessageImplementationGuid instance
         """
         segments_and_groups = []
+        root_gathering = []
         root = self._element_tree.getroot()
         if _is_uebertragungsdatei(root):
             for elem in root.iter():
+                if elem.tag.startswith("S_UNA") | elem.tag.startswith("S_UNB"):
+                    root_gathering.append(elem)
                 if elem.tag.startswith("M_"):
-                    root = elem
+                    root_gathering.append(elem)
                     break
-        for index, element in enumerate(root):
-            if index == 0:
+        for sinlge_root in root_gathering:
+            if sinlge_root.tag.startswith("M_"):
+                for index, element in enumerate(sinlge_root):
+                    if index == 0:
+                        if not element.tag.startswith("S_UNH"):
+                            continue
+                    segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
+            if sinlge_root.tag.startswith("S_UNA") | sinlge_root.tag.startswith("S_UNB"):
+                segments_and_groups.extend(self._iter_segments_and_segment_groups(sinlge_root))
+            else:
                 continue
-            segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
 
         result = MessageImplementationGuide(
             veroeffentlichungsdatum=self.get_publishing_date(),
