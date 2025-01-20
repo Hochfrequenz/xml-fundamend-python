@@ -4,7 +4,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Union
 
-from ._dataclass_wrapper import dataclass
+from .base import FundamendBaseModel
 
 # I didn't invent the data model ;)
 # pylint:disable=too-many-instance-attributes
@@ -23,8 +23,7 @@ class MigStatus(StrEnum):
     O = "O"
 
 
-@dataclass(kw_only=True, eq=True)
-class Code:
+class Code(FundamendBaseModel):
     """
     A single code element inside a MIG data element, indicated by the `<Code>` tag.
     """
@@ -36,8 +35,7 @@ class Code:
     value: str | None  # e.g. 'UTILTS'
 
 
-@dataclass(kw_only=True, eq=True)
-class DataElement:
+class DataElement(FundamendBaseModel):
     """
     A single data element inside a MIG Segment.
     This models both the 'Datenelement' and the 'Gruppendatenelement', indicated by the `<D_xxxx` tag.
@@ -59,8 +57,7 @@ class DataElement:
     codes: list[Code]
 
 
-@dataclass(eq=True, kw_only=True)
-class DataElementGroup:
+class DataElementGroup(FundamendBaseModel):
     """
     A group of data elements, German 'Datenelementgruppe', indicated by the `<C_xxxx>` tag.
     Are able to contain a single or multiple data elements.
@@ -91,8 +88,7 @@ class DataElementGroup:
     data_elements: list[DataElement]
 
 
-@dataclass(frozen=True, eq=True, order=True, unsafe_hash=True, kw_only=True)
-class Segment:
+class Segment(FundamendBaseModel):
     """
     A segment inside a MIG, indicated by the `<S_xxxx>` tag. A segment contains data elements and data element groups.
     """
@@ -126,8 +122,7 @@ class Segment:
     data_elements: list[DataElement | DataElementGroup]
 
 
-@dataclass(kw_only=True, eq=True)
-class SegmentGroup:
+class SegmentGroup(FundamendBaseModel):
     """
     A 'Segmentgruppe' inside a MIG, indicated by the `<G_xxx>` tag. A segment contains segments and segments groups.
     """
@@ -160,8 +155,7 @@ class SegmentGroup:
     elements: list[Union[Segment, "SegmentGroup"]]
 
 
-@dataclass(kw_only=True, eq=True)
-class MessageImplementationGuide:
+class MessageImplementationGuide(FundamendBaseModel):
     """
     message implementation guide (MIG)
     """
