@@ -6,11 +6,10 @@
 from datetime import date
 from typing import Union
 
-from ._dataclass_wrapper import dataclass
+from fundamend.models.base import FundamendBaseModel
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class Code:
+class Code(FundamendBaseModel):
     """
     A single code element inside an AHB DataElement, indicated by the `<Code>` tag.
     """
@@ -24,8 +23,7 @@ class Code:
     ahb_status: str  #: e.g. 'X' # new for AHB
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class DataElement:
+class DataElement(FundamendBaseModel):
     """
     A single data element, German 'Datenelement' inside an AHB Segment, indicated by the `<D_xxxx>` tag.
     This element can contain a single or multiple Code elements.
@@ -40,8 +38,7 @@ class DataElement:
     codes: list[Code]
 
 
-@dataclass(eq=True, kw_only=True, frozen=True)
-class DataElementGroup:
+class DataElementGroup(FundamendBaseModel):
     """
     A group of data elements, German 'Datenelementgruppe' inside the AHB, indicated by the `<C_xxxx>` tag.
     This model can contain both the 'Datenelement' and the 'Gruppendatenelement'
@@ -65,8 +62,7 @@ class DataElementGroup:
     data_elements: list[DataElement]
 
 
-@dataclass(frozen=True, eq=True, unsafe_hash=True, kw_only=True)
-class Segment:
+class Segment(FundamendBaseModel):
     """
     A segment inside an AHB, indicated by the `<S_xxxx>` tag.
     This model can contain both data elements and data element groups.
@@ -91,8 +87,7 @@ class Segment:
     data_elements: list[DataElement | DataElementGroup]
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class SegmentGroup:
+class SegmentGroup(FundamendBaseModel):
     """
     A 'Segmentgruppe' inside an AHB, indicated by the `<G_xxxx>` tag.
     This model can contain both Segments and segment groups.
@@ -117,8 +112,7 @@ class SegmentGroup:
     elements: list[Union[Segment, "SegmentGroup"]]
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class Anwendungsfall:
+class Anwendungsfall(FundamendBaseModel):
     """
     One 'Anwendungsfall', indicated by `<AWF>` tag, corresponds to one Prüfidentifikator or type of Message
     """
@@ -138,16 +132,14 @@ class Anwendungsfall:
     elements: list[Union[Segment, SegmentGroup]]
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class Bedingung:
+class Bedingung(FundamendBaseModel):
     """Ein ConditionKeyConditionText Mapping"""
 
     nummer: str  #: e.g. '1'
     text: str  #: e.g. 'Nur MP-ID aus Sparte Strom'
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class UbBedingung:
+class UbBedingung(FundamendBaseModel):
     """Eine UB-Bedingung"""
 
     # Example:
@@ -156,8 +148,7 @@ class UbBedingung:
     text: str  #: e.g. '([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])'
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class Paket:
+class Paket(FundamendBaseModel):
     """Ein Bedingungspaket/PackageKeyConditionText Mapping"""
 
     # Example:
@@ -166,8 +157,7 @@ class Paket:
     text: str  #: e.g. '--'
 
 
-@dataclass(kw_only=True, eq=True, frozen=True)
-class Anwendungshandbuch:
+class Anwendungshandbuch(FundamendBaseModel):
     """
     Ein Anwendungshandbuch, indicated by the `<AHB` tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im
     selben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.

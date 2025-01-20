@@ -17,7 +17,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [] # add all the fundamend dependencies here, None so far
+dependencies = [
+    "pydantic"
+]
 dynamic = ["readme", "version"]
 
 [project.optional-dependencies]
