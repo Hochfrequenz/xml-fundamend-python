@@ -26,7 +26,7 @@ class MigStatus(StrEnum):
 @dataclass(kw_only=True, eq=True)
 class Code:
     """
-    a single code element inside a MIG Dataelement
+    A single code element inside a MIG data element, indicated by the `<Code>` tag.
     """
 
     # Example:
@@ -40,7 +40,8 @@ class Code:
 class DataElement:
     """
     A single data element inside a MIG Segment.
-    This models both the 'Datenelement' and the 'Gruppendatenelement'
+    This models both the 'Datenelement' and the 'Gruppendatenelement', indicated by the `<D_xxxx` tag.
+    Are able to contain a single or multiple Code elements.
     """
 
     # pylint:disable=line-too-long
@@ -51,8 +52,8 @@ class DataElement:
     id: str  # e.g. 'D_0065'
     name: str  # e.g. 'Nachrichtentyp-Kennung'
     description: str | None = None  # e.g. ''
-    status_std: MigStatus
-    status_specification: MigStatus
+    status_std: MigStatus  # e.g. M
+    status_specification: MigStatus  # e.g. M
     format_std: str  #: e.g. 'an..6'
     format_specification: str  #: e.g. 'an..6'
     codes: list[Code]
@@ -61,7 +62,8 @@ class DataElement:
 @dataclass(eq=True, kw_only=True)
 class DataElementGroup:
     """
-    a group of data elements, German 'Datenelementgruppe'.
+    A group of data elements, German 'Datenelementgruppe', indicated by the `<C_xxxx>` tag.
+    Are able to contain a single or multiple data elements.
     """
 
     # "Die Datenelementgruppe C0829 enthält mehrere Gruppendatenelemente. Diese Datenelementgruppe enthält das
@@ -84,15 +86,15 @@ class DataElementGroup:
     id: str  # e.g. 'C_C082'
     name: str  # e.g. 'Identifikation des Beteiligten'
     description: str | None = None  # e.g. ''
-    status_std: MigStatus
-    status_specification: MigStatus
+    status_std: MigStatus  # e.g. C
+    status_specification: MigStatus  # e.g. R
     data_elements: list[DataElement]
 
 
 @dataclass(frozen=True, eq=True, order=True, unsafe_hash=True, kw_only=True)
 class Segment:
     """
-    a segment inside a MIG
+    A segment inside a MIG, indicated by the `<S_xxxx>` tag. A segment contains data elements and data element groups.
     """
 
     # Example:
@@ -118,8 +120,8 @@ class Segment:
     number: str  #: e.g. '00004'
     max_rep_std: int  #: e.g. 1
     max_rep_specification: int  #: e.g. 1
-    status_std: MigStatus
-    status_specification: MigStatus
+    status_std: MigStatus  # e.g. M
+    status_specification: MigStatus  # e.g. M
     example: str | None  #: e.g. "NAD+MS+9900259000002::293'"
     data_elements: list[DataElement | DataElementGroup]
 
@@ -127,7 +129,7 @@ class Segment:
 @dataclass(kw_only=True, eq=True)
 class SegmentGroup:
     """
-    a "Segtmentgruppe"
+    A 'Segmentgruppe' inside a MIG, indicated by the `<G_xxx>` tag. A segment contains segments and segments groups.
     """
 
     # pylint:disable=line-too-long
