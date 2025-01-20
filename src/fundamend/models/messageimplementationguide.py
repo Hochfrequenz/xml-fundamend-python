@@ -26,7 +26,7 @@ class MigStatus(StrEnum):
 @dataclass(kw_only=True, eq=True)
 class Code:
     """
-    A single code element inside a MIG Dataelement, indicated by the ´<Code´ tag.
+    A single code element inside a MIG data element, indicated by the `<Code>` tag.
     """
 
     # Example:
@@ -40,7 +40,7 @@ class Code:
 class DataElement:
     """
     A single data element inside a MIG Segment.
-    This models both the 'Datenelement' and the 'Gruppendatenelement', indicated by the ´<D_xxxx´ tag.
+    This models both the 'Datenelement' and the 'Gruppendatenelement', indicated by the `<D_xxxx` tag.
     Are able to contain a single or multiple Code elements.
     """
 
@@ -62,7 +62,7 @@ class DataElement:
 @dataclass(eq=True, kw_only=True)
 class DataElementGroup:
     """
-    A group of data elements, German 'Datenelementgruppe', indicated by the ´<C_xxxx´ tag.
+    A group of data elements, German 'Datenelementgruppe', indicated by the `<C_xxxx>` tag.
     Are able to contain a single or multiple data elements.
     """
 
@@ -94,7 +94,7 @@ class DataElementGroup:
 @dataclass(frozen=True, eq=True, order=True, unsafe_hash=True, kw_only=True)
 class Segment:
     """
-    A segment inside a MIG, indicated by the ´<S_xxxx´ tag. A segment contains data elements and data element groups.
+    A segment inside a MIG, indicated by the `<S_xxxx>` tag. A segment contains data elements and data element groups.
     """
 
     # Example:
@@ -129,7 +129,7 @@ class Segment:
 @dataclass(kw_only=True, eq=True)
 class SegmentGroup:
     """
-    A "Segtmentgruppe" inside a MIG, indicated by the ´<G_xxxx´ tag. A segment contains segments and segments groups.
+    A 'Segmentgruppe' inside a MIG, indicated by the `<G_xxx>` tag. A segment contains segments and segments groups.
     """
 
     # pylint:disable=line-too-long
