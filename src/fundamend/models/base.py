@@ -1,3 +1,7 @@
+"""
+Base class for all models in the fundamend package.
+"""
+
 from pydantic import BaseModel, ConfigDict
 
 
