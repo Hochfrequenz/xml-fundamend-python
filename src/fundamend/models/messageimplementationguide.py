@@ -2,6 +2,7 @@
 
 from datetime import date
 from enum import StrEnum
+from typing import Union
 
 from ._dataclass_wrapper import dataclass
 
@@ -154,8 +155,7 @@ class SegmentGroup:
     max_rep_specification: int  # e.g. 1
     status_std: MigStatus
     status_specification: MigStatus
-    segments: list[Segment]
-    segment_groups: list["SegmentGroup"]
+    elements: list[Union[Segment, "SegmentGroup"]]
 
 
 @dataclass(kw_only=True, eq=True)
@@ -175,5 +175,4 @@ class MessageImplementationGuide:
 
     format: str  #: e.g. 'UTILTS'
 
-    segments: list[Segment]
-    segment_groups: list[SegmentGroup]
+    elements: list[Union[Segment, "SegmentGroup"]]

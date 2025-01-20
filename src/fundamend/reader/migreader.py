@@ -113,8 +113,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         level=int(element.attrib["Level"]),
         max_rep_std=int(element.attrib["MaxRep_Std"]),
         max_rep_specification=int(element.attrib["MaxRep_Specification"]),
-        segments=[s for s in segments_and_groups if isinstance(s, Segment)],
-        segment_groups=[sg for sg in segments_and_groups if isinstance(sg, SegmentGroup)],
+        elements=list(segments_and_groups),
     )
 
 
@@ -197,7 +196,6 @@ class MigReader:
             autor=self.get_author(),
             versionsnummer=self.get_version(),
             format=self.get_format(),
-            segments=[s for s in segments_and_groups if isinstance(s, Segment)],
-            segment_groups=[s for s in segments_and_groups if isinstance(s, SegmentGroup)],
+            elements=list(segments_and_groups),
         )
         return result
