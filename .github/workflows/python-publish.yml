@@ -21,6 +21,11 @@ jobs:
         os: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ secrets.XML_SUBMODULE_PAT }} # token with repo scope; expires never
+          # https://github.com/Hochfrequenz/xml-fundamend-python/settings/secrets/actions/XML_AHB_MIG_Token
+          submodules: "recursive"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
