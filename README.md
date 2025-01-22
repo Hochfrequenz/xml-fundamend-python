@@ -81,14 +81,8 @@ Die vollständigen Beispiele finden sich in den [unittests](unittests):
 - Beispiel [AHB UTILTS](unittests/example_ahb_utilts_11d.py)
 - Beispiel [MIG UTILTS](https://github.com/Hochfrequenz/xml-fundamend-python/blob/main/unittests/example_migs.py)
 
-### Verwendung mit Pydantic
-Per default verwendet fundamend die [dataclasses aus der Python-Standardlibrary](https://docs.python.org/3/library/dataclasses.html).
-Es lässt sich aber auch direkt mit [Pydantic](https://docs.pydantic.dev/latest/) und den [Pydantic dataclasses](https://docs.pydantic.dev/2.7/concepts/dataclasses/) verwenden.
-Wenn entweder pydantic schon installiert ist, oder mittels
-```bash
-pip install fundamend[pydantic]
-```
-mit installiert wird, dann sind Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, automatisch pydantic Objekte.
+### Pydantic
+Die Datenmodelle, die von `AhbReader` und `MigReader` zurückgegeben werden, sind pydantic Objekte.
 
 Mit Pydantic können die Ergebnisse auch leicht bspw. als JSON exportiert werden (was auch über ein CLI-Tool im nächsten Abschnitt) noch einfacher möglich ist.
 ```python

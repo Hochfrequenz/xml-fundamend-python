@@ -1,11 +1,7 @@
 from pathlib import Path
 
 import pytest
-
-try:
-    from pydantic import RootModel, TypeAdapter
-except ImportError:
-    pytest.skip("Only available with pydantic", allow_module_level=True)
+from pydantic import RootModel, TypeAdapter
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
