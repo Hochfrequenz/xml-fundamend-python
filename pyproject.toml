@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "pydantic"
+    "pydantic>=2"
 ]
 dynamic = ["readme", "version"]
 
@@ -33,12 +33,7 @@ formatting = [
 linting = [
     "pylint==3.3.3"
 ]
-pydantic = [
-    "pydantic>=2"
-    # if you install fundamend[pydantic], the dataclasses from pydantic will be used
-]
 cli = [
-    "fundamend[pydantic]",
     "typer" # if you install fundamend[cli], the cli commands are available via typer
 ]
 spellcheck = [
