@@ -54,7 +54,7 @@ class DataElement(FundamendBaseModel):
     status_specification: MigStatus  # e.g. M
     format_std: str  #: e.g. 'an..6'
     format_specification: str  #: e.g. 'an..6'
-    codes: list[Code]
+    codes: tuple[Code, ...]
 
 
 class DataElementGroup(FundamendBaseModel):
@@ -85,7 +85,7 @@ class DataElementGroup(FundamendBaseModel):
     description: str | None = None  # e.g. ''
     status_std: MigStatus  # e.g. C
     status_specification: MigStatus  # e.g. R
-    data_elements: list[DataElement]
+    data_elements: tuple[DataElement, ...]
 
 
 class Segment(FundamendBaseModel):
@@ -119,7 +119,7 @@ class Segment(FundamendBaseModel):
     status_std: MigStatus  # e.g. M
     status_specification: MigStatus  # e.g. M
     example: str | None  #: e.g. "NAD+MS+9900259000002::293'"
-    data_elements: list[DataElement | DataElementGroup]
+    data_elements: tuple[DataElement | DataElementGroup, ...]
 
 
 class SegmentGroup(FundamendBaseModel):
@@ -152,7 +152,7 @@ class SegmentGroup(FundamendBaseModel):
     max_rep_specification: int  # e.g. 1
     status_std: MigStatus
     status_specification: MigStatus
-    elements: list[Union[Segment, "SegmentGroup"]]
+    elements: tuple["Segment | SegmentGroup", ...]
 
 
 class MessageImplementationGuide(FundamendBaseModel):
@@ -171,4 +171,4 @@ class MessageImplementationGuide(FundamendBaseModel):
 
     format: str  #: e.g. 'UTILTS'
 
-    elements: list[Union[Segment, "SegmentGroup"]]
+    elements: tuple[Segment | SegmentGroup, ...]
