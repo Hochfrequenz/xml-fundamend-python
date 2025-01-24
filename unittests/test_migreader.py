@@ -110,7 +110,7 @@ def test_read_mig(mig_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
         ),
     ],
 )
-def test_read_mig(mig_xml_file_path: Path) -> None:
+def test_mig_hashable(mig_xml_file_path: Path) -> None:
     reader = MigReader(mig_xml_file_path)
     mig = reader.read()
     assert isinstance(mig, MessageImplementationGuide)

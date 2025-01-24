@@ -185,7 +185,7 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, snapshot: SnapshotAsser
         ),
     ],
 )
-def test_anwendungshandbuch_hashable(ahb_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
+def test_anwendungshandbuch_hashable(ahb_xml_file_path: Path) -> None:
     reader = AhbReader(ahb_xml_file_path)
     ahb = reader.read()
     assert isinstance(ahb, Anwendungshandbuch)
