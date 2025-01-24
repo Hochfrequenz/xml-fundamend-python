@@ -1,10 +1,289 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- this file has been created by copying "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml" and adding an extra Uebertragsdatei tag on root level with the attributes that were in M_UTILTS before -->
+<!-- -->
 <Uebertragungsdatei
   Versionsnummer="1.1d"
   Veroeffentlichungsdatum="02.04.2024"
   Author="BDEW"
 >
+  <S_UNA
+    Name="Trennzeichen-Vorgabe"
+    Description="Dieses Segment wird benutzt, um den Empfänger der Übertragungsdatei darüber zu unterrichten, dass andere Trennzeichen als die Standardtrennzeichen benutzt werden.&#13;&#10;&#13;&#10;Bei Anwendung der Standardtrennzeichen braucht das UNA-Segment nicht gesendet werden. Wenn es gesendet wird, muss es unmittelbar dem UNB-Segment vorangehen und die sechs vom Absender gewählten Trennzeichen enthalten.&#13;&#10;&#13;&#10;Unabhängig davon, ob alle Trennzeichen geändert wurden, muss jedes Datenelement innerhalb dieses Segmentes gefüllt werden, d. h. wenn Standardzeichen mit nutzerdefinierten Zeichen gemischt verwendet werden, müssen alle verwendeten Trennzeichen angegeben werden.&#13;&#10;&#13;&#10;Die Angabe der Trennzeichen im UNA-Segment erfolgt ohne Verwendung von Trennzeichen zwischen den Datenelementen."
+    Counter="0000"
+    Level="0"
+    Number="00001"
+    MaxRep_Std="1"
+    MaxRep_Specification="1"
+    Status_Std="C"
+    Status_Specification="C"
+    Example="UNA:+.? &apos;"
+  >
+    <D_UNA1
+      Name="Gruppendatenelement-Trennzeichen"
+      Description="Wird verwendet als Trennzeichen zwischen Gruppendatenelementen innerhalb einer Datenelementgruppe (Standardwert : )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+    <D_UNA2
+      Name="Segment-Bezeichner- und Datenelement-Trennzeichen"
+      Description="Wird zur Trennung von zwei einfachen Datenelementen oder Gruppendatenelementen verwendet (Standardwert + )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+    <D_UNA3
+      Name="Dezimalzeichen"
+      Description="Wird zur Angabe des Dezimalzeichens verwendet (Standardwert . )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+    <D_UNA4
+      Name="Freigabezeichen"
+      Description="Wird verwendet, um den Trennzeichen und dem Segment-Endezeichen ihre normale Bedeutung zurückzugeben (Standardwert ? )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+    <D_UNA5
+      Name="Reserviert für spätere Verwendung"
+      Description="(Standardwert &lt;Leerzeichen&gt; )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+    <D_UNA6
+      Name="Segment-Endezeichen"
+      Description="Wird zur Anzeige des Endes der Segmentdaten verwendet (Standardwert &apos; )"
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an1"
+      Format_Specification="an1"
+    />
+  </S_UNA>
+  <S_UNB
+    Name="Nutzdaten-Kopfsegment"
+    Description="Dieses Segment dient der Umklammerung der Übertragungsdatei, zur Identifikation des Partners, für den die Übertragungsdatei bestimmt ist und den Partner, der die Übertragungsdatei gesendet hat. Das Prinzip des UNB-Segments gleicht dem eines physischen Umschlags, der einen oder mehrere Briefe oder Dokumente enthält und die Adressen angibt, wohin geliefert werden soll und woher der Umschlag gekommen ist.&#13;&#10;&#13;&#10;DE0001: Der empfohlene (Standard-) Zeichensatz zur Anwendung in der BDEW-Spezifikation ist der Zeichensatz C (UNOC). Sollten Anwender einen anderen als den Zeichensatz C nutzen wollen, sollten sie vor dem Beginn des Datenaustauschs auf bilateraler Basis eine Vereinbarung schließen.&#13;&#10;&#13;&#10;DE0004 und DE0010: Die Verwendung von Internationalen Lokationsnummern (ILN =&gt; neue Bezeichnung ist GLN) zur Identifikation des Absenders und Empfängers der Übertragungsdatei wird (soweit bekannt) empfohlen. Wahlweise kann hierfür die BDEW-Codenummer des Geschäftspartners verwendet werden.&#13;&#10;&#13;&#10;DE0008: Die Adresse für Rückleitung stellt der Absender bereit, um den Empfänger der Übertragungsdatei über die Adresse im System des Absenders zu informieren, an die Antwortdateien gesendet werden müssen.&#13;&#10;&#13;&#10;DE0014: Die Weiterleitungsadresse, die ursprünglich vom Empfänger der Übertragungsdatei bereitgestellt wurde, wird vom Absender benutzt, um dem Empfänger die Adresse im System des Empfängers mitzuteilen, an die die Übertragungsdatei geleitet werden soll. Über die hier mitgeteilte Adresse hat der Empfänger der Übertragungsdatei den Absender vor der Datenübertragung zu informieren. &#13;&#10;&#13;&#10;DES004: Datums- und Zeitangaben in dieser Datenelementgruppe entsprechen dem Datum und der Uhrzeit, an dem der Absender die Übertragungsdatei vorbereitete. Diese Datums- und Zeitangaben müssen nicht notwendigerweise mit den Datums- und Zeitangaben der enthaltenen Nachrichten übereinstimmen.&#13;&#10;&#13;&#10;DE0020: Die Datenaustauschreferenz wird vom Absender der Übertragungsdatei generiert und dient der eindeutigen Identifikation jeder Übertragungsdatei. Sollte der Absender der Übertragungsdatei Datenaustauschreferenzen wiederverwenden wollen, wird empfohlen, jede Nummer für mindestens drei Monate aufzubewahren, bevor sie wieder benutzt wird. Zur Sicherstellung der Eindeutigkeit sollte die Datenaustauschreferenz mit der Absenderidentifikation (DE0004) verbunden werden.&#13;&#10;&#13;&#10;DES005: Die Anwendung des Passworts muss zunächst von den Datenaustauschpartnern bilateral vereinbart werden.&#13;&#10;&#13;&#10;DE0026: Dieses Datenelement wird zur Identifikation des Anwendungsprogramms im System des Empfängers benutzt, an das die Übertragungsdatei geleitet wird. Dieses Datenelement darf nur benutzt werden, wenn die Übertragungsdatei nur einen Nachrichtentyp enthält. Die verwendete Referenz in diesem Datenelement wird vom Absender der Übertragungsdatei festgelegt.&#13;&#10;&#13;&#10;DE0031: Die BNetzA hat vorgegeben, dass die CONTRL immer versandt wird, daher ist eine Angabe in diesem Datenelement nicht erforderlich."
+    Counter="0000"
+    Level="0"
+    Number="00002"
+    MaxRep_Std="1"
+    MaxRep_Specification="1"
+    Status_Std="M"
+    Status_Specification="M"
+    Example="UNB+UNOC:3+9900259000008:14:X+9900259000008:14:X+070426:1151+X+X:AA+X+A++X+1&apos;"
+  >
+    <C_S001
+      Name="Syntax-Bezeichner"
+      Description=""
+      Status_Std="M"
+      Status_Specification="M"
+    >
+      <D_0001
+        Name="Syntax-Kennung"
+        Description=""
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="a4"
+        Format_Specification="a4"
+      >
+        <Code Name="UN/ECE-Zeichensatz C" Description="">UNOC</Code>
+      </D_0001>
+      <D_0002
+        Name="Syntax-Versionsnummer"
+        Description="3 = Syntax-Versionsnummer 3"
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="n1"
+        Format_Specification="n1"
+      >
+        <Code Name="Version 3" Description="">3</Code>
+      </D_0002>
+    </C_S001>
+    <C_S002
+      Name="Absender der Übertragungsdatei"
+      Description=""
+      Status_Std="M"
+      Status_Specification="M"
+    >
+      <D_0004
+        Name="Absenderbezeichnung"
+        Description="Internationale Lokationsnummer (n13) oder BDEW-Codenummer"
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="an..35"
+        Format_Specification="an..35"
+      />
+      <D_0007
+        Name="Teilnehmerbezeichnung, Qualifier"
+        Description=""
+        Status_Std="C"
+        Status_Specification="R"
+        Format_Std="an..4"
+        Format_Specification="an..4"
+      >
+        <Code Name="GS1" Description="">14</Code>
+        <Code
+          Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)"
+          Description=""
+        >500</Code>
+      </D_0007>
+      <D_0008
+        Name="Adresse für Rückleitung"
+        Description=""
+        Status_Std="C"
+        Status_Specification="O"
+        Format_Std="an..14"
+        Format_Specification="an..14"
+      />
+    </C_S002>
+    <C_S003
+      Name="Empfänger der Übertragungsdatei"
+      Description=""
+      Status_Std="M"
+      Status_Specification="M"
+    >
+      <D_0010
+        Name="Empfängerbezeichnung"
+        Description="Internationale Lokationsnummer (n13) oder BDEW-Codenummer"
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="an..35"
+        Format_Specification="an..35"
+      />
+      <D_0007
+        Name="Teilnehmerbezeichnung, Qualifier"
+        Description="14 = GS1 (ehem. EAN International)"
+        Status_Std="C"
+        Status_Specification="R"
+        Format_Std="an..4"
+        Format_Specification="an..4"
+      >
+        <Code Name="GS1" Description="">14</Code>
+        <Code
+          Name="DE, BDEW (Bundesverband der Energie- und Wasserwirtschaft e.V.)"
+          Description=""
+        >500</Code>
+      </D_0007>
+      <D_0014
+        Name="Weiterleitungsadresse"
+        Description=""
+        Status_Std="C"
+        Status_Specification="O"
+        Format_Std="an..14"
+        Format_Specification="an..14"
+      />
+    </C_S003>
+    <C_S004
+      Name="Datum/Uhrzeit der Erstellung"
+      Description=""
+      Status_Std="M"
+      Status_Specification="M"
+    >
+      <D_0017
+        Name="Datum der Erstellung"
+        Description="JJMMTT"
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="n6"
+        Format_Specification="n6"
+      />
+      <D_0019
+        Name="Uhrzeit der Erstellung"
+        Description="HHMM"
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="n4"
+        Format_Specification="n4"
+      />
+    </C_S004>
+    <D_0020
+      Name="Datenaustauschreferenz"
+      Description="Eindeutige Referenz zur Identifikation der Übertragungsdatei, vergeben vom Absender."
+      Status_Std="M"
+      Status_Specification="M"
+      Format_Std="an..14"
+      Format_Specification="an..14"
+    />
+    <C_S005
+      Name="Referenz/Passwort des Empfängers"
+      Description=""
+      Status_Std="C"
+      Status_Specification="O"
+    >
+      <D_0022
+        Name="Referenz oder Passwort des Empfängers"
+        Description=""
+        Status_Std="M"
+        Status_Specification="M"
+        Format_Std="an..14"
+        Format_Specification="an..14"
+      />
+      <D_0025
+        Name="Referenz oder Passwort des Empfängers, Qualifier"
+        Description=""
+        Status_Std="C"
+        Status_Specification="O"
+        Format_Std="an2"
+        Format_Specification="an2"
+      />
+    </C_S005>
+    <D_0026
+      Name="Anwendungsreferenz"
+      Description="Nachrichtentyp, falls die Übertragungsdatei nur einen Nachrichtentyp enthält."
+      Status_Std="C"
+      Status_Specification="O"
+      Format_Std="an..14"
+      Format_Specification="an..14"
+    />
+    <D_0029
+      Name="Verarbeitungspriorität, Code"
+      Description=""
+      Status_Std="C"
+      Status_Specification="O"
+      Format_Std="a1"
+      Format_Specification="a1"
+    >
+      <Code Name="Höchste Priorität" Description="">A</Code>
+    </D_0029>
+    <D_0031
+      Name="Bestätigungsanforderung"
+      Description=""
+      Status_Std="C"
+      Status_Specification="N"
+      Format_Std="n1"
+      Format_Specification="n1"
+    />
+    <D_0032
+      Name="Austauschvereinbarungskennung"
+      Description=""
+      Status_Std="C"
+      Status_Specification="O"
+      Format_Std="an..35"
+      Format_Specification="an..35"
+    />
+    <D_0035
+      Name="Test-Kennzeichen"
+      Description=""
+      Status_Std="C"
+      Status_Specification="O"
+      Format_Std="n1"
+      Format_Specification="n1"
+    >
+      <Code Name="Übertragungsdatei ist ein Test" Description="">1</Code>
+    </D_0035>
+  </S_UNB>
+  <!-- The Following S_UNA and S_UNB segements are not part of the original file,
+   but are added here for completeness testing reasons and were inspired by UTILMD-->
+  <!--
+  https://github.com/Hochfrequenz/xml-fundamend-python/issues/57
+  -->
 <M_UTILTS>
   <S_UNH Name="Nachrichten-Kopfsegment" Description="Dieses Segment dient dazu, eine Nachricht zu eröffnen, zu identifizieren und zu spezifizieren." Counter="0010" Level="0" Number="00001" MaxRep_Std="1" MaxRep_Specification="1" Status_Std="M" Status_Specification="M" Example="UNH+1+UTILTS:D:18A:UN:1.1d&apos;">
     <D_0062 Name="Nachrichten-Referenznummer" Description="Eindeutige Nachrichtenreferenz in einer Nachricht des Absenders.&#13;&#10;Nummer der Nachrichten einer Übertragungsdatei im Datenaustausch. Identisch mit DE0062 im UNT, i. d. R. vom sendenden Konverter vergeben." Status_Std="M" Status_Specification="M" Format_Std="an..14" Format_Specification="an..14"/>
