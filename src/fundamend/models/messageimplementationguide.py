@@ -2,7 +2,6 @@
 
 from datetime import date
 from enum import StrEnum
-from typing import Union
 
 from .base import FundamendBaseModel
 

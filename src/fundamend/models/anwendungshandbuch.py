@@ -4,7 +4,6 @@
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
 
 from datetime import date
-from typing import Union
 
 from fundamend.models.base import FundamendBaseModel
 
