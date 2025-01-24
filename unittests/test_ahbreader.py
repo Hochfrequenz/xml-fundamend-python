@@ -172,3 +172,24 @@ def test_get_anwendungshandbuch(ahb_xml_file_path: Path, snapshot: SnapshotAsser
     for awf in actual.anwendungsfaelle:
         assert any(awf.elements)
     snapshot.assert_match(actual)
+
+
+@pytest.mark.parametrize(
+    "ahb_xml_file_path",
+    [
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            id="UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+        ),
+    ],
+)
+def test_anwendungshandbuch_hashable(ahb_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
+    reader = AhbReader(ahb_xml_file_path)
+    ahb = reader.read()
+    assert isinstance(ahb, Anwendungshandbuch)
+    hash_code = hash(ahb)
+    assert isinstance(hash_code, int)
+    hash_collection = set()
+    hash_collection.add(ahb)
