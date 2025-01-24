@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
-          token: ${{ secrets.XML_SUBMODULE_PAT }} # token with repo scope; expires never
+          token: ${{ secrets.XML_SUBMODULE_PAT }} # token with repo scope; expires in Jan2026
           # https://github.com/Hochfrequenz/xml-fundamend-python/settings/secrets/actions/XML_AHB_MIG_Token
           submodules: "recursive"
       - name: Set up Python ${{ matrix.python-version }}
