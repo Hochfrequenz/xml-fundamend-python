@@ -23,6 +23,7 @@ from fundamend.reader.element_distinction import (
     _is_segment_group,
     _is_uebertragungsdatei,
 )
+from fundamend.utils import lstrip
 
 
 def _to_code(element: ET.Element) -> Code:
@@ -79,7 +80,7 @@ def _to_segment(element: ET.Element) -> Segment:
         else:
             raise ValueError(f"unexpected element: {child.tag}")
     return Segment(
-        id=element.tag.lstrip("S_"),
+        id=lstrip("S_", element.tag),
         name=element.attrib["Name"],
         description=element.attrib["Description"] or None,
         counter=element.attrib["Counter"],
@@ -105,7 +106,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         else:
             raise ValueError(f"unexpected element: {child.tag}")
     return SegmentGroup(
-        id=element.tag.lstrip("G_SG"),
+        id=lstrip("G_SG", element.tag),
         name=element.attrib["Name"],
         status_std=MigStatus(element.attrib["Status_Std"]),
         status_specification=MigStatus(element.attrib["Status_Specification"]),
@@ -164,7 +165,7 @@ class MigReader:
         root = self._element_tree.getroot()
         if _is_uebertragungsdatei(root):
             root = _get_first_tag_starting_with_m(root)
-        return root.tag.lstrip("M_")  # converts 'M_UTILTS' to 'UTILTS'
+        return lstrip("M_", root.tag)  # converts 'M_UTILTS' to 'UTILTS'
 
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""

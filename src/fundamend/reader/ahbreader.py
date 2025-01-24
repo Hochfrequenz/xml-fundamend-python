@@ -29,6 +29,7 @@ from fundamend.reader.element_distinction import (
     _is_segment_group,
     _is_uebertragungsdatei,
 )
+from fundamend.utils import lstrip, strip
 
 # pylint:disable=duplicate-code
 # yes, it's very similar to the MigReader
@@ -49,21 +50,21 @@ def _to_code(element: ET.Element) -> Code:
 
 def _to_bedingung(element: ET.Element) -> Bedingung:
     return Bedingung(
-        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        nummer=strip("[", element.attrib["Nummer"], "]"),
         text=element.text.strip(),  # type:ignore[union-attr]
     )
 
 
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
     return UbBedingung(
-        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        nummer=strip("[", element.attrib["Nummer"], "]"),
         text=element.text.strip(),  # type:ignore[union-attr]
     )
 
 
 def _to_paket(element: ET.Element) -> Paket:
     return Paket(
-        nummer=element.attrib["Nummer"].lstrip("[").rstrip("]"),
+        nummer=strip("[", element.attrib["Nummer"], "]"),
         text=(element.text or "").strip(),
     )
 
@@ -126,7 +127,7 @@ def _to_segment(element: ET.Element) -> Segment:
     if "AHB_Status" in element.attrib and element.attrib["AHB_Status"].strip():
         ahb_status = element.attrib["AHB_Status"]
     return Segment(
-        id=element.tag.lstrip("S_"),
+        id=lstrip("S_", element.tag),
         name=element.attrib["Name"],
         number=element.attrib["Number"],
         ahb_status=ahb_status,
@@ -145,7 +146,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         else:
             raise ValueError(f"unexpected element: {child.tag}")
     return SegmentGroup(
-        id=element.tag.lstrip("G_SG"),
+        id=lstrip("G_SG", element.tag),
         name=element.attrib["Name"],
         ahb_status=element.attrib["AHB_Status"],
         elements=tuple(list(segments_and_groups)),
@@ -244,7 +245,7 @@ class AhbReader:
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
-            format=format_element.tag.lstrip("M_"),
+            format=lstrip("M_", format_element.tag),
             elements=tuple(segments_and_groups),
         )
 
