@@ -4,7 +4,6 @@
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
 
 from datetime import date
-from typing import Union
 
 from fundamend.models.base import FundamendBaseModel
 
@@ -35,7 +34,7 @@ class DataElement(FundamendBaseModel):
     # </D_0065>
     id: str  # e.g. 'D_0065'
     name: str  # e.g. 'Nachrichtentyp-Kennung'
-    codes: list[Code]
+    codes: tuple[Code, ...]
 
 
 class DataElementGroup(FundamendBaseModel):
@@ -59,7 +58,7 @@ class DataElementGroup(FundamendBaseModel):
 
     id: str  # e.g. 'C_C082'
     name: str  # e.g. 'Dokumenten-/Nachrichtenname'
-    data_elements: list[DataElement]
+    data_elements: tuple[DataElement, ...]
 
 
 class Segment(FundamendBaseModel):
@@ -84,7 +83,7 @@ class Segment(FundamendBaseModel):
     name: str  #: e.g. 'Beginn der Nachricht'
     number: str  #: e.g. '00002'
     ahb_status: str | None  #: e.g. 'Muss'
-    data_elements: list[DataElement | DataElementGroup]
+    data_elements: tuple[DataElement | DataElementGroup, ...]
 
 
 class SegmentGroup(FundamendBaseModel):
@@ -109,7 +108,7 @@ class SegmentGroup(FundamendBaseModel):
     id: str  #: e.g. 'SG6'
     name: str  #: e.g. 'Prüfidentifikator'
     ahb_status: str | None  #: e.g. 'Muss'
-    elements: list[Union[Segment, "SegmentGroup"]]
+    elements: tuple["Segment | SegmentGroup", ...]
 
 
 class Anwendungsfall(FundamendBaseModel):
@@ -129,7 +128,7 @@ class Anwendungsfall(FundamendBaseModel):
     beschreibung: str  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
     format: str  #: e.g. 'UTILTS'
-    elements: list[Union[Segment, SegmentGroup]]
+    elements: tuple[Segment | SegmentGroup, ...]
 
 
 class Bedingung(FundamendBaseModel):
@@ -176,7 +175,7 @@ class Anwendungshandbuch(FundamendBaseModel):
 
     versionsnummer: str
     """e.g. '1.1d'"""
-    anwendungsfaelle: list[Anwendungsfall]  #: die einzelnen Prüfidendifikatoren
-    bedingungen: list[Bedingung]
-    ub_bedingungen: list[UbBedingung]
-    pakete: list[Paket]
+    anwendungsfaelle: tuple[Anwendungsfall, ...]  #: die einzelnen Prüfidendifikatoren
+    bedingungen: tuple[Bedingung, ...]
+    ub_bedingungen: tuple[UbBedingung, ...]
+    pakete: tuple[Paket, ...]

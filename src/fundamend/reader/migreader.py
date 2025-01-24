@@ -46,7 +46,7 @@ def _to_data_element(element: ET.Element) -> DataElement:
         status_specification=MigStatus(element.attrib["Status_Specification"]),
         format_std=element.attrib["Format_Std"],
         format_specification=element.attrib["Format_Specification"],
-        codes=codes,
+        codes=tuple(codes),
     )
 
 
@@ -64,7 +64,7 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
         description=element.attrib["Description"] or None,
         status_std=MigStatus(element.attrib["Status_Std"]),
         status_specification=MigStatus(element.attrib["Status_Specification"]),
-        data_elements=data_elements,
+        data_elements=tuple(data_elements),
     )
 
 
@@ -90,7 +90,7 @@ def _to_segment(element: ET.Element) -> Segment:
         status_specification=MigStatus(element.attrib["Status_Specification"]),
         example=element.attrib["Example"] or None,
         number=element.attrib["Number"],
-        data_elements=data_elements,
+        data_elements=tuple(data_elements),
     )
 
 
@@ -113,7 +113,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         level=int(element.attrib["Level"]),
         max_rep_std=int(element.attrib["MaxRep_Std"]),
         max_rep_specification=int(element.attrib["MaxRep_Specification"]),
-        elements=list(segments_and_groups),
+        elements=tuple(segments_and_groups),
     )
 
 
@@ -196,6 +196,6 @@ class MigReader:
             autor=self.get_author(),
             versionsnummer=self.get_version(),
             format=self.get_format(),
-            elements=list(segments_and_groups),
+            elements=tuple(segments_and_groups),
         )
         return result

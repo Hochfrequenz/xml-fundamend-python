@@ -93,7 +93,7 @@ def _to_data_element(element: ET.Element) -> DataElement:
     return DataElement(
         id=element.tag,
         name=element.attrib["Name"],
-        codes=codes,
+        codes=tuple(codes),
     )
 
 
@@ -108,7 +108,7 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
     return DataElementGroup(
         id=element.tag,
         name=element.attrib["Name"],
-        data_elements=data_elements,
+        data_elements=tuple(data_elements),
     )
 
 
@@ -130,7 +130,7 @@ def _to_segment(element: ET.Element) -> Segment:
         name=element.attrib["Name"],
         number=element.attrib["Number"],
         ahb_status=ahb_status,
-        data_elements=data_elements,
+        data_elements=tuple(data_elements),
     )
 
 
@@ -148,7 +148,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         id=element.tag.lstrip("G_SG"),
         name=element.attrib["Name"],
         ahb_status=element.attrib["AHB_Status"],
-        elements=list(segments_and_groups),
+        elements=tuple(list(segments_and_groups)),
     )
 
 
@@ -245,7 +245,7 @@ class AhbReader:
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
             format=format_element.tag.lstrip("M_"),
-            elements=list(segments_and_groups),
+            elements=tuple(segments_and_groups),
         )
 
     def read(self) -> Anwendungshandbuch:
@@ -257,9 +257,9 @@ class AhbReader:
             veroeffentlichungsdatum=self.get_publishing_date(),
             autor=self.get_author(),
             versionsnummer=self.get_version(),
-            bedingungen=self.get_bedingungen(),
-            ub_bedingungen=self.get_ub_bedingungen(),
-            pakete=self.get_pakete(),
-            anwendungsfaelle=self.get_anwendungsfaelle(),
+            bedingungen=tuple(self.get_bedingungen()),
+            ub_bedingungen=tuple(self.get_ub_bedingungen()),
+            pakete=tuple(self.get_pakete()),
+            anwendungsfaelle=tuple(self.get_anwendungsfaelle()),
         )
         return result

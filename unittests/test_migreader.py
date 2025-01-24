@@ -97,3 +97,24 @@ def test_read_mig(mig_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
     assert actual is not None
     assert isinstance(actual, MessageImplementationGuide)
     snapshot.assert_match(actual)
+
+
+@pytest.mark.parametrize(
+    "mig_xml_file_path",
+    [
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            id="UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+        ),
+    ],
+)
+def test_mig_hashable(mig_xml_file_path: Path) -> None:
+    reader = MigReader(mig_xml_file_path)
+    mig = reader.read()
+    assert isinstance(mig, MessageImplementationGuide)
+    hash_code = hash(mig)
+    assert isinstance(hash_code, int)
+    hash_collection = set()
+    hash_collection.add(mig)
