@@ -187,9 +187,7 @@ class MigReader:
                 if elem.tag.startswith("M_"):
                     root = elem
                     break
-        for index, element in enumerate(root):
-            if index == 0:
-                continue
+        for element in root:
             segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
 
         result = MessageImplementationGuide(
