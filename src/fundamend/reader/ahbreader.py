@@ -51,14 +51,14 @@ def _to_code(element: ET.Element) -> Code:
 def _to_bedingung(element: ET.Element) -> Bedingung:
     return Bedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=(element.text or "").strip(),  # type:ignore[union-attr]
+        text=(element.text or "").strip(),
     )
 
 
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
     return UbBedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=element.text.strip(),  # type:ignore[union-attr]
+        text=(element.text or "").strip(),
     )
 
 
