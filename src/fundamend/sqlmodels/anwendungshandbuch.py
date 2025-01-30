@@ -83,6 +83,7 @@ class DataElement(SQLModel, table=True):
     name: str = Field(index=True)  # e.g. 'Nachrichtentyp-Kennung'
     codes: list[Code] = Relationship(back_populates="dataelement")
     position: Optional[int] = Field(default=None, index=True)
+    ahb_status: Optional[str] = None
     dataelementgroup: Union["DataElementGroup", None] = Relationship(back_populates="data_elements")
     data_element_group_primary_key: UUID | None = Field(default=None, foreign_key="dataelementgroup.primary_key")
 
@@ -98,6 +99,7 @@ class DataElement(SQLModel, table=True):
                 Code.from_model(pydantic_code, position=position_index)
                 for position_index, pydantic_code in enumerate(model.codes)
             ],
+            ahb_status=model.ahb_status,
             position=position,
         )
         return result
@@ -106,6 +108,7 @@ class DataElement(SQLModel, table=True):
         return PydanticDataElement(
             id=self.id,
             name=self.name,
+            ahb_status=self.ahb_status,
             codes=tuple(x.to_model() for x in sorted(self.codes, key=lambda y: y.position or 0)),
         )
 

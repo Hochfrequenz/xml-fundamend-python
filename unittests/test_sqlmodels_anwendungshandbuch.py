@@ -12,6 +12,8 @@ from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
 
+from .conftest import is_private_submodule_checked_out
+
 
 @pytest.fixture()
 def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
@@ -46,9 +48,16 @@ def test_sqlmodels_single_anwendungshandbuch(sqlite_session: Session) -> None:
 
 
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     assert private_submodule_root.exists() and private_submodule_root.is_dir()
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         roundtrip_abb = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
+        ahb_json = ahb.model_dump(mode="json")
+        roundtrip_json = roundtrip_abb.model_dump(mode="json")
+        assert (
+            ahb_json == roundtrip_json
+        )  # in pycharm the error message is much better when comparing plain python dicts
         assert roundtrip_abb == ahb
