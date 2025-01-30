@@ -23,6 +23,9 @@ def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
     SQLModel.metadata.create_all(engine)
     with Session(bind=engine) as session:
         yield session
+        session.commit()
+        session.flush()
+    print(f"Wrote all data to {database_path.absolute()}")
 
 
 def _load_anwendungshandbuch_ahb_to_and_from_db(
@@ -46,7 +49,6 @@ def test_sqlmodels_single_anwendungshandbuch(sqlite_session: Session) -> None:
     assert ahb_json == roundtrip_json  # in pycharm the error message is much better when comparing plain python dicts
     assert roundtrip_abb == ahb
 
-
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
@@ -55,9 +57,5 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         roundtrip_abb = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
-        ahb_json = ahb.model_dump(mode="json")
-        roundtrip_json = roundtrip_abb.model_dump(mode="json")
-        assert (
-            ahb_json == roundtrip_json
-        )  # in pycharm the error message is much better when comparing plain python dicts
         assert roundtrip_abb == ahb
+
