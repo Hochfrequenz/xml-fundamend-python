@@ -10,6 +10,7 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from fundamend import AhbReader
+from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch
 
 
@@ -23,18 +24,20 @@ def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
         yield session
 
 
-def _load_anwendungshandbuch_ahb_to_db(session: Session, json_path: Path) -> None:
-    with open(json_path, "r", encoding="utf-8") as json_file:
-        file_body = json.loads(json_file.read())
-    ahb = Anwendungshandbuch.model_validate(file_body)
-    return None
+def _load_anwendungshandbuch_ahb_to_and_from_db(
+    session: Session, pydantic_ahb: PydanticAnwendunghandbuch
+) -> PydanticAnwendunghandbuch:
+    sql_ahb = Anwendungshandbuch.from_model(pydantic_ahb)
+    session.add(sql_ahb)
+    session.commit()
+    session.refresh(sql_ahb)
+    pydantic_ahb_after_roundtrip = sql_ahb.to_model()
+    return pydantic_ahb_after_roundtrip
 
 
 def test_sqlmodels_anwendungshandbuch(sqlite_session: Session, tmp_path: Path) -> None:
     ahb = AhbReader(
         Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"
     ).read()
-    ahb_json_file_path = tmp_path / "utilts_ahb1.1.json"
-    with open(ahb_json_file_path, "w", encoding="utf-8") as json_file:
-        json.dump(ahb.model_dump(mode="json"), json_file, indent=2, ensure_ascii=False)
-    _load_anwendungshandbuch_ahb_to_db(sqlite_session, ahb_json_file_path)
+    roundtrip_abb = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
+    assert roundtrip_abb == ahb

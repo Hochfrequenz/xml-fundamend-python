@@ -1,6 +1,6 @@
 """Anwendungshandbuch SQL models"""
 
-from typing import Union
+from typing import Optional, Union
 
 # pylint: disable=too-few-public-methods, duplicate-code
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
@@ -18,20 +18,50 @@ import uuid
 from datetime import date
 from uuid import UUID
 
+from fundamend.models.anwendungshandbuch import Anwendungsfall as PydanticAnwendungsfall
+from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendungshandbuch
+from fundamend.models.anwendungshandbuch import Bedingung as PydanticBedingung
+from fundamend.models.anwendungshandbuch import Code as PydanticCode
+from fundamend.models.anwendungshandbuch import DataElement as PydanticDataElement
+from fundamend.models.anwendungshandbuch import DataElementGroup as PydanticDataElementGroup
+from fundamend.models.anwendungshandbuch import Paket as PydanticPaket
+from fundamend.models.anwendungshandbuch import Segment as PydanticSegment
+from fundamend.models.anwendungshandbuch import SegmentGroup as PydanticSegmentGroup
+from fundamend.models.anwendungshandbuch import UbBedingung as PydanticUbBedingung
+
 
 class Code(SQLModel, table=True):
     """
     A single code element inside an AHB DataElement, indicated by the `<Code>` tag.
     """
 
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     name: str  # e.g. 'Netznutzungszeiten-Nachricht'
     description: str | None = None  # e.g. ''
     value: str | None  # e.g. 'UTILTS'
     ahb_status: str  #: e.g. 'X' # new for AHB
+    position: Optional[int] = None
 
     dataelement: Union["DataElement", None] = Relationship(back_populates="codes")
     data_element_primary_key: UUID | None = Field(default=None, foreign_key="dataelement.primary_key")
+
+    @classmethod
+    def from_model(cls, model: PydanticCode, position: int = None) -> "Code":
+        return Code(
+            name=model.name,
+            description=model.description,
+            value=model.value,
+            ahb_status=model.ahb_status,
+            position=position,
+        )
+
+    def to_model(self) -> PydanticCode:
+        return PydanticCode(
+            name=self.name,
+            description=self.description,
+            value=self.value,
+            ahb_status=self.ahb_status,
+        )
 
 
 class DataElement(SQLModel, table=True):
@@ -44,16 +74,34 @@ class DataElement(SQLModel, table=True):
     # <D_0065 Name="Nachrichtentyp-Kennung">
     #   <Code Name="Netznutzungszeiten-Nachricht" Description="" AHB_Status="X">UTILTS</Code>
     # </D_0065>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str  # e.g. 'D_0065'
     name: str  # e.g. 'Nachrichtentyp-Kennung'
     codes: list[Code] = Relationship(back_populates="dataelement")
-
+    position: Optional[int] = None
     dataelementgroup: Union["DataElementGroup", None] = Relationship(back_populates="data_elements")
     data_element_group_primary_key: UUID | None = Field(default=None, foreign_key="dataelementgroup.primary_key")
 
     segment: Union["Segment", None] = Relationship(back_populates="data_elements")
     segment_primary_key: UUID | None = Field(default=None, foreign_key="segment.primary_key")
+
+    @classmethod
+    def from_model(cls, model: PydanticDataElement, position: Optional[int] = None) -> "DataElement":
+        result = DataElement(
+            id=model.id,
+            name=model.name,
+            codes=[
+                Code.from_model(pydantic_code, position=position_index)
+                for position_index, pydantic_code in enumerate(model.codes)
+            ],
+            position=position,
+        )
+        return result
+
+    def to_model(self) -> PydanticDataElement:
+        return PydanticDataElement(
+            id=self.id, name=self.name, codes=[x.to_model() for x in sorted(self.codes, key=lambda y: y.position)]
+        )
 
 
 class DataElementGroup(SQLModel, table=True):
@@ -74,14 +122,32 @@ class DataElementGroup(SQLModel, table=True):
     #      <Code Name="Berechnungsformel" Description="" AHB_Status="X">Z36</Code>
     #   </D_1001>
     # </C_C002>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str  # e.g. 'C_C082'
     name: str  # e.g. 'Dokumenten-/Nachrichtenname'
     data_elements: list[DataElement] = Relationship(back_populates="dataelementgroup")
-
+    position: Optional[int] = None
     segment: Union["Segment", None] = Relationship(back_populates="data_element_groups")
     segment_primary_key: Union[UUID, None] = Field(default=None, foreign_key="segment.primary_key")
 
+    @classmethod
+    def from_model(cls, model: PydanticDataElementGroup, position: Optional[int] = None) -> "DataElementGroup":
+        return DataElementGroup(
+            id=model.id,
+            name=model.name,
+            data_elements=[
+                DataElement.from_model(x, position=position_index)
+                for position_index, x in enumerate(model.data_elements)
+            ],
+            position=position,
+        )
+
+    def to_model(self) -> PydanticDataElementGroup:
+        return PydanticDataElementGroup(
+            id=self.id,
+            name=self.name,
+            data_elements=[x.to_model() for x in sorted(self.data_elements, key=lambda y: y.position)],
+        )
 
 
 class Segment(SQLModel, table=True):
@@ -102,19 +168,50 @@ class Segment(SQLModel, table=True):
     #       <D_1004 Name="Dokumentennummer" AHB_Status="X"/>
     #    </C_C106>
     # </S_BGM>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str  #: e.g. 'BGM'
     name: str  #: e.g. 'Beginn der Nachricht'
     number: str  #: e.g. '00002'
     ahb_status: str | None  #: e.g. 'Muss'
-    data_elements: list[DataElement]=Relationship(back_populates="segment")
-    data_element_groups:list[DataElementGroup]=Relationship(back_populates="dataelementgroup")
+    data_elements: list[DataElement] = Relationship(back_populates="segment")
+    data_element_groups: list[DataElementGroup] = Relationship(back_populates="segment")
+    position: Optional[int] = None
 
     segmentgroup: Union["SegmentGroup", None] = Relationship(back_populates="segments")
     segmentgroup_primary_key: Union[UUID, None] = Field(default=None, foreign_key="segmentgroup.primary_key")
 
     anwendungsfall: Union["Anwendungsfall", None] = Relationship(back_populates="segments")
     anwendungsfall_primary_key: Union[UUID, None] = Field(default=None, foreign_key="anwendungsfall.primary_key")
+
+    @classmethod
+    def from_model(cls, model: PydanticSegment, position: Optional[int] = None) -> "Segment":
+        result = Segment(
+            id=model.id,
+            name=model.name,
+            number=model.number,
+            ahb_status=model.ahb_status,
+            position=position,
+        )
+        for _position, element in enumerate(model.data_elements):
+            if isinstance(element, PydanticDataElement):
+                result.data_elements.append(DataElement.from_model(element, position=_position))
+                continue
+            if isinstance(element, DataElementGroup):
+                result.data_element_groups.append(DataElementGroup.from_model(element, position=_position))
+                continue
+        return result
+
+    def to_model(self) -> PydanticSegment:
+        return PydanticSegment(
+            id=self.id,
+            name=self.name,
+            number=self.number,
+            ahb_status=self.ahb_status,
+            data_elements=[
+                x.to_model()
+                for x in sorted((self.data_elements or []) + (self.data_element_groups or []), key=lambda y: y.position)
+            ],
+        )
 
 
 class SegmentGroup(SQLModel, table=True):
@@ -136,18 +233,57 @@ class SegmentGroup(SQLModel, table=True):
     #     </C_C506>
     #   </S_RFF>
     #  </G_SG6>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str  #: e.g. 'SG6'
     name: str  #: e.g. 'Prüfidentifikator'
     ahb_status: str | None  #: e.g. 'Muss'
-    segments:list[Segment]=Relationship(back_populates="segmentgroup")
-    segment_groups:list["SegmentGroup"]=Relationship(back_populates="segmentgroup")
+    segments: list[Segment] = Relationship(back_populates="segmentgroup")
+    position: Optional[int] = None
+    # Foreign key linking child groups to parent group
+    parent_segment_group_primary_key: Union[UUID, None] = Field(default=None, foreign_key="segmentgroup.primary_key")
 
-    segmentgroup: Union["SegmentGroup", None] = Relationship(back_populates="segment_groups")
-    segmentgroup_primary_key: Union[UUID, None] = Field(default=None, foreign_key="segmentgroup.primary_key")
+    # Define self-referential relationship
+    segment_groups: list["SegmentGroup"] = Relationship(
+        back_populates="parent_segment_group",
+        sa_relationship_kwargs={"remote_side": "SegmentGroup.primary_key"},
+    )
+
+    parent_segment_group: Union["SegmentGroup", None] = Relationship(back_populates="segment_groups")
 
     anwendungsfall: Union["Anwendungsfall", None] = Relationship(back_populates="segment_groups")
     anwendungsfall_primary_key: Union[UUID, None] = Field(default=None, foreign_key="anwendungsfall.primary_key")
+
+    @classmethod
+    def from_model(cls, model: PydanticSegmentGroup, position: Optional[int] = None) -> "SegmentGroup":
+        result = SegmentGroup(
+            id=model.id,
+            name=model.name,
+            ahb_status=model.ahb_status,
+            position=position,
+        )
+        for _position, element in enumerate(model.elements):
+            if isinstance(element, PydanticSegment):
+                result.segments.append(Segment.from_model(element, position=_position))
+                continue
+            if isinstance(element, PydanticSegmentGroup):
+                sg = SegmentGroup.from_model(element, position=_position)
+                if result.segment_groups is None:
+                    result.segment_groups = [sg]
+                else:
+                    result.segment_groups.append(sg)
+                continue
+        return result
+
+    def to_model(self) -> PydanticSegmentGroup:
+        return PydanticSegmentGroup(
+            id=self.id,
+            name=self.name,
+            ahb_status=self.ahb_status,
+            elements=[
+                x.to_model()
+                for x in sorted((self.segments or []) + (self.segment_groups or []), key=lambda y: y.position)
+            ],
+        )
 
 
 class Anwendungsfall(SQLModel, table=True):
@@ -163,24 +299,54 @@ class Anwendungsfall(SQLModel, table=True):
     #     </S_UNT>
     #   </M_UTILTS>
     # </AWF>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     pruefidentifikator: str  #: e.g. '25001'
     beschreibung: str  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
     format: str  #: e.g. 'UTILTS'
-    segments:list[Segment] = Relationship(back_populates="anwendungsfall")
+    segments: list[Segment] = Relationship(back_populates="anwendungsfall")
     segment_groups: list[SegmentGroup] = Relationship(back_populates="anwendungsfall")
-
+    position: Optional[int] = None
     anwendungshandbuch: Union["Anwendungshandbuch", None] = Relationship(back_populates="anwendungsfaelle")
     anwendungshandbuch_primary_key: Union[UUID, None] = Field(
         default=None, foreign_key="anwendungshandbuch.primary_key"
     )
 
+    @classmethod
+    def from_model(cls, model: PydanticAnwendungsfall, position: Optional[int] = None) -> "Anwendungsfall":
+        result = Anwendungsfall(
+            pruefidentifikator=model.pruefidentifikator,
+            beschreibung=model.beschreibung,
+            kommunikation_von=model.kommunikation_von,
+            format=model.format,
+            position=position,
+        )
+        for _position, element in enumerate(model.elements):
+            if isinstance(element, PydanticSegment):
+                result.segments.append(Segment.from_model(element, position=_position))
+                continue
+            if isinstance(element, PydanticSegmentGroup):
+                result.segment_groups.append(SegmentGroup.from_model(element, position=_position))
+                continue
+        return result
+
+    def to_model(self) -> PydanticAnwendungsfall:
+        return PydanticAnwendungsfall(
+            pruefidentifikator=self.pruefidentifikator,
+            beschreibung=self.beschreibung,
+            kommunikation_von=self.kommunikation_von,
+            format=self.format,
+            elements=[
+                x.to_model()
+                for x in sorted(((self.segments or []) + (self.segment_groups or [])), key=lambda y: y.position)
+            ],
+        )
+
 
 class Bedingung(SQLModel, table=True):
     """Ein ConditionKeyConditionText Mapping"""
 
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     nummer: str  #: e.g. '1'
     text: str  #: e.g. 'Nur MP-ID aus Sparte Strom'
     anwendungshandbuch: Union["Anwendungshandbuch", None] = Relationship(back_populates="bedingungen")
@@ -188,13 +354,20 @@ class Bedingung(SQLModel, table=True):
         default=None, foreign_key="anwendungshandbuch.primary_key"
     )
 
+    @classmethod
+    def from_model(cls, model: PydanticBedingung) -> "Bedingung":
+        return Bedingung(nummer=model.nummer, text=model.text)
+
+    def to_model(self) -> PydanticBedingung:
+        return PydanticBedingung(nummer=self.nummer, text=self.text)
+
 
 class UbBedingung(SQLModel, table=True):
     """Eine UB-Bedingung"""
 
     # Example:
     # <UB_Bedingung Nummer="[UB1]">([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])</UB_Bedingung>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     nummer: str  #: e.g. 'UB1'
     text: str  #: e.g. '([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])'
     anwendungshandbuch: Union["Anwendungshandbuch", None] = Relationship(back_populates="ub_bedingungen")
@@ -202,13 +375,20 @@ class UbBedingung(SQLModel, table=True):
         default=None, foreign_key="anwendungshandbuch.primary_key"
     )
 
+    @classmethod
+    def from_model(cls, model: PydanticUbBedingung) -> "UbBedingung":
+        return UbBedingung(nummer=model.nummer, text=model.text)
+
+    def to_model(self) -> PydanticUbBedingung:
+        return PydanticUbBedingung(nummer=self.nummer, text=self.text)
+
 
 class Paket(SQLModel, table=True):
     """Ein Bedingungspaket/PackageKeyConditionText Mapping"""
 
     # Example:
     # <Paket Nummer="[1P]">--</Paket>
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     nummer: str  #: e.g. '1P'
     text: str  #: e.g. '--'
 
@@ -217,6 +397,13 @@ class Paket(SQLModel, table=True):
         default=None, foreign_key="anwendungshandbuch.primary_key"
     )
 
+    @classmethod
+    def from_model(cls, model: PydanticPaket) -> "Paket":
+        return Paket(nummer=model.nummer, text=model.text)
+
+    def to_model(self) -> PydanticPaket:
+        return PydanticPaket(nummer=self.nummer, text=self.text)
+
 
 class Anwendungshandbuch(SQLModel, table=True):
     """
@@ -224,7 +411,7 @@ class Anwendungshandbuch(SQLModel, table=True):
     selben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
     """
 
-    primary_key: UUID = Field(primary_key=True, default=uuid.uuid4)
+    primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     # Example:
     # <AHB Versionsnummer="1.1d" Veroeffentlichungsdatum="02.04.2024" Author="BDEW">
     #  <AWF Pruefidentifikator="25001" Beschreibung="Berechnungsformel" Kommunikation_von="NB an MSB / LF">
@@ -244,3 +431,26 @@ class Anwendungshandbuch(SQLModel, table=True):
     bedingungen: list[Bedingung] = Relationship(back_populates="anwendungshandbuch")
     ub_bedingungen: list[UbBedingung] = Relationship(back_populates="anwendungshandbuch")
     pakete: list[Paket] = Relationship(back_populates="anwendungshandbuch")
+
+    @classmethod
+    def from_model(cls, model: PydanticAnwendungshandbuch) -> "Anwendungshandbuch":
+        return Anwendungshandbuch(
+            veroeffentlichungsdatum=model.veroeffentlichungsdatum,
+            autor=model.autor,
+            versionsnummer=model.versionsnummer,
+            bedingungen=[Bedingung.from_model(x) for x in model.bedingungen],
+            ub_bedingungen=[UbBedingung.from_model(x) for x in model.ub_bedingungen],
+            pakete=[Paket.from_model(x) for x in model.pakete],
+            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle],
+        )
+
+    def to_model(self) -> PydanticAnwendungshandbuch:
+        return PydanticAnwendungshandbuch(
+            veroeffentlichungsdatum=self.veroeffentlichungsdatum,
+            autor=self.autor,
+            versionsnummer=self.versionsnummer,
+            bedingungen=[x.to_model() for x in self.bedingungen],
+            ub_bedingungen=[x.to_model() for x in self.ub_bedingungen],
+            pakete=[x.to_model() for x in self.pakete],
+            anwendungsfaelle=[x.to_model() for x in sorted(self.anwendungsfaelle, key=lambda y: y.position)],
+        )
