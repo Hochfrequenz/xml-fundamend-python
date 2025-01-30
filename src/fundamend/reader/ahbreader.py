@@ -91,9 +91,13 @@ def _to_data_element(element: ET.Element) -> DataElement:
             codes.append(_to_code(child))
         else:
             raise ValueError(f"unexpected element: {child.tag}")
+    ahb_status: str | None = None
+    if "AHB_Status" in element.attrib and element.attrib["AHB_Status"].strip():
+        ahb_status = element.attrib["AHB_Status"]
     return DataElement(
         id=element.tag,
         name=element.attrib["Name"],
+        ahb_status=ahb_status,
         codes=tuple(codes),
     )
 
