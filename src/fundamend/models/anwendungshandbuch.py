@@ -34,6 +34,7 @@ class DataElement(FundamendBaseModel):
     # </D_0065>
     id: str  # e.g. 'D_0065'
     name: str  # e.g. 'Nachrichtentyp-Kennung'
+    ahb_status: str | None  # e.g. 'X'
     codes: tuple[Code, ...]
 
 
