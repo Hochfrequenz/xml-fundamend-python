@@ -44,8 +44,9 @@ def test_sqlmodels_single_anwendungshandbuch(sqlite_session: Session) -> None:
     assert ahb_json == roundtrip_json  # in pycharm the error message is much better when comparing plain python dicts
     assert roundtrip_abb == ahb
 
+
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
-    private_submodule_root = Path(__file__).parent.parent/"xml-migs-and-ahbs"
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     assert private_submodule_root.exists() and private_submodule_root.is_dir()
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
