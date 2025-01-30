@@ -14,8 +14,3 @@ you need to install fundamend[sqlmodels] to use this sub-package
 #     raise ValueError(f"{type_} has no matching SQLAlchemy type")
 # E   ValueError: <class 'fundamend.models.anwendungshandbuch.Anwendungshandbuch'> has no matching SQLAlchemy type
 # => you need to keep the models in sync manually by now
-
-
-
-
-
