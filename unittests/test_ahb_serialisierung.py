@@ -204,3 +204,11 @@ def test_read_mig_xml(mig_xml_file_path: Path, expected_date: date) -> None:
     reader = MigReader(mig_xml_file_path)
     actual = reader.get_publishing_date()
     assert actual == expected_date
+
+
+def test_deserializing_all_migs() -> None:
+    if not private_submodule_is_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    for mig_file_path in data_path.rglob("**/*MIG*.xml"):
+        reader = MigReader(mig_file_path)
+        _ = reader.read()  # must not crash
