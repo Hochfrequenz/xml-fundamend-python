@@ -49,6 +49,7 @@ def test_sqlmodels_single_anwendungshandbuch(sqlite_session: Session) -> None:
     assert ahb_json == roundtrip_json  # in pycharm the error message is much better when comparing plain python dicts
     assert roundtrip_abb == ahb
 
+
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
@@ -58,4 +59,3 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
         ahb = AhbReader(ahb_file_path).read()
         roundtrip_abb = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
         assert roundtrip_abb == ahb
-
