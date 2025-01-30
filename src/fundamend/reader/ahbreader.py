@@ -51,7 +51,7 @@ def _to_code(element: ET.Element) -> Code:
 def _to_bedingung(element: ET.Element) -> Bedingung:
     return Bedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=element.text.strip(),  # type:ignore[union-attr]
+        text=(element.text or "").strip(),  # type:ignore[union-attr]
     )
 
 
@@ -148,7 +148,11 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
     return SegmentGroup(
         id=lstrip("G_SG", element.tag),
         name=element.attrib["Name"],
-        ahb_status=element.attrib["AHB_Status"],
+        ahb_status=(
+            element.attrib["AHB_Status"].strip() or None
+            if "AHB_Status" in element.attrib and element.attrib["AHB_Status"] is not None
+            else None
+        ),
         elements=tuple(list(segments_and_groups)),
     )
 
