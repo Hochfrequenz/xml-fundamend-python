@@ -104,7 +104,7 @@ def test_read_ahb_xml(ahb_xml_file_path: Path, expected_date: date) -> None:
 
 
 def test_deserializing_all_ahbs() -> None:
-    if not private_submodule_is_checked_out():
+    if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     for ahb_file_path in data_path.rglob("**/*AHB*.xml"):
         reader = AhbReader(ahb_file_path)
