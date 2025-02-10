@@ -28,7 +28,7 @@ sqlmodels = [
   "sqlalchemy[mypy]>=2.0.37"
 ]
 coverage = [
-    "coverage==7.6.10"
+    "coverage==7.6.11"
 ]
 formatting = [
     "black==25.1.0",
