@@ -51,7 +51,7 @@ def main(
             readable=True,
             resolve_path=True,
         ),
-    ]
+    ],
 ) -> None:
     """
     converts the xml file from xml_in_path to a json file next to the .xml

@@ -1,4 +1,4 @@
-""""model classes for Anwendungshandbücher (AHB)"""
+""" "model classes for Anwendungshandbücher (AHB)"""
 
 # pylint:disable=duplicate-code
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
