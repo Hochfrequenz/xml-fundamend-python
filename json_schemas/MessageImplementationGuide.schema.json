@@ -1,7 +1,7 @@
 {
     "$defs": {
         "Code": {
-            "description": "a single code element inside a MIG Dataelement",
+            "description": "A single code element inside a MIG data element, indicated by the `<Code>` tag.",
             "properties": {
                 "description": {
                     "anyOf": [
@@ -39,7 +39,7 @@
             "type": "object"
         },
         "DataElement": {
-            "description": "A single data element inside a MIG Segment.\nThis models both the 'Datenelement' and the 'Gruppendatenelement'",
+            "description": "A single data element inside a MIG Segment.\nThis models both the 'Datenelement' and the 'Gruppendatenelement', indicated by the `<D_xxxx` tag.\nAre able to contain a single or multiple Code elements.",
             "properties": {
                 "codes": {
                     "items": {
@@ -96,7 +96,7 @@
             "type": "object"
         },
         "DataElementGroup": {
-            "description": "a group of data elements, German 'Datenelementgruppe'.",
+            "description": "A group of data elements, German 'Datenelementgruppe', indicated by the `<C_xxxx>` tag.\nAre able to contain a single or multiple data elements.",
             "properties": {
                 "data_elements": {
                     "items": {
@@ -149,13 +149,14 @@
                 "C",
                 "R",
                 "N",
-                "D"
+                "D",
+                "O"
             ],
             "title": "MigStatus",
             "type": "string"
         },
         "Segment": {
-            "description": "a segment inside a MIG",
+            "description": "A segment inside a MIG, indicated by the `<S_xxxx>` tag. A segment contains data elements and data element groups.",
             "properties": {
                 "counter": {
                     "title": "Counter",
@@ -246,11 +247,25 @@
             "type": "object"
         },
         "SegmentGroup": {
-            "description": "a \"Segtmentgruppe\"",
+            "description": "A 'Segmentgruppe' inside a MIG, indicated by the `<G_xxx>` tag. A segment contains segments and segments groups.",
             "properties": {
                 "counter": {
                     "title": "Counter",
                     "type": "string"
+                },
+                "elements": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/Segment"
+                            },
+                            {
+                                "$ref": "#/$defs/SegmentGroup"
+                            }
+                        ]
+                    },
+                    "title": "Elements",
+                    "type": "array"
                 },
                 "id": {
                     "title": "Id",
@@ -272,20 +287,6 @@
                     "title": "Name",
                     "type": "string"
                 },
-                "segment_groups": {
-                    "items": {
-                        "$ref": "#/$defs/SegmentGroup"
-                    },
-                    "title": "Segment Groups",
-                    "type": "array"
-                },
-                "segments": {
-                    "items": {
-                        "$ref": "#/$defs/Segment"
-                    },
-                    "title": "Segments",
-                    "type": "array"
-                },
                 "status_specification": {
                     "$ref": "#/$defs/MigStatus"
                 },
@@ -302,8 +303,7 @@
                 "max_rep_specification",
                 "status_std",
                 "status_specification",
-                "segments",
-                "segment_groups"
+                "elements"
             ],
             "title": "SegmentGroup",
             "type": "object"
@@ -315,23 +315,23 @@
             "title": "Autor",
             "type": "string"
         },
+        "elements": {
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/$defs/Segment"
+                    },
+                    {
+                        "$ref": "#/$defs/SegmentGroup"
+                    }
+                ]
+            },
+            "title": "Elements",
+            "type": "array"
+        },
         "format": {
             "title": "Format",
             "type": "string"
-        },
-        "segment_groups": {
-            "items": {
-                "$ref": "#/$defs/SegmentGroup"
-            },
-            "title": "Segment Groups",
-            "type": "array"
-        },
-        "segments": {
-            "items": {
-                "$ref": "#/$defs/Segment"
-            },
-            "title": "Segments",
-            "type": "array"
         },
         "veroeffentlichungsdatum": {
             "format": "date",
@@ -348,8 +348,7 @@
         "autor",
         "versionsnummer",
         "format",
-        "segments",
-        "segment_groups"
+        "elements"
     ],
     "title": "MessageImplementationGuide",
     "type": "object"
