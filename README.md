@@ -120,6 +120,19 @@ Das Ergebnis sieht dann so aus:
               "codes": []
             },
 ```
+
+### SQL Models
+Die Daten aus den XML-Dateien (Stand 2025-02-10 nur AHBs) lassen sich auch in Datenbanken persistieren.
+Die dazu verwendeten [SQLModel](https://sqlmodel.tiangolo.com/)-Klassen lassen sich mit `fundamend[sqlmodel]` installieren.
+Instanzen der Pydantic-Klassen lassen sich in SQL-Models überführen und umgekehrt:
+```python
+from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
+from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
+
+my_sql_model = SqlAnwendungshandbuch.from_model(pydantic_ahb)
+pydantic_ahb = my_sql_model.to_model()
+```
+
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash
