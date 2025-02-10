@@ -5,11 +5,9 @@ import pytest
 
 from fundamend.reader import AhbReader, MigReader
 
+from .conftest import is_private_submodule_checked_out
+
 data_path: Path = Path(__file__).parent.parent / "xml-migs-and-ahbs"
-
-
-def private_submodule_is_checked_out() -> bool:
-    return any(data_path.iterdir())
 
 
 @pytest.mark.parametrize(
@@ -98,7 +96,7 @@ def private_submodule_is_checked_out() -> bool:
     ],
 )
 def test_read_ahb_xml(ahb_xml_file_path: Path, expected_date: date) -> None:
-    if not private_submodule_is_checked_out():
+    if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     reader = AhbReader(ahb_xml_file_path)
     actual = reader.get_publishing_date()
@@ -106,7 +104,7 @@ def test_read_ahb_xml(ahb_xml_file_path: Path, expected_date: date) -> None:
 
 
 def test_deserializing_all_ahbs() -> None:
-    if not private_submodule_is_checked_out():
+    if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     for ahb_file_path in data_path.rglob("**/*AHB*.xml"):
         reader = AhbReader(ahb_file_path)
@@ -199,7 +197,7 @@ def test_deserializing_all_ahbs() -> None:
     ],
 )
 def test_read_mig_xml(mig_xml_file_path: Path, expected_date: date) -> None:
-    if not private_submodule_is_checked_out():
+    if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     reader = MigReader(mig_xml_file_path)
     actual = reader.get_publishing_date()
@@ -207,7 +205,7 @@ def test_read_mig_xml(mig_xml_file_path: Path, expected_date: date) -> None:
 
 
 def test_deserializing_all_migs() -> None:
-    if not private_submodule_is_checked_out():
+    if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     for mig_file_path in data_path.rglob("**/*MIG*.xml"):
         reader = MigReader(mig_file_path)
