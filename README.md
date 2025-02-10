@@ -16,7 +16,7 @@ Das ist ein wichtiger Schritt für eine echte Digitalisierung der Marktkommunika
 
 Die nun maschinenlesbaren Informationen über den Aufbau von EDIFACT-Nachrichten sind XML-basiert.
 
-Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss.
+Dieses Repository enthält ein kleines Python-Paket, das die XML-Dateien einliest und als vollständig typisierte Python-Objekte zur Verfügung stellt, damit sich niemand mit XML herumschlagen muss (also am Ende des Tages Model Binding).
 Das ist alles.
 
 Hochfrequenz stellt mit [migmose](https://github.com/Hochfrequenz/migmose) und [kohlrahbi](https://github.com/Hochfrequenz/kohlrahbi) auch Tools bereit, um maschinenlesbare MIGs bzw. AHBs aus `.docx`-Dateien zu scrapen.
