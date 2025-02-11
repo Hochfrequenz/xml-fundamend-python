@@ -1,11 +1,25 @@
 {
     "$defs": {
         "Anwendungsfall": {
-            "description": "One Anwendungsfall \"AWF\" corresponds to one Prüfidentifikator or Type of Message",
+            "description": "One 'Anwendungsfall', indicated by `<AWF>` tag, corresponds to one Prüfidentifikator or type of Message",
             "properties": {
                 "beschreibung": {
                     "title": "Beschreibung",
                     "type": "string"
+                },
+                "elements": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/Segment"
+                            },
+                            {
+                                "$ref": "#/$defs/SegmentGroup"
+                            }
+                        ]
+                    },
+                    "title": "Elements",
+                    "type": "array"
                 },
                 "format": {
                     "title": "Format",
@@ -18,20 +32,6 @@
                 "pruefidentifikator": {
                     "title": "Pruefidentifikator",
                     "type": "string"
-                },
-                "segment_groups": {
-                    "items": {
-                        "$ref": "#/$defs/SegmentGroup"
-                    },
-                    "title": "Segment Groups",
-                    "type": "array"
-                },
-                "segments": {
-                    "items": {
-                        "$ref": "#/$defs/Segment"
-                    },
-                    "title": "Segments",
-                    "type": "array"
                 }
             },
             "required": [
@@ -39,8 +39,7 @@
                 "beschreibung",
                 "kommunikation_von",
                 "format",
-                "segments",
-                "segment_groups"
+                "elements"
             ],
             "title": "Anwendungsfall",
             "type": "object"
@@ -65,7 +64,7 @@
             "type": "object"
         },
         "Code": {
-            "description": "a single code element inside an AHB DataElement",
+            "description": "A single code element inside an AHB DataElement, indicated by the `<Code>` tag.",
             "properties": {
                 "ahb_status": {
                     "title": "Ahb Status",
@@ -108,8 +107,19 @@
             "type": "object"
         },
         "DataElement": {
-            "description": "A single data element inside a AHB Segment.\nThis models both the 'Datenelement' and the 'Gruppendatenelement'",
+            "description": "A single data element, German 'Datenelement' inside an AHB Segment, indicated by the `<D_xxxx>` tag.\nThis element can contain a single or multiple Code elements.",
             "properties": {
+                "ahb_status": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "title": "Ahb Status"
+                },
                 "codes": {
                     "items": {
                         "$ref": "#/$defs/Code"
@@ -129,13 +139,14 @@
             "required": [
                 "id",
                 "name",
+                "ahb_status",
                 "codes"
             ],
             "title": "DataElement",
             "type": "object"
         },
         "DataElementGroup": {
-            "description": "a group of data elements, German 'Datenelementgruppe' inside the AHB",
+            "description": "A group of data elements, German 'Datenelementgruppe' inside the AHB, indicated by the `<C_xxxx>` tag.\nThis model can contain both the 'Datenelement' and the 'Gruppendatenelement'",
             "properties": {
                 "data_elements": {
                     "items": {
@@ -181,7 +192,7 @@
             "type": "object"
         },
         "Segment": {
-            "description": "a segment inside an AHB",
+            "description": "A segment inside an AHB, indicated by the `<S_xxxx>` tag.\nThis model can contain both data elements and data element groups.",
             "properties": {
                 "ahb_status": {
                     "anyOf": [
@@ -232,7 +243,7 @@
             "type": "object"
         },
         "SegmentGroup": {
-            "description": "a \"Segmentgruppe\" inside an AHB",
+            "description": "A 'Segmentgruppe' inside an AHB, indicated by the `<G_xxxx>` tag.\nThis model can contain both Segments and segment groups.",
             "properties": {
                 "ahb_status": {
                     "anyOf": [
@@ -245,6 +256,20 @@
                     ],
                     "title": "Ahb Status"
                 },
+                "elements": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/Segment"
+                            },
+                            {
+                                "$ref": "#/$defs/SegmentGroup"
+                            }
+                        ]
+                    },
+                    "title": "Elements",
+                    "type": "array"
+                },
                 "id": {
                     "title": "Id",
                     "type": "string"
@@ -252,28 +277,13 @@
                 "name": {
                     "title": "Name",
                     "type": "string"
-                },
-                "segment_groups": {
-                    "items": {
-                        "$ref": "#/$defs/SegmentGroup"
-                    },
-                    "title": "Segment Groups",
-                    "type": "array"
-                },
-                "segments": {
-                    "items": {
-                        "$ref": "#/$defs/Segment"
-                    },
-                    "title": "Segments",
-                    "type": "array"
                 }
             },
             "required": [
                 "id",
                 "name",
                 "ahb_status",
-                "segments",
-                "segment_groups"
+                "elements"
             ],
             "title": "SegmentGroup",
             "type": "object"
@@ -298,7 +308,7 @@
             "type": "object"
         }
     },
-    "description": "Ein Anwendungshandbuch bündelt verschiedene Nachrichtentypen/Anwendungsfälle im selben Format oder mit der selben\nregulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.",
+    "description": "Ein Anwendungshandbuch, indicated by the `<AHB` tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im\nselben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.",
     "properties": {
         "anwendungsfaelle": {
             "items": {
