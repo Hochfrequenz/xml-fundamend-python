@@ -112,3 +112,6 @@ exclude = ["/unittests"]
 [tool.hatch.build.targets.wheel]
 only-include = ["src"]
 sources = ["src"]
+include = [
+    "src/fundamend/sqlmodels/*.sql",
+]

@@ -6,10 +6,14 @@ from pathlib import Path
 from typing import Generator
 
 import pytest
+import sqlalchemy
+from black.nodes import first_leaf
+from sqlalchemy import text
 from sqlmodel import Session, SQLModel, create_engine
 
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
+from fundamend.sqlmodels.ahbview import create_ahb_view
 from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
 
 from .conftest import is_private_submodule_checked_out
@@ -48,6 +52,32 @@ def test_sqlmodels_single_anwendungshandbuch(sqlite_session: Session) -> None:
     roundtrip_json = roundtrip_abb.model_dump(mode="json")
     assert ahb_json == roundtrip_json  # in pycharm the error message is much better when comparing plain python dicts
     assert roundtrip_abb == ahb
+
+
+def test_sqlmodels_single_anwendungshandbuch_with_ahb_view(sqlite_session: Session) -> None:
+    ahb = AhbReader(
+        Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"
+    ).read()
+    _ = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
+    create_ahb_view(session=sqlite_session)
+    arbitrary_pruefi = ahb.anwendungsfaelle[0].pruefidentifikator
+
+    stmt = text(
+        """
+        SELECT ahm.*
+        FROM ahb_hierarchy_materialized ahm
+        JOIN anwendungsfall af ON af.primary_key = ahm.anwendungsfall_pk
+        WHERE af.pruefidentifikator = :pruefi
+        ORDER BY sort_path
+    """
+    )
+
+    # Correct session execution syntax:
+    results = sqlite_session.execute(stmt, {"pruefi": arbitrary_pruefi}).mappings().all()
+    first_row = results[0]
+    last_row = results[-1]
+    assert first_row["path"] == "Nachrichten-Kopfsegment"
+    assert last_row["path"] == "Nachrichten-Endesegment > Nachrichten-Referenznummer"
 
 
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
