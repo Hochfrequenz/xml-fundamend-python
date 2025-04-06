@@ -8,7 +8,7 @@ from typing import Optional, Union
 
 
 try:
-    from sqlalchemy import UniqueConstraint
+    from sqlalchemy import UniqueConstraint, CheckConstraint
     from sqlmodel import Field, Relationship, SQLModel
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
@@ -454,6 +454,9 @@ class Anwendungshandbuch(SQLModel, table=True):
     selben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
     """
 
+    __table_args__ = (
+        CheckConstraint("gueltig_bis IS NULL OR gueltig_bis > gueltig_von", name="gueltig_von_bis_sanity"),
+    )
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     # Example:
     # <AHB Versionsnummer="1.1d" Veroeffentlichungsdatum="02.04.2024" Author="BDEW">
