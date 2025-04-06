@@ -8,7 +8,7 @@ from typing import Optional, Union
 
 
 try:
-    from sqlalchemy import UniqueConstraint, CheckConstraint
+    from sqlalchemy import CheckConstraint, UniqueConstraint
     from sqlmodel import Field, Relationship, SQLModel
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
