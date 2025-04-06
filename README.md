@@ -133,6 +133,16 @@ my_sql_model = SqlAnwendungshandbuch.from_model(pydantic_ahb)
 pydantic_ahb = my_sql_model.to_model()
 ```
 
+#### Befüllen einer Datenbank mit AHB-Informationen
+In den XML-Rohdaten sind die Informationen aus den AHBs theoretisch beliebig tief verschachtelt, weil jede Segmentgruppe ihrerseits wieder Segmentgruppen enthalten kann.
+Diese Rekursion ist so auch in den SQL-Model-Klassen abgebildet.
+Dieses Paket liefert eine Hilfsfunktion, die die AHBs wieder "flach" zieht, sodass die Datenstruktur mit den flachen AHBs aus bspw. den PDF-Dateien vergleichbar ist, ohne jedoch die Strukturinformationen zu verlieren.
+Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle zu befüllen.
+
+```python
+
+```
+
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash
