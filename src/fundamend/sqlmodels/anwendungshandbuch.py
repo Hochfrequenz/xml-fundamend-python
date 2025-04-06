@@ -470,10 +470,17 @@ class Anwendungshandbuch(SQLModel, table=True):
     """e.g. '1.1d'"""
     anwendungsfaelle: list[Anwendungsfall] = Relationship(
         back_populates="anwendungshandbuch"
-    )  #: die einzelnen Prüfidendifikatoren
+    )  #: die einzelnen Prüfidentifikatoren
     bedingungen: list[Bedingung] = Relationship(back_populates="anwendungshandbuch")
     ub_bedingungen: list[UbBedingung] = Relationship(back_populates="anwendungshandbuch")
     pakete: list[Paket] = Relationship(back_populates="anwendungshandbuch")
+
+    # Die Gültig von/bis Datümer sind leider nicht teil des XML-Datenmodells, obwohl sie viel nützlicher wären als bspw.
+    # das Veröffentlichungsdatum. Die Informationen darf man sich schön aus der mehr schlecht als recht gepflegten API
+    # von bdew-mako.de rauskratzen. Sie sind aber nützlich um mehrere Versionen des AHBs in einer DB zu speichern.
+    # Daher hier als SQLModel-Attribute ohne Entsprechung im XML/rohen Original-Datenmodell.
+    gueltig_von: Optional[date] = Field(default=None, index=True) #: inklusives Startdatum (Deutsche Zeitzone)
+    gueltig_bis: Optional[date] = Field(default=None, index=True) #: ggf. exklusives Enddatum (Deutsche Zeitzone)
 
     @classmethod
     def from_model(cls, model: PydanticAnwendungshandbuch) -> "Anwendungshandbuch":
