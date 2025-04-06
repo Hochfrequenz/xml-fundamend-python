@@ -115,6 +115,13 @@ def test_create_db_and_populate_with_ahb_view_with_duplicates(drop_raw_tables: b
         return
     actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=drop_raw_tables)
     assert actual_sqlite_path.exists()
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    with Session(bind=engine) as session:
+        stmt = select(AhbHierarchyMaterialized).where(AhbHierarchyMaterialized.pruefidentifikator == "25001").order_by(
+            AhbHierarchyMaterialized.sort_path
+        )
+        results = session.exec(stmt).all()
+    assert len(results) > 0
 
 
 def test_create_sqlite_from_submodule() -> None:

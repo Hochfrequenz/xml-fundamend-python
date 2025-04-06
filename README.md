@@ -135,12 +135,27 @@ pydantic_ahb = my_sql_model.to_model()
 
 #### Befüllen einer Datenbank mit AHB-Informationen
 In den XML-Rohdaten sind die Informationen aus den AHBs theoretisch beliebig tief verschachtelt, weil jede Segmentgruppe ihrerseits wieder Segmentgruppen enthalten kann.
-Diese Rekursion ist so auch in den SQL-Model-Klassen abgebildet.
+Diese Rekursion ist so auch in den SQL-Model-Klassen und der Datenbank abgebildet.
 Dieses Paket liefert eine Hilfsfunktion, die die AHBs wieder "flach" zieht, sodass die Datenstruktur mit den flachen AHBs aus bspw. den PDF-Dateien vergleichbar ist, ohne jedoch die Strukturinformationen zu verlieren.
-Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle zu befüllen.
+Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle `ahb_hierarchy_materialized` zu befüllen.
 
 ```python
-
+# pip install fundamend[sqlmodel]
+from pathlib import Path
+from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
+from sqlmodel import Session, create_engine, select
+ahb_paths = [
+    Path("UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"),
+    # add more AHB XML files here
+]
+sqlite_file = create_db_and_populate_with_ahb_view(ahb_paths) # copy the file to somewhere else if necessary
+engine = create_engine(f"sqlite:///{sqlite_file}")
+with Session(bind=engine) as session:
+    stmt = select(AhbHierarchyMaterialized).where(AhbHierarchyMaterialized.pruefidentifikator == "25001").order_by(
+            AhbHierarchyMaterialized.sort_path
+        )
+    results = session.exec(stmt).all()
 ```
 
 ### CLI Tool für XML➡️JSON Konvertierung

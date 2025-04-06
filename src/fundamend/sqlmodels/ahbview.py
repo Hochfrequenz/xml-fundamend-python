@@ -101,3 +101,5 @@ def create_db_and_populate_with_ahb_view(ahb_files: Iterable[Path], drop_raw_tab
         session.commit()
         session.flush()
     return sqlite_path
+
+__all__ = ["create_db_and_populate_with_ahb_view", "create_ahb_view"]
