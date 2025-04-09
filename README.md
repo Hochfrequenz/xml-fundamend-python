@@ -182,19 +182,22 @@ ORDER BY sort_path;
 <details>
 <summary>Ergebnisse des `SELECT`</summary>
 <br>
+... 125 andere Zeilen ...
 
-| path | type | segmentgroup\_name | segmentgroup\_ahb\_status | segment\_id | segment\_name | segment\_ahb\_status | dataelementgroup\_id | dataelementgroup\_name | dataelement\_id | dataelement\_name | dataelement\_ahb\_status | code\_value | code\_name | code\_ahb\_status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Nachrichten-Kopfsegment | segment | null | null | UNH | Nachrichten-Kopfsegment | Muss | null | null | null | null | null | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Referenznummer | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | null | null | D\_0062 | Nachrichten-Referenznummer | X | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung | dataelementgroup | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | null | null | null | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Nachrichtentyp-Kennung | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0065 | Nachrichtentyp-Kennung | null | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Nachrichtentyp-Kennung &gt; Netznutzungszeiten-Nachricht | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0065 | Nachrichtentyp-Kennung | null | UTILTS | Netznutzungszeiten-Nachricht | X |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Versionsnummer des Nachrichtentyps | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0052 | Versionsnummer des Nachrichtentyps | null | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Versionsnummer des Nachrichtentyps &gt; Entwurfs-Version | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0052 | Versionsnummer des Nachrichtentyps | null | D | Entwurfs-Version | X |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Freigabenummer des Nachrichtentyps | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0054 | Freigabenummer des Nachrichtentyps | null | null | null | null |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Freigabenummer des Nachrichtentyps &gt; Ausgabe 2018 - A | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0054 | Freigabenummer des Nachrichtentyps | null | 18A | Ausgabe 2018 - A | X |
-| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Verwaltende Organisation | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0051 | Verwaltende Organisation | null | null | null | null |
+| path | type | segmentgroup\_name | segmentgroup\_ahb\_status | segment\_id | segment\_name | segment\_ahb\_status | dataelementgroup\_id | dataelementgroup\_name | dataelement\_id | dataelement\_name | dataelement\_ahb\_status | code\_value |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Vorgang &gt; Bestandteil des Rechenschritts | segment\_group | Bestandteil des Rechenschritts | Muss \[2006\] | null | null | null | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts | segment | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Handlung, Code | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | D\_1229 | Handlung, Code | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Handlung, Code &gt; Bestandteil des Rechenschritts | code | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | D\_1229 | Handlung, Code | null | Z37 |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Information über eine Folge | dataelementgroup | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | C\_C286 | Information über eine Folge | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Information über eine Folge &gt; Rechenschrittidentifikator | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | C\_C286 | Information über eine Folge | D\_1050 | Rechenschrittidentifikator | X \[913\] | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID | segment | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz | dataelementgroup | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz, Qualifier | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1153 | Referenz, Qualifier | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz, Qualifier &gt; Referenz auf Zeitraum-ID | code | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1153 | Referenz, Qualifier | null | Z46 |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz auf Zeitraum-ID | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1154 | Referenz auf Zeitraum-ID | X \[914\] ∧ \[937\] \[59\] | null |
+
 ...
 </details>
 
