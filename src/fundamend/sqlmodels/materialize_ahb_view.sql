@@ -21,7 +21,9 @@ ordered_roots AS (
         NULL AS number,
         af.pruefidentifikator,
         af.format,
-        ah.versionsnummer
+        ah.versionsnummer,
+        ah.gueltig_von,
+        ah.gueltig_bis
     FROM segmentgroup sg
     JOIN anwendungsfall af ON sg.anwendungsfall_primary_key = af.primary_key
     JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -39,7 +41,9 @@ ordered_roots AS (
         s.number,
         af.pruefidentifikator,
         af.format,
-        ah.versionsnummer
+        ah.versionsnummer,
+        ah.gueltig_von,
+        ah.gueltig_bis
     FROM segment s
     JOIN anwendungsfall af ON s.anwendungsfall_primary_key = af.primary_key
     JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -72,6 +76,8 @@ root_hierarchy AS (
         o.pruefidentifikator,
         o.format,
         o.versionsnummer,
+        o.gueltig_von,
+        o.gueltig_bis,
 
         CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END AS segmentgroup_id,
         CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END AS segmentgroup_name,
@@ -104,7 +110,7 @@ hierarchy AS (
         h.path || ' > ' || child.name, h.path, h.root_order, 'segment_group',
         h.source_id,
         h.sort_path || substr('00000' || child.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         child.id, child.name, child.ahb_status, child.position, child.anwendungsfall_primary_key,
 
@@ -128,7 +134,7 @@ hierarchy AS (
         h.path || ' > ' || s.name, h.path, h.root_order, 'segment',
         h.source_id,
         h.sort_path || substr('00000' || s.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         h.segmentgroup_id, h.segmentgroup_name, h.segmentgroup_ahb_status, h.segmentgroup_position, h.segmentgroup_anwendungsfall_primary_key,
 
@@ -151,7 +157,7 @@ hierarchy AS (
         h.path || ' > ' || deg.name, h.path, h.root_order, 'dataelementgroup',
         h.source_id,
         h.sort_path || substr('00000' || deg.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         h.segmentgroup_id, h.segmentgroup_name, h.segmentgroup_ahb_status, h.segmentgroup_position, h.segmentgroup_anwendungsfall_primary_key,
 
@@ -174,7 +180,7 @@ hierarchy AS (
         h.path || ' > ' || de.name, h.path, h.root_order, 'dataelement',
         h.source_id,
         h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         h.segmentgroup_id, h.segmentgroup_name, h.segmentgroup_ahb_status, h.segmentgroup_position, h.segmentgroup_anwendungsfall_primary_key,
 
@@ -197,7 +203,7 @@ hierarchy AS (
         h.path || ' > ' || de.name, h.path, h.root_order, 'dataelement',
         h.source_id,
         h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         h.segmentgroup_id, h.segmentgroup_name, h.segmentgroup_ahb_status, h.segmentgroup_position, h.segmentgroup_anwendungsfall_primary_key,
 
@@ -220,7 +226,7 @@ hierarchy AS (
         h.path || ' > ' || c.name, h.path, h.root_order, 'code',
         h.source_id,
         h.sort_path || substr('00000' || c.position, -5) || '-' AS sort_path,
-        h.pruefidentifikator, h.format, h.versionsnummer,
+        h.pruefidentifikator, h.format, h.versionsnummer, h.gueltig_von, h.gueltig_bis,
 
         h.segmentgroup_id, h.segmentgroup_name, h.segmentgroup_ahb_status, h.segmentgroup_position, h.segmentgroup_anwendungsfall_primary_key,
 
@@ -240,7 +246,6 @@ SELECT hex(randomblob(16))  AS id, *
 FROM hierarchy
 ORDER BY anwendungsfall_pk, sort_path;
 
--- Add indexes
 CREATE UNIQUE INDEX idx_hierarchy_id ON ahb_hierarchy_materialized (id);
 CREATE INDEX idx_hierarchy_afpk ON ahb_hierarchy_materialized (anwendungsfall_pk);
 CREATE INDEX idx_hierarchy_sort ON ahb_hierarchy_materialized (anwendungsfall_pk, sort_path);
@@ -248,25 +253,22 @@ CREATE INDEX idx_hierarchy_type ON ahb_hierarchy_materialized (type);
 CREATE INDEX idx_hierarchy_pruefidentifikator ON ahb_hierarchy_materialized (pruefidentifikator);
 CREATE INDEX idx_hierarchy_format ON ahb_hierarchy_materialized (format);
 CREATE INDEX idx_hierarchy_versionsnummer ON ahb_hierarchy_materialized (versionsnummer);
-
+CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_von);
+CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
 CREATE INDEX idx_hierarchy_segmentgroup_id ON ahb_hierarchy_materialized (segmentgroup_id);
 CREATE INDEX idx_hierarchy_segmentgroup_name ON ahb_hierarchy_materialized (segmentgroup_name);
 CREATE INDEX idx_hierarchy_segmentgroup_position ON ahb_hierarchy_materialized (segmentgroup_position);
-
 CREATE INDEX idx_hierarchy_segment_id ON ahb_hierarchy_materialized (segment_id);
 CREATE INDEX idx_hierarchy_segment_name ON ahb_hierarchy_materialized (segment_name);
 CREATE INDEX idx_hierarchy_segment_number ON ahb_hierarchy_materialized (segment_number);
 CREATE INDEX idx_hierarchy_segment_position ON ahb_hierarchy_materialized (segment_position);
-
 CREATE INDEX idx_hierarchy_dataelementgroup_id ON ahb_hierarchy_materialized (dataelementgroup_id);
 CREATE INDEX idx_hierarchy_dataelementgroup_name ON ahb_hierarchy_materialized (dataelementgroup_name);
 CREATE INDEX idx_hierarchy_dataelementgroup_position ON ahb_hierarchy_materialized (dataelementgroup_position);
-
 CREATE INDEX idx_hierarchy_dataelement_id ON ahb_hierarchy_materialized (dataelement_id);
 CREATE INDEX idx_hierarchy_dataelement_name ON ahb_hierarchy_materialized (dataelement_name);
 CREATE INDEX idx_hierarchy_dataelement_position ON ahb_hierarchy_materialized (dataelement_position);
 CREATE INDEX idx_hierarchy_dataelement_ahb_status ON ahb_hierarchy_materialized (dataelement_ahb_status);
-
 CREATE INDEX idx_hierarchy_code_id ON ahb_hierarchy_materialized (code_id);
 CREATE INDEX idx_hierarchy_code_name ON ahb_hierarchy_materialized (code_name);
 CREATE INDEX idx_hierarchy_code_description ON ahb_hierarchy_materialized (code_description);

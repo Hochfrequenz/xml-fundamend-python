@@ -2,6 +2,7 @@
 we try to fill a database using kohlrahbi[sqlmodels] and the data from the machine-readable AHB submodule
 """
 
+from datetime import date
 from pathlib import Path
 from typing import Generator
 
@@ -9,6 +10,7 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from fundamend import AhbReader
+from fundamend.internals.hochfrequenz import get_ahbs_from_submodule
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.sqlmodels.ahbview import create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
@@ -117,8 +119,10 @@ def test_create_db_and_populate_with_ahb_view_with_duplicates(drop_raw_tables: b
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
-        stmt = select(AhbHierarchyMaterialized).where(AhbHierarchyMaterialized.pruefidentifikator == "25001").order_by(
-            AhbHierarchyMaterialized.sort_path
+        stmt = (
+            select(AhbHierarchyMaterialized)
+            .where(AhbHierarchyMaterialized.pruefidentifikator == "25001")
+            .order_by(AhbHierarchyMaterialized.sort_path)
         )
         results = session.exec(stmt).all()
     assert len(results) > 0
@@ -130,4 +134,173 @@ def test_create_sqlite_from_submodule() -> None:
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     assert private_submodule_root.exists() and private_submodule_root.is_dir()
     actual_sqlite_path = create_db_and_populate_with_ahb_view(list(private_submodule_root.rglob("**/*AHB*.xml")))
+    assert actual_sqlite_path.exists()
+
+
+_psr = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+_relevant_files_fv2504 = [
+    # I really tried to derive the from/to dates from the file names, but it's a pain.
+    # We know this from the edi-energy-scraper.
+    # FV2504 below; FV2404 above
+    (
+        _psr / "APERAK" / "APERAK_AHB_2_4a_Fehlerkorrektur_2025_02_25_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "COMDIS" / "COMDIS_AHB_1_0f_ausserordentliche_2025_01_31_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "CONTRL" / "CONTRL_AHB_2_4a_Fehlerkorrektur_2024_12_13_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "IFTSTA" / "IFTSTA_AHB_2_0g_Fehlerkorrektur_2025_02_25_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "INSRPT" / "INSRPT_AHB_1_1g_ausserordentliche_2024_07_26_2023_03_23.xml",
+        date(
+            2023,
+            3,
+            23,
+        ),
+        None,
+    ),
+    (
+        _psr / "INVOIC" / "INVOIC_AHB_2_5d_Fehlerkorrektur_2025_01_31_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "MSCONS" / "MSCONS_AHB_3_1f_Fehlerkorrektur_2025_03_20_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "ORDCHG" / "ORDCHG_AHB_1_0a_2024_10_01_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "ORDERS" / "ORDERS_AHB_1_0a_2024_10_01_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "ORDRSP" / "ORDRSP_AHB_1_0a_2024_10_01_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "PARTIN" / "PARTIN_AHB_1_0e_2024_10_01_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "PRICAT" / "PRICAT_AHB_2_0e_2024_06_19_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "QUOTES" / "QUOTES_AHB_1_0_Fehlerkorrektur_2024_12_13_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "REMADV" / "REMADV_AHB_2_5d_Fehlerkorrektur_2025_01_31_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "REQOTE" / "REQOTE_AHB_1_0a_Fehlerkorrektur_2025_02_25_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "UTILMD" / "UTILMD_AHB_Strom_2_1_Fehlerkorrektur_2025_03_20_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+    (
+        _psr / "UTILTS" / "UTILTS_AHB_1_0_Fehlerkorrektur_2025_02_18_2025_06_06.xml",
+        date(
+            2025,
+            6,
+            6,
+        ),
+        None,
+    ),
+]
+
+
+def test_create_sqlite_from_submodule_with_validity() -> None:
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    assert _psr.exists() and _psr.is_dir()
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(_relevant_files_fv2504, drop_raw_tables=True)
     assert actual_sqlite_path.exists()

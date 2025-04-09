@@ -494,7 +494,7 @@ class Anwendungshandbuch(SQLModel, table=True):
             bedingungen=[Bedingung.from_model(x) for x in model.bedingungen],
             ub_bedingungen=[UbBedingung.from_model(x) for x in model.ub_bedingungen],
             pakete=[Paket.from_model(x) for x in model.pakete],
-            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle],
+            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle if not x.is_outdated],
         )
 
     def to_model(self) -> PydanticAnwendungshandbuch:

@@ -5,14 +5,16 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 import logging
 import tempfile
 from collections import Counter
+from datetime import date
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Literal, Optional
 
 import sqlalchemy
 from sqlalchemy.sql.functions import func
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from fundamend import AhbReader
+from fundamend import Anwendungshandbuch as PydanticAnwendungshandbuch
 from fundamend.sqlmodels.anwendungshandbuch import (
     AhbHierarchyMaterialized,
     Anwendungsfall,
@@ -57,14 +59,18 @@ def create_ahb_view(session: Session) -> None:
     )
 
 
-def create_db_and_populate_with_ahb_view(ahb_files: Iterable[Path], drop_raw_tables: bool = False) -> Path:
+def create_db_and_populate_with_ahb_view(
+    ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
+    drop_raw_tables: bool = False,
+) -> Path:
     """
     Creates a SQLite database as temporary file, populates it with the AHBs provided and the materializes the AHB view.
+    You may provide either paths to the AHB.xml files or tuples where each Path comes with a gueltig_von and gueltig_bis
+    date.
     Optionally deletes the original tables to have a smaller db file (only if the prüfis are unique across all AHBs).
     Returns the path to the temporary database file.
     The calling code should move the file to a permanent location if needed.
     """
-    ahbs = [AhbReader(p).read() for p in ahb_files]
     with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as sqlite_file:
         sqlite_path = Path(sqlite_file.name)
     engine = create_engine(f"sqlite:///{sqlite_path}")
@@ -72,10 +78,25 @@ def create_db_and_populate_with_ahb_view(ahb_files: Iterable[Path], drop_raw_tab
     SQLModel.metadata.create_all(engine)
     pruefis_added: list[str] = []
     with Session(bind=engine) as session:
-        for ahb in ahbs:
+        for item in ahb_files:
+            ahb: PydanticAnwendungshandbuch
+            gueltig_von: Optional[date]
+            gueltig_bis: Optional[date]
+            if isinstance(item, Path):
+                ahb = AhbReader(item).read()
+                gueltig_von = None
+                gueltig_bis = None
+            elif isinstance(item, tuple):
+                ahb = AhbReader(item[0]).read()
+                gueltig_von = item[1]
+                gueltig_bis = item[2]
+            else:
+                raise ValueError(f"Invalid item type in ahb_files: {type(item)}")
             sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
+            sql_ahb.gueltig_von = gueltig_von
+            sql_ahb.gueltig_bis = gueltig_bis
             session.add(sql_ahb)
-            pruefis_added += [af.pruefidentifikator for af in ahb.anwendungsfaelle]
+            pruefis_added += [af.pruefidentifikator for af in sql_ahb.anwendungsfaelle]
         session.commit()
         session.flush()
         create_ahb_view(session)
@@ -101,5 +122,6 @@ def create_db_and_populate_with_ahb_view(ahb_files: Iterable[Path], drop_raw_tab
         session.commit()
         session.flush()
     return sqlite_path
+
 
 __all__ = ["create_db_and_populate_with_ahb_view", "create_ahb_view"]
