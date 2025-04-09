@@ -8,6 +8,7 @@ from typing import Generator
 
 import pytest
 from sqlmodel import Session, SQLModel, create_engine, select
+from syrupy.assertion import SnapshotAssertion
 
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
@@ -100,11 +101,37 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
     create_ahb_view(session=sqlite_session)
 
 
+@pytest.mark.snapshot
 @pytest.mark.parametrize("drop_raw_tables", [True, False])
-def test_create_db_and_populate_with_ahb_view(drop_raw_tables: bool) -> None:
+def test_create_db_and_populate_with_ahb_view(drop_raw_tables: bool, snapshot: SnapshotAssertion) -> None:
     ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
     actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=drop_raw_tables)
     assert actual_sqlite_path.exists()
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    with Session(bind=engine) as session:
+        stmt = (
+            select(AhbHierarchyMaterialized)
+            .where(AhbHierarchyMaterialized.pruefidentifikator == "25001")
+            .order_by(AhbHierarchyMaterialized.sort_path)
+        )
+        results = session.exec(stmt).all()
+    raw_results = [r.model_dump(mode="json") for r in results]
+    for raw_result in raw_results:
+        for guid_column in [
+            "anwendungsfall_pk",
+            "current_id",
+            "dataelement_id",
+            "code_id",
+            "id",
+            "root_id",
+            "dataelementgroup_id",
+            "source_id",
+            "parent_id",
+            "segmentgroup_anwendungsfall_primary_key",
+        ]:  # there's no point to compare those
+            if guid_column in raw_result:
+                del raw_result[guid_column]
+    snapshot.assert_match(raw_results)
 
 
 @pytest.mark.parametrize("drop_raw_tables", [True, False])
@@ -127,7 +154,7 @@ def test_create_db_and_populate_with_ahb_view_with_duplicates(drop_raw_tables: b
             .order_by(AhbHierarchyMaterialized.sort_path)
         )
         results = session.exec(stmt).all()
-    assert len(results) > 0
+    assert any(results)
 
 
 def test_create_sqlite_from_submodule() -> None:
