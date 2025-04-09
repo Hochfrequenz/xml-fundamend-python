@@ -118,7 +118,7 @@ def create_db_and_populate_with_ahb_view(
                 SegmentGroupLink,
             ]:
                 session.execute(sqlalchemy.text(f"DROP TABLE IF EXISTS {model_class.__tablename__};"))
-                _logger.debug("Dropped %s'", model_class.__tablename__)
+                _logger.debug("Dropped %s", model_class.__tablename__)
         session.commit()
         session.flush()
     return sqlite_path
