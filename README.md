@@ -157,6 +157,46 @@ with Session(bind=engine) as session:
         )
     results = session.exec(stmt).all()
 ```
+oder in plain SQL:
+```sql
+-- sqlite dialect
+SELECT path,
+       type,
+       segmentgroup_name,
+       segmentgroup_ahb_status,
+       segment_id,
+       segment_name,
+       segment_ahb_status,
+       dataelementgroup_id,
+       dataelementgroup_name,
+       dataelement_id,
+       dataelement_name,
+       dataelement_ahb_status,
+       code_value,
+       code_name,
+       code_ahb_status
+FROM ahb_hierarchy_materialized
+WHERE pruefidentifikator = '25001'
+ORDER BY sort_path;
+```
+<details>
+<summary>Ergebnisse des `SELECT`</summary>
+<br>
+
+| path | type | segmentgroup\_name | segmentgroup\_ahb\_status | segment\_id | segment\_name | segment\_ahb\_status | dataelementgroup\_id | dataelementgroup\_name | dataelement\_id | dataelement\_name | dataelement\_ahb\_status | code\_value | code\_name | code\_ahb\_status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Nachrichten-Kopfsegment | segment | null | null | UNH | Nachrichten-Kopfsegment | Muss | null | null | null | null | null | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Referenznummer | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | null | null | D\_0062 | Nachrichten-Referenznummer | X | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung | dataelementgroup | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | null | null | null | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Nachrichtentyp-Kennung | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0065 | Nachrichtentyp-Kennung | null | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Nachrichtentyp-Kennung &gt; Netznutzungszeiten-Nachricht | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0065 | Nachrichtentyp-Kennung | null | UTILTS | Netznutzungszeiten-Nachricht | X |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Versionsnummer des Nachrichtentyps | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0052 | Versionsnummer des Nachrichtentyps | null | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Versionsnummer des Nachrichtentyps &gt; Entwurfs-Version | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0052 | Versionsnummer des Nachrichtentyps | null | D | Entwurfs-Version | X |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Freigabenummer des Nachrichtentyps | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0054 | Freigabenummer des Nachrichtentyps | null | null | null | null |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Freigabenummer des Nachrichtentyps &gt; Ausgabe 2018 - A | code | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0054 | Freigabenummer des Nachrichtentyps | null | 18A | Ausgabe 2018 - A | X |
+| Nachrichten-Kopfsegment &gt; Nachrichten-Kennung &gt; Verwaltende Organisation | dataelement | null | null | UNH | Nachrichten-Kopfsegment | Muss | C\_S009 | Nachrichten-Kennung | D\_0051 | Verwaltende Organisation | null | null | null | null |
+...
+</details>
 
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
