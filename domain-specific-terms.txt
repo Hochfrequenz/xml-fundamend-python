@@ -13,3 +13,5 @@ alle
 ende
 tages
 sie
+rekursion
+rekursive
