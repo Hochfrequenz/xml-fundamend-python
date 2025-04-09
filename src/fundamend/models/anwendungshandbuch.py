@@ -131,6 +131,15 @@ class Anwendungsfall(FundamendBaseModel):
     format: str  #: e.g. 'UTILTS'
     elements: tuple[Segment | SegmentGroup, ...]
 
+    @property
+    def is_outdated(self) -> bool:
+        """
+        the experts creating the XMLs thought it was a good idea to encode the information if something is there just
+        for legacy reasons in the prüfidentifikator attribute - where else.
+        It's not like they could've added just another attribute to indicate that.
+        """
+        return "##alt##" in self.pruefidentifikator.lower()  # table flip moment
+
 
 class Bedingung(FundamendBaseModel):
     """Ein ConditionKeyConditionText Mapping"""
