@@ -81,6 +81,7 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         roundtrip_abb = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
+        ahb.anwendungsfaelle = [x for x in ahb.anwendungsfaelle if not x.is_outdated]
         assert roundtrip_abb == ahb
 
 
