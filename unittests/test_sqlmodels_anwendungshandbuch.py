@@ -10,7 +10,6 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from fundamend import AhbReader
-from fundamend.internals.hochfrequenz import get_ahbs_from_submodule
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.sqlmodels.ahbview import create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
