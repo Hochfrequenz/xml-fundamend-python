@@ -133,6 +133,74 @@ my_sql_model = SqlAnwendungshandbuch.from_model(pydantic_ahb)
 pydantic_ahb = my_sql_model.to_model()
 ```
 
+#### Befüllen einer Datenbank mit AHB-Informationen
+In den XML-Rohdaten sind die Informationen aus den AHBs theoretisch beliebig tief verschachtelt, weil jede Segmentgruppe ihrerseits wieder Segmentgruppen enthalten kann.
+Diese Rekursion ist so auch in den SQL-Model-Klassen und der Datenbank abgebildet.
+Dieses Paket liefert eine Hilfsfunktion, die die AHBs wieder "flach" zieht, sodass die Datenstruktur mit den flachen AHBs aus bspw. den PDF-Dateien vergleichbar ist, ohne jedoch die Strukturinformationen zu verlieren.
+Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle `ahb_hierarchy_materialized` zu befüllen.
+
+```python
+# pip install fundamend[sqlmodel]
+from pathlib import Path
+from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
+from sqlmodel import Session, create_engine, select
+ahb_paths = [
+    Path("UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"),
+    # add more AHB XML files here
+]
+sqlite_file = create_db_and_populate_with_ahb_view(ahb_paths) # copy the file to somewhere else if necessary
+engine = create_engine(f"sqlite:///{sqlite_file}")
+with Session(bind=engine) as session:
+    stmt = select(AhbHierarchyMaterialized).where(AhbHierarchyMaterialized.pruefidentifikator == "25001").order_by(
+            AhbHierarchyMaterialized.sort_path
+        )
+    results = session.exec(stmt).all()
+```
+oder in plain SQL:
+```sql
+-- sqlite dialect
+SELECT path,
+       type,
+       segmentgroup_name,
+       segmentgroup_ahb_status,
+       segment_id,
+       segment_name,
+       segment_ahb_status,
+       dataelementgroup_id,
+       dataelementgroup_name,
+       dataelement_id,
+       dataelement_name,
+       dataelement_ahb_status,
+       code_value,
+       code_name,
+       code_ahb_status
+FROM ahb_hierarchy_materialized
+WHERE pruefidentifikator = '25001'
+ORDER BY sort_path;
+```
+<details>
+<summary>Ergebnisse des `SELECT`</summary>
+<br>
+... 125 andere Zeilen ...
+
+| path | type | segmentgroup\_name | segmentgroup\_ahb\_status | segment\_id | segment\_name | segment\_ahb\_status | dataelementgroup\_id | dataelementgroup\_name | dataelement\_id | dataelement\_name | dataelement\_ahb\_status | code\_value |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Vorgang &gt; Bestandteil des Rechenschritts | segment\_group | Bestandteil des Rechenschritts | Muss \[2006\] | null | null | null | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts | segment | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Handlung, Code | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | D\_1229 | Handlung, Code | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Handlung, Code &gt; Bestandteil des Rechenschritts | code | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | null | null | D\_1229 | Handlung, Code | null | Z37 |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Information über eine Folge | dataelementgroup | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | C\_C286 | Information über eine Folge | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Bestandteil des Rechenschritts &gt; Information über eine Folge &gt; Rechenschrittidentifikator | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | SEQ | Bestandteil des Rechenschritts | Muss | C\_C286 | Information über eine Folge | D\_1050 | Rechenschrittidentifikator | X \[913\] | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID | segment | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | null | null | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz | dataelementgroup | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | null | null | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz, Qualifier | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1153 | Referenz, Qualifier | null | null |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz, Qualifier &gt; Referenz auf Zeitraum-ID | code | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1153 | Referenz, Qualifier | null | Z46 |
+| Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz auf Zeitraum-ID | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1154 | Referenz auf Zeitraum-ID | X \[914\] ∧ \[937\] \[59\] | null |
+
+...
+</details>
+
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash

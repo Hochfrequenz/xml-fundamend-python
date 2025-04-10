@@ -1,6 +1,11 @@
 """Anwendungshandbuch SQL models"""
 
+import uuid
+from datetime import date
 from typing import Optional, Union
+from uuid import UUID
+
+from efoli import EdifactFormatVersion
 
 # pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
 
@@ -15,9 +20,6 @@ except ImportError as import_error:
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
     raise
 
-import uuid
-from datetime import date
-from uuid import UUID
 
 from fundamend.models.anwendungshandbuch import Anwendungsfall as PydanticAnwendungsfall
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendungshandbuch
@@ -482,8 +484,21 @@ class Anwendungshandbuch(SQLModel, table=True):
     # das Veröffentlichungsdatum. Die Informationen darf man sich schön aus der mehr schlecht als recht gepflegten API
     # von bdew-mako.de rauskratzen. Sie sind aber nützlich um mehrere Versionen des AHBs in einer DB zu speichern.
     # Daher hier als SQLModel-Attribute ohne Entsprechung im XML/rohen Original-Datenmodell.
-    gueltig_von: Optional[date] = Field(default=None, index=True)  #: inklusives Startdatum (Deutsche Zeitzone)
-    gueltig_bis: Optional[date] = Field(default=None, index=True)  #: ggf. exklusives Enddatum (Deutsche Zeitzone)
+    gueltig_von: Optional[date] = Field(default=None, index=True)
+    """
+    inklusives Startdatum der Gültigkeit dieses AHBs (Deutsche Zeitzone)
+    """
+    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    """
+    Ggf. exklusives Enddatum der Gültigkeit dieses AHBs (Deutsche Zeitzone).
+    Wir verwenden None für ein offenes Ende, nicht 9999-12-31.
+    """
+    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+    """
+    efoli format version (note that this is not derived from the gueltig von/bis dates but has to be set explicitly).
+    It's also not a computed column although technically this might have been possible.
+    For details about the type check the documentation of the EdifactFormatVersion enum from the efoli package.
+    """
 
     @classmethod
     def from_model(cls, model: PydanticAnwendungshandbuch) -> "Anwendungshandbuch":
@@ -494,7 +509,7 @@ class Anwendungshandbuch(SQLModel, table=True):
             bedingungen=[Bedingung.from_model(x) for x in model.bedingungen],
             ub_bedingungen=[UbBedingung.from_model(x) for x in model.ub_bedingungen],
             pakete=[Paket.from_model(x) for x in model.pakete],
-            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle],
+            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle if not x.is_outdated],
         )
 
     def to_model(self) -> PydanticAnwendungshandbuch:
@@ -507,3 +522,71 @@ class Anwendungshandbuch(SQLModel, table=True):
             pakete=tuple(x.to_model() for x in sorted(self.pakete, key=lambda y: y.position or 0)),
             anwendungsfaelle=tuple(x.to_model() for x in sorted(self.anwendungsfaelle, key=lambda y: y.position or 0)),
         )
+
+
+class AhbHierarchyMaterialized(SQLModel, table=True):
+    """
+    A materialized flattened AHB hierarchy containing segment groups, segments, data elements, codes,
+    and enriched with metadata like format, versionsnummer, and prüfidentifikator.
+    This table is not thought to be written to, but only read from.
+    It is created once after all other tables have been filled by the create_ahb_view function in ahbview.py.
+    """
+
+    __tablename__ = "ahb_hierarchy_materialized"
+    id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    anwendungsfall_pk: UUID = Field(index=True)
+    current_id: UUID
+    root_id: UUID
+    parent_id: Optional[UUID] = None
+    depth: int
+    position: Optional[int] = Field(default=None)
+    path: str
+    id_path: str
+    parent_path: str
+    root_order: int
+    type: str = Field(index=True)
+    source_id: UUID
+    sort_path: str = Field(index=True)
+
+    # Metadata
+    pruefidentifikator: str = Field(index=True)
+    format: str = Field(index=True)
+    versionsnummer: str = Field(index=True)
+    gueltig_von: Optional[date] = Field(default=None, index=True)
+    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    kommunikation_von: Optional[str] = Field(default=None, index=True)
+    beschreibung: Optional[str] = Field(default=None, index=True)
+    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+
+    # Segment Group
+    segmentgroup_id: Optional[str] = Field(default=None, index=True)
+    segmentgroup_name: Optional[str] = Field(default=None, index=True)
+    segmentgroup_ahb_status: Optional[str] = Field(default=None)
+    segmentgroup_position: Optional[int] = Field(default=None, index=True)
+    segmentgroup_anwendungsfall_primary_key: Optional[UUID] = Field(default=None)
+
+    # Segment
+    segment_id: Optional[str] = Field(default=None, index=True)
+    segment_name: Optional[str] = Field(default=None, index=True)
+    segment_number: Optional[str] = Field(default=None, index=True)
+    segment_ahb_status: Optional[str] = Field(default=None)
+    segment_position: Optional[int] = Field(default=None, index=True)
+
+    # Data Element Group
+    dataelementgroup_id: Optional[str] = Field(default=None, index=True)
+    dataelementgroup_name: Optional[str] = Field(default=None, index=True)
+    dataelementgroup_position: Optional[int] = Field(default=None, index=True)
+
+    # Data Element
+    dataelement_id: Optional[str] = Field(default=None, index=True)
+    dataelement_name: Optional[str] = Field(default=None, index=True)
+    dataelement_position: Optional[int] = Field(default=None, index=True)
+    dataelement_ahb_status: Optional[str] = Field(default=None, index=True)
+
+    # Code
+    code_id: Optional[UUID] = Field(default=None, index=True)
+    code_name: Optional[str] = Field(default=None, index=True)
+    code_description: Optional[str] = Field(default=None, index=True)
+    code_value: Optional[str] = Field(default=None, index=True)
+    code_ahb_status: Optional[str] = Field(default=None, index=True)
+    code_position: Optional[int] = Field(default=None, index=True)
