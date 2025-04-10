@@ -407,7 +407,7 @@ WITH RECURSIVE
                          'code',
                          h.source_id,
                          h.sort_path || substr('00000' || c.position, -5) || '-' AS sort_path,
-                         h.id_path || c.name || '>'                       AS id_path,
+                         h.id_path || c.value || '>'                       AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
