@@ -6,11 +6,18 @@
 #
 annotated-types==0.7.0
     # via pydantic
-pydantic==2.10.5
+efoli==1.4.0
     # via fundamend (pyproject.toml)
-pydantic-core==2.27.2
+pydantic==2.11.3
+    # via fundamend (pyproject.toml)
+pydantic-core==2.33.1
     # via pydantic
+pytz==2025.2
+    # via efoli
 typing-extensions==4.13.1
     # via
     #   pydantic
     #   pydantic-core
+    #   typing-inspection
+typing-inspection==0.4.0
+    # via pydantic
