@@ -22,6 +22,8 @@ WITH RECURSIVE
                              ah.versionsnummer,
                              ah.gueltig_von,
                              ah.gueltig_bis,
+                             af.beschreibung,
+                             af.kommunikation_von,
                              ah.edifact_format_version
                       FROM segmentgroup sg
                                JOIN anwendungsfall af ON sg.anwendungsfall_primary_key = af.primary_key
@@ -42,7 +44,10 @@ WITH RECURSIVE
                              ah.versionsnummer,
                              ah.gueltig_von,
                              ah.gueltig_bis,
+                             af.beschreibung,
+                             af.kommunikation_von,
                              ah.edifact_format_version
+
                       FROM segment s
                                JOIN anwendungsfall af ON s.anwendungsfall_primary_key = af.primary_key
                                JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -72,6 +77,8 @@ WITH RECURSIVE
                               o.versionsnummer,
                               o.gueltig_von,
                               o.gueltig_bis,
+                              o.beschreibung,
+                              o.kommunikation_von,
                               o.edifact_format_version,
 
                               CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END AS segmentgroup_id,
@@ -127,6 +134,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          child.id,
@@ -180,6 +189,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          h.segmentgroup_id,
@@ -232,6 +243,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          h.segmentgroup_id,
@@ -284,6 +297,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          h.segmentgroup_id,
@@ -337,6 +352,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          h.segmentgroup_id,
@@ -389,6 +406,8 @@ WITH RECURSIVE
                          h.versionsnummer,
                          h.gueltig_von,
                          h.gueltig_bis,
+                         h.beschreibung,
+                         h.kommunikation_von,
                          h.edifact_format_version,
 
                          h.segmentgroup_id,
@@ -435,6 +454,8 @@ CREATE INDEX idx_hierarchy_format ON ahb_hierarchy_materialized (format);
 CREATE INDEX idx_hierarchy_versionsnummer ON ahb_hierarchy_materialized (versionsnummer);
 CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_von);
 CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
+CREATE INDEX idx_hierarchy_beschreibung ON ahb_hierarchy_materialized (beschreibung);
+CREATE INDEX idx_hierarchy_kommunikation_von ON ahb_hierarchy_materialized (kommunikation_von);
 CREATE INDEX idx_hierarchy_edifact_format_version ON ahb_hierarchy_materialized (edifact_format_version);
 CREATE INDEX idx_hierarchy_segmentgroup_id ON ahb_hierarchy_materialized (segmentgroup_id);
 CREATE INDEX idx_hierarchy_segmentgroup_name ON ahb_hierarchy_materialized (segmentgroup_name);
@@ -456,3 +477,6 @@ CREATE INDEX idx_hierarchy_code_description ON ahb_hierarchy_materialized (code_
 CREATE INDEX idx_hierarchy_code_value ON ahb_hierarchy_materialized (code_value);
 CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_ahb_status);
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
+
+---
+

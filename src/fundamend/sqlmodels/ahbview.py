@@ -131,14 +131,14 @@ def create_db_and_populate_with_ahb_view(
         session.flush()
         create_ahb_view(session)
         if drop_raw_tables:
-            duplicate_pruefis_for_same_gueltigkeitszeitraum = [
-                duplicate_pruefi
-                for duplicate_pruefi, group in groupby(
+            duplicate_pruefis_for_same_gueltigkeitszeitraum = []
+
+            for duplicate_pruefi, group in groupby(
                     sorted(pruefis_added, key=lambda x: x.pruefidentifikator), key=lambda x: x.pruefidentifikator
-                )
-                if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:]))  # type:ignore[has-type]
-                for group_list in [list(group)]
-            ]
+            ):
+                group_list = list(group)
+                if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:])):
+                    duplicate_pruefis_for_same_gueltigkeitszeitraum.append(duplicate_pruefi)
             if any(duplicate_pruefis_for_same_gueltigkeitszeitraum):
                 raise ValueError(
                     # pylint:disable=line-too-long

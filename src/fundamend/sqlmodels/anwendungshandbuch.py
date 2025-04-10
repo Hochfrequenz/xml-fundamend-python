@@ -553,6 +553,8 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     versionsnummer: str = Field(index=True)
     gueltig_von: Optional[date] = Field(default=None, index=True)
     gueltig_bis: Optional[date] = Field(default=None, index=True)
+    kommunikation_von: Optional[str] = Field(default=None, index=True)
+    beschreibung: Optional[str] = Field(default=None, index=True)
     edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
 
     # Segment Group

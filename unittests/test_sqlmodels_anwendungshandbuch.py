@@ -187,3 +187,5 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
         results = session.exec(stmt).all()
     assert any(results)
     assert all(x.gueltig_von is not None for x in results)
+    assert all(x.kommunikation_von is not None for x in results)
+    assert all(x.beschreibung is not None for x in results)
