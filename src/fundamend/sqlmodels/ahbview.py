@@ -4,13 +4,14 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 
 import logging
 import tempfile
-from collections import Counter
 from datetime import date
+from itertools import groupby
 from pathlib import Path
 from typing import Iterable, Literal, Optional
 
 import sqlalchemy
 from efoli import get_edifact_format_version
+from pydantic import BaseModel
 from sqlalchemy.sql.functions import func
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -60,6 +61,27 @@ def create_ahb_view(session: Session) -> None:
     )
 
 
+class _PruefiValidity(BaseModel):
+    """
+    models how long a model, associated with a pruefidentifikator is valid
+    """
+
+    gueltig_von: Optional[date]  # inclusive start
+    gueltig_bis: Optional[date]  # exclusive end
+    pruefidentifikator: str
+
+    def overlaps(self, other: "_PruefiValidity") -> bool:
+        """
+        returns true if the two validity periods overlap
+        """
+        return (
+            (self.gueltig_bis is None or other.gueltig_von is None or self.gueltig_bis > other.gueltig_von)
+            and (self.gueltig_von is None or other.gueltig_bis is None or self.gueltig_von < other.gueltig_bis)
+            or (self.gueltig_bis is None and other.gueltig_bis is None)
+            or (self.gueltig_von is None and other.gueltig_von is None)
+        )
+
+
 def create_db_and_populate_with_ahb_view(
     ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
     drop_raw_tables: bool = False,
@@ -77,7 +99,7 @@ def create_db_and_populate_with_ahb_view(
     engine = create_engine(f"sqlite:///{sqlite_path}")
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
-    pruefis_added: list[str] = []
+    pruefis_added: list[_PruefiValidity] = []
     with Session(bind=engine) as session:
         for item in ahb_files:
             ahb: PydanticAnwendungshandbuch
@@ -97,18 +119,30 @@ def create_db_and_populate_with_ahb_view(
             sql_ahb.gueltig_von = gueltig_von
             sql_ahb.gueltig_bis = gueltig_bis
             if sql_ahb.gueltig_von is not None:
-                sql_ahb.edifact_format_version = get_edifact_format_version(gueltig_von)
+                sql_ahb.edifact_format_version = get_edifact_format_version(sql_ahb.gueltig_von)
             session.add(sql_ahb)
-            pruefis_added += [af.pruefidentifikator for af in sql_ahb.anwendungsfaelle]
+            pruefis_added += [
+                _PruefiValidity(
+                    pruefidentifikator=af.pruefidentifikator, gueltig_bis=gueltig_bis, gueltig_von=gueltig_von
+                )
+                for af in sql_ahb.anwendungsfaelle
+            ]
         session.commit()
         session.flush()
         create_ahb_view(session)
         if drop_raw_tables:
-            duplicate_pruefis = [item for item, count in Counter(pruefis_added).items() if count > 1]
-            if any(duplicate_pruefis):
+            duplicate_pruefis_for_same_gueltigkeitszeitraum = [
+                duplicate_pruefi
+                for duplicate_pruefi, group in groupby(
+                    sorted(pruefis_added, key=lambda x: x.pruefidentifikator), key=lambda x: x.pruefidentifikator
+                )
+                if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:]))  # type:ignore[has-type]
+                for group_list in [list(group)]
+            ]
+            if any(duplicate_pruefis_for_same_gueltigkeitszeitraum):
                 raise ValueError(
                     # pylint:disable=line-too-long
-                    f"There are duplicate pruefidentifikators in the AHBs: {', '.join(duplicate_pruefis)}. Dropping the source tables is not a good idea."
+                    f"There are duplicate pruefidentifikators in the AHBs: {', '.join(duplicate_pruefis_for_same_gueltigkeitszeitraum)}. Dropping the source tables is not a good idea."
                 )
             for model_class in [
                 SqlAnwendungshandbuch,
