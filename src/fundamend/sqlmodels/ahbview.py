@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Iterable, Literal, Optional
 
 import sqlalchemy
+from efoli import get_edifact_format_version
 from sqlalchemy.sql.functions import func
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -95,6 +96,8 @@ def create_db_and_populate_with_ahb_view(
             sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
             sql_ahb.gueltig_von = gueltig_von
             sql_ahb.gueltig_bis = gueltig_bis
+            if sql_ahb.gueltig_von is not None:
+                sql_ahb.edifact_format_version = get_edifact_format_version(gueltig_von)
             session.add(sql_ahb)
             pruefis_added += [af.pruefidentifikator for af in sql_ahb.anwendungsfaelle]
         session.commit()

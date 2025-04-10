@@ -2,6 +2,8 @@
 
 from typing import Optional, Union
 
+from efoli import EdifactFormatVersion
+
 # pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
 
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
@@ -482,8 +484,21 @@ class Anwendungshandbuch(SQLModel, table=True):
     # das Veröffentlichungsdatum. Die Informationen darf man sich schön aus der mehr schlecht als recht gepflegten API
     # von bdew-mako.de rauskratzen. Sie sind aber nützlich um mehrere Versionen des AHBs in einer DB zu speichern.
     # Daher hier als SQLModel-Attribute ohne Entsprechung im XML/rohen Original-Datenmodell.
-    gueltig_von: Optional[date] = Field(default=None, index=True)  #: inklusives Startdatum (Deutsche Zeitzone)
-    gueltig_bis: Optional[date] = Field(default=None, index=True)  #: ggf. exklusives Enddatum (Deutsche Zeitzone)
+    gueltig_von: Optional[date] = Field(default=None, index=True)
+    """
+    inklusives Startdatum der Gültigkeit dieses AHBs (Deutsche Zeitzone)
+    """
+    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    """
+    Ggf. exklusives Enddatum der Gültigkeit dieses AHBs (Deutsche Zeitzone).
+    Wir verwenden None für ein offenes Ende, nicht 9999-12-31.
+    """
+    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+    """
+    efoli format version (note that this is not derived from the gueltig von/bis dates but has to be set explicitly).
+    It's also not a computed column although technically this might have been possible.
+    For details about the type check the documentation of the EdifactFormatVersion enum from the efoli package.
+    """
 
     @classmethod
     def from_model(cls, model: PydanticAnwendungshandbuch) -> "Anwendungshandbuch":
@@ -536,6 +551,9 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     pruefidentifikator: str = Field(index=True)
     format: str = Field(index=True)
     versionsnummer: str = Field(index=True)
+    gueltig_von: Optional[date] = Field(default=None, index=True)
+    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
 
     # Segment Group
     segmentgroup_id: Optional[str] = Field(default=None, index=True)
