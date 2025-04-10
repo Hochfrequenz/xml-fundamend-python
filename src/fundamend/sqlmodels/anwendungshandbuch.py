@@ -21,7 +21,6 @@ except ImportError as import_error:
     raise
 
 
-
 from fundamend.models.anwendungshandbuch import Anwendungsfall as PydanticAnwendungsfall
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendungshandbuch
 from fundamend.models.anwendungshandbuch import Bedingung as PydanticBedingung
