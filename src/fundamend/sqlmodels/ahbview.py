@@ -82,6 +82,23 @@ class _PruefiValidity(BaseModel):
         )
 
 
+def _check_for_no_overlaps(pruefi_validities: list[_PruefiValidity]) -> None:
+    """raises a value error if there are duplicates/redundancies"""
+    duplicate_pruefis_for_same_gueltigkeitszeitraum = []
+
+    for duplicate_pruefi, group in groupby(
+        sorted(pruefi_validities, key=lambda x: x.pruefidentifikator), key=lambda x: x.pruefidentifikator
+    ):
+        group_list = list(group)
+        if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:])):
+            duplicate_pruefis_for_same_gueltigkeitszeitraum.append(duplicate_pruefi)
+    if any(duplicate_pruefis_for_same_gueltigkeitszeitraum):
+        raise ValueError(
+            # pylint:disable=line-too-long
+            f"There are duplicate pruefidentifikators in the AHBs: {', '.join(duplicate_pruefis_for_same_gueltigkeitszeitraum)}. Dropping the source tables is not a good idea."
+        )
+
+
 def create_db_and_populate_with_ahb_view(
     ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
     drop_raw_tables: bool = False,
@@ -131,19 +148,7 @@ def create_db_and_populate_with_ahb_view(
         session.flush()
         create_ahb_view(session)
         if drop_raw_tables:
-            duplicate_pruefis_for_same_gueltigkeitszeitraum = []
-
-            for duplicate_pruefi, group in groupby(
-                    sorted(pruefis_added, key=lambda x: x.pruefidentifikator), key=lambda x: x.pruefidentifikator
-            ):
-                group_list = list(group)
-                if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:])):
-                    duplicate_pruefis_for_same_gueltigkeitszeitraum.append(duplicate_pruefi)
-            if any(duplicate_pruefis_for_same_gueltigkeitszeitraum):
-                raise ValueError(
-                    # pylint:disable=line-too-long
-                    f"There are duplicate pruefidentifikators in the AHBs: {', '.join(duplicate_pruefis_for_same_gueltigkeitszeitraum)}. Dropping the source tables is not a good idea."
-                )
+            _check_for_no_overlaps(pruefis_added)
             for model_class in [
                 SqlAnwendungshandbuch,
                 Anwendungsfall,
