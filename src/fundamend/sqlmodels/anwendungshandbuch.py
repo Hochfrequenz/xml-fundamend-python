@@ -1,6 +1,9 @@
 """Anwendungshandbuch SQL models"""
 
+import uuid
+from datetime import date
 from typing import Optional, Union
+from uuid import UUID
 
 from efoli import EdifactFormatVersion
 
@@ -17,9 +20,7 @@ except ImportError as import_error:
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
     raise
 
-import uuid
-from datetime import date
-from uuid import UUID
+
 
 from fundamend.models.anwendungshandbuch import Anwendungsfall as PydanticAnwendungsfall
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendungshandbuch
