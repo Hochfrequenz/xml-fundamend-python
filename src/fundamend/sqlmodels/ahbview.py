@@ -37,9 +37,9 @@ def create_ahb_view(session: Session) -> None:
     Create a materialized view for the Anwendungshandbücher using a SQLAlchemy session.
     Warning: This is only tested for SQLite!
     """
-    sql_path = Path(__file__).parent / "materialize_ahb_view.sql"
+    path_to_sql_command = Path(__file__).parent / "materialize_ahb_view.sql"
 
-    with open(sql_path, "r", encoding="utf-8") as sql_file:
+    with open(path_to_sql_command, "r", encoding="utf-8") as sql_file:
         bare_sql = sql_file.read()
 
     bare_statements = bare_sql.split(";")
