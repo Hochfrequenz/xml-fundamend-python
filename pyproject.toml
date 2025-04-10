@@ -18,7 +18,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "pydantic>=2"
+    "pydantic>=2",
+    "efoli>=1.4.0"
 ]
 dynamic = ["readme", "version"]
 
