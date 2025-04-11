@@ -139,6 +139,10 @@ Diese Rekursion ist so auch in den SQL-Model-Klassen und der Datenbank abgebilde
 Dieses Paket liefert eine Hilfsfunktion, die die AHBs wieder "flach" zieht, sodass die Datenstruktur mit den flachen AHBs aus bspw. den PDF-Dateien vergleichbar ist, ohne jedoch die Strukturinformationen zu verlieren.
 Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle `ahb_hierarchy_materialized` zu befüllen.
 
+Die Möglichkeiten einer solchen AHB-Datenbank mit Strukturinformationen (die es in der Form in den PDF-AHBs nicht gibt) schafft viele denkbare Anwendungen.
+Was wenn man die Datenbank als Grundlage nähme, um eine Frontend für AHBs zu bauen, das bequemer nutzbar ist als PDFs mit mehr als 1000 Seiten in denen man nur schlecht suchen kann? Das gibt es: [ahbesser](https://github.com/Hochfrequenz/ahbesser) aka [AHB-Tabellen](https://ahb-tabellen.hochfrequenz.de/).
+Was wenn man die Datenbank als Grundlage nähme, um ein Frontend zu bauen, das AHBs in verschiedenen Versionen vergleicht und einen lesbaren Diff erzeugt der anders als die Änderungshistorie der PDFs sogar vollständig ist? Das gibt es: [ahlbatross](https://github.com/Hochfrequenz/ahlbatross).
+
 ```python
 # pip install fundamend[sqlmodel]
 from pathlib import Path
@@ -199,6 +203,30 @@ ORDER BY sort_path;
 | Vorgang &gt; Bestandteil des Rechenschritts &gt; Referenz auf eine Zeitraum-ID &gt; Referenz &gt; Referenz auf Zeitraum-ID | dataelement | Bestandteil des Rechenschritts | Muss \[2006\] | RFF | Referenz auf eine Zeitraum-ID | Muss | C\_C506 | Referenz | D\_1154 | Referenz auf Zeitraum-ID | X \[914\] ∧ \[937\] \[59\] | null |
 
 ...
+</details>
+
+<details>
+<summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen</summary>
+<br>
+    
+```sql
+    with fv2504 as (SELECT *
+                FROM ahb_hierarchy_materialized
+                WHERE pruefidentifikator = '55014'
+                  and edifact_format_version = 'FV2504'
+                ORDER BY sort_path ASC),
+     fv2410 as (SELECT *
+                FROM ahb_hierarchy_materialized
+                WHERE pruefidentifikator = '55014'
+                  and edifact_format_version = 'FV2410'
+                ORDER BY sort_path ASC)
+SELECT fv2504.path
+FROM fv2504
+         LEFT JOIN fv2410 on fv2504.id_path = fv2410.id_path
+WHERE fv2410.id is null -- alle zeilen, die so im fv2410 ahb nicht vorhanden waren
+ORDER BY fv2504.sort_path;
+```
+
 </details>
 
 ### CLI Tool für XML➡️JSON Konvertierung
