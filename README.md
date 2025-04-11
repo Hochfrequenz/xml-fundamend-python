@@ -139,6 +139,10 @@ Diese Rekursion ist so auch in den SQL-Model-Klassen und der Datenbank abgebilde
 Dieses Paket liefert eine Hilfsfunktion, die die AHBs wieder "flach" zieht, sodass die Datenstruktur mit den flachen AHBs aus bspw. den PDF-Dateien vergleichbar ist, ohne jedoch die Strukturinformationen zu verlieren.
 Dazu wird eine rekursive Common Table Expression (CTE) verwendet, um eine zusätzliche Hilfstabelle `ahb_hierarchy_materialized` zu befüllen.
 
+Die Möglichkeiten einer solchen AHB-Datenbank mit Strukturinformationen (die es in der Form in den PDF-AHBs nicht gibt) schafft viele denkbare Anwendungen.
+Was wenn man die Datenbank als Grundlage nähme, um eine Frontend für AHBs zu bauen, das bequemer nutzbar ist als PDFs mit mehr als 1000 Seiten in denen man nur schlecht suchen kann? Das gibt es: [ahbesser](https://github.com/Hochfrequenz/ahbesser) aka [AHB-Tabellen](https://ahb-tabellen.hochfrequenz.de/).
+Was wenn man die Datenbank als Grundlage nähme, um ein Frontend zu bauen, das AHBs in verschiedenen Versionen vergleicht und einen lesbaren Diff erzeugt der anders als die Änderungshistorie der PDFs sogar vollständig ist? Das gibt es: [ahlbatross](https://github.com/Hochfrequenz/ahlbatross).
+
 ```python
 # pip install fundamend[sqlmodel]
 from pathlib import Path
