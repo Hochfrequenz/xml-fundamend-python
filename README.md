@@ -201,6 +201,28 @@ ORDER BY sort_path;
 ...
 </details>
 
+<details>
+<summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen</summary>
+<br>
+```sql
+    with fv2504 as (SELECT *
+                FROM ahb_hierarchy_materialized
+                WHERE pruefidentifikator = '55014'
+                  and edifact_format_version = 'FV2504'
+                ORDER BY sort_path ASC),
+     fv2410 as (SELECT *
+                FROM ahb_hierarchy_materialized
+                WHERE pruefidentifikator = '55014'
+                  and edifact_format_version = 'FV2410'
+                ORDER BY sort_path ASC)
+SELECT fv2504.path
+FROM fv2504
+         LEFT JOIN fv2410 on fv2504.id_path = fv2410.id_path
+WHERE fv2410.id is null -- alle zeilen, die so im fv2410 ahb nicht vorhanden waren
+ORDER BY fv2504.sort_path;
+```
+</details>
+
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash
