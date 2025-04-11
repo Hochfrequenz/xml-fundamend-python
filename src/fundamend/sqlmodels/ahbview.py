@@ -12,7 +12,6 @@ from typing import Iterable, Literal, Optional
 import sqlalchemy
 from efoli import get_edifact_format_version
 from pydantic import BaseModel
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.functions import func
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -52,7 +51,7 @@ def create_ahb_view(session: Session) -> None:
         if statement:
             try:
                 session.execute(sqlalchemy.text(statement))
-            except OperationalError:
+            except sqlalchemy.exc.IntegrityError:
                 if " UNIQUE " in bare_statement:
                     session.execute(sqlalchemy.text(bare_statement.replace(" UNIQUE ", " ")))
                 else:
