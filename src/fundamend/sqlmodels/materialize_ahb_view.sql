@@ -12,7 +12,7 @@ WITH RECURSIVE
     ordered_roots AS (SELECT sg.primary_key,
                              sg.position,
                              'segment_group' AS type,
-                             'SG' || sg.id           AS root_id_text,
+                             'SG' || sg.id   AS root_id_text,
                              sg.name,
                              sg.ahb_status,
                              sg.anwendungsfall_primary_key,
@@ -186,7 +186,7 @@ WITH RECURSIVE
                          'segment',
                          h.source_id,
                          h.sort_path || substr('00000' || s.position, -5) || '-' AS sort_path,
-                         h.id_path || s.id || '>'                       AS id_path,
+                         h.id_path || s.id || '>'                                AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -241,7 +241,7 @@ WITH RECURSIVE
                          'dataelementgroup',
                          h.source_id,
                          h.sort_path || substr('00000' || deg.position, -5) || '-' AS sort_path,
-                         h.id_path || deg.id || '>'                       AS id_path,
+                         h.id_path || deg.id || '>'                                AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -296,7 +296,7 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-                         h.id_path || de.id || '>'                       AS id_path,
+                         h.id_path || de.id || '>'                                AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -352,7 +352,7 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-                         h.id_path || de.id || '>'                       AS id_path,
+                         h.id_path || de.id || '>'                                AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -407,7 +407,7 @@ WITH RECURSIVE
                          'code',
                          h.source_id,
                          h.sort_path || substr('00000' || c.position, -5) || '-' AS sort_path,
-                         h.id_path || c.value || '>'                       AS id_path,
+                         h.id_path || c.value || '>'                             AS id_path,
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -486,6 +486,9 @@ CREATE INDEX idx_hierarchy_code_description ON ahb_hierarchy_materialized (code_
 CREATE INDEX idx_hierarchy_code_value ON ahb_hierarchy_materialized (code_value);
 CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_ahb_status);
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
-
----
+CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
+CREATE INDEX idx_hierarchy_id_path ON ahb_hierarchy_materialized (id_path);
+-- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
+CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
+CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
 

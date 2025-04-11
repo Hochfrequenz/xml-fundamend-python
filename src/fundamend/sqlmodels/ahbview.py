@@ -49,7 +49,13 @@ def create_ahb_view(session: Session) -> None:
     for bare_statement in bare_statements:
         statement = bare_statement.strip()
         if statement:
-            session.execute(sqlalchemy.text(statement))
+            try:
+                session.execute(sqlalchemy.text(statement))
+            except sqlalchemy.exc.IntegrityError:
+                if " UNIQUE " in bare_statement:
+                    session.execute(sqlalchemy.text(bare_statement.replace(" UNIQUE ", " ")))
+                else:
+                    raise
     session.commit()
     number_of_inserted_rows = session.scalar(
         select(func.count(AhbHierarchyMaterialized.id))  # type:ignore[arg-type] # pylint:disable=not-callable #
