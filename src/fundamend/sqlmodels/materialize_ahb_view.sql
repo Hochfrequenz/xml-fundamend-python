@@ -488,6 +488,6 @@ CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_a
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
 CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
 CREATE INDEX idx_hierarchy_id_path ON ahb_hierarchy_materialized (id_path);
-
----
+CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
+CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
 
