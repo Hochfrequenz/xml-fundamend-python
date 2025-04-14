@@ -5,7 +5,7 @@ import pytest
 from sqlmodel import Session, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.sqlmodels.ahbesser_view import AhbesserLine, create_ahbesser_view
+from fundamend.sqlmodels.ahbtabellen_view import AhbTabellenLine, create_ahbtabellen_view
 from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view
 
 
@@ -22,8 +22,12 @@ def test_create_db_and_ahbesser_view(snapshot: SnapshotAssertion) -> None:
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
-        create_ahbesser_view(session)
-        stmt = select(AhbesserLine).where(AhbesserLine.pruefidentifikator == "25001").order_by(AhbesserLine.sort_path)
+        create_ahbtabellen_view(session)
+        stmt = (
+            select(AhbTabellenLine)
+            .where(AhbTabellenLine.pruefidentifikator == "25001")
+            .order_by(AhbTabellenLine.sort_path)
+        )
         results = session.exec(stmt).all()
     raw_results = [r.model_dump(mode="json") for r in results]
     for raw_result in raw_results:

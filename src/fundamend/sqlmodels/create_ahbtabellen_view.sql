@@ -2,8 +2,8 @@
 -- Then we can create another view on top of ahb_hierarchy_materialized.
 -- This is especially useful for our ahbesser frontend (aka "AHB-Tabellen")
 
-DROP TABLE IF EXISTS v_ahbesser; -- this is because sqlmodel tries to create a table first... it doesn't know that this is just a view. bit dirty but ok.
-DROP VIEW IF EXISTS v_ahbesser;
+DROP TABLE IF EXISTS v_ahbtabellen; -- this is because sqlmodel tries to create a table first... it doesn't know that this is just a view. bit dirty but ok.
+DROP VIEW IF EXISTS v_ahbtabellen;
 CREATE VIEW v_ahbesser as
 SELECT id                                                                                                   as id,
        edifact_format_version                                                                               as format_version,
