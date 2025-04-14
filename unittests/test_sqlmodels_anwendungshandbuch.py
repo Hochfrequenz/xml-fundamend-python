@@ -13,9 +13,9 @@ from syrupy.assertion import SnapshotAssertion
 
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
-from fundamend.sqlmodels.ahbview import create_ahb_view, create_db_and_populate_with_ahb_view
-from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
-from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
+from fundamend.sqlmodels import AhbHierarchyMaterialized
+from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
+from fundamend.sqlmodels import create_ahb_view, create_db_and_populate_with_ahb_view
 
 from .conftest import is_private_submodule_checked_out
 

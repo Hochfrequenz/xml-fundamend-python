@@ -4,21 +4,28 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 
 import logging
 import tempfile
+import uuid
 from datetime import date
 from itertools import groupby
 from pathlib import Path
 from typing import Iterable, Literal, Optional
+from uuid import UUID
 
 import sqlalchemy
-from efoli import get_edifact_format_version
+from efoli import EdifactFormatVersion, get_edifact_format_version
 from pydantic import BaseModel
-from sqlalchemy.sql.functions import func
-from sqlmodel import Session, SQLModel, create_engine, select
+
+try:
+    from sqlalchemy.sql.functions import func
+    from sqlmodel import Field, Session, SQLModel, create_engine, select
+except ImportError as import_error:
+    import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
+    # sqlmodel is only an optional dependency when fundamend is used to fill a database
+    raise
 
 from fundamend import AhbReader
 from fundamend import Anwendungshandbuch as PydanticAnwendungshandbuch
 from fundamend.sqlmodels.anwendungshandbuch import (
-    AhbHierarchyMaterialized,
     Anwendungsfall,
 )
 from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
@@ -157,4 +164,72 @@ def create_db_and_populate_with_ahb_view(
     return sqlite_path
 
 
-__all__ = ["create_db_and_populate_with_ahb_view", "create_ahb_view"]
+class AhbHierarchyMaterialized(SQLModel, table=True):
+    """
+    A materialized flattened AHB hierarchy containing segment groups, segments, data elements, codes,
+    and enriched with metadata like format, versionsnummer, and prüfidentifikator.
+    This table is not thought to be written to, but only read from.
+    It is created once after all other tables have been filled by the create_ahb_view function in ahbview.py.
+    """
+
+    __tablename__ = "ahb_hierarchy_materialized"
+    id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    anwendungsfall_pk: UUID = Field(index=True)
+    current_id: UUID
+    root_id: UUID
+    parent_id: Optional[UUID] = None
+    depth: int
+    position: Optional[int] = Field(default=None)
+    path: str
+    id_path: str
+    parent_path: str
+    root_order: int
+    type: str = Field(index=True)
+    source_id: UUID
+    sort_path: str = Field(index=True)
+
+    # Metadata
+    pruefidentifikator: str = Field(index=True)
+    format: str = Field(index=True)
+    versionsnummer: str = Field(index=True)
+    gueltig_von: Optional[date] = Field(default=None, index=True)
+    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    kommunikation_von: Optional[str] = Field(default=None, index=True)
+    beschreibung: Optional[str] = Field(default=None, index=True)
+    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+
+    # Segment Group
+    segmentgroup_id: Optional[str] = Field(default=None, index=True)
+    segmentgroup_name: Optional[str] = Field(default=None, index=True)
+    segmentgroup_ahb_status: Optional[str] = Field(default=None)
+    segmentgroup_position: Optional[int] = Field(default=None, index=True)
+    segmentgroup_anwendungsfall_primary_key: Optional[UUID] = Field(default=None)
+
+    # Segment
+    segment_id: Optional[str] = Field(default=None, index=True)
+    segment_name: Optional[str] = Field(default=None, index=True)
+    segment_number: Optional[str] = Field(default=None, index=True)
+    segment_ahb_status: Optional[str] = Field(default=None)
+    segment_position: Optional[int] = Field(default=None, index=True)
+
+    # Data Element Group
+    dataelementgroup_id: Optional[str] = Field(default=None, index=True)
+    dataelementgroup_name: Optional[str] = Field(default=None, index=True)
+    dataelementgroup_position: Optional[int] = Field(default=None, index=True)
+
+    # Data Element
+    dataelement_id: Optional[str] = Field(default=None, index=True)
+    dataelement_name: Optional[str] = Field(default=None, index=True)
+    dataelement_position: Optional[int] = Field(default=None, index=True)
+    dataelement_ahb_status: Optional[str] = Field(default=None, index=True)
+
+    # Code
+    code_id: Optional[UUID] = Field(default=None, index=True)
+    code_name: Optional[str] = Field(default=None, index=True)
+    code_description: Optional[str] = Field(default=None, index=True)
+    code_value: Optional[str] = Field(default=None, index=True)
+    code_ahb_status: Optional[str] = Field(default=None, index=True)
+    code_position: Optional[int] = Field(default=None, index=True)
+
+
+__all__ = ["AhbHierarchyMaterialized", "create_db_and_populate_with_ahb_view", "create_ahb_view"]

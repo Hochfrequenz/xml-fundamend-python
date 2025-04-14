@@ -14,3 +14,32 @@ you need to install fundamend[sqlmodels] to use this sub-package
 #     raise ValueError(f"{type_} has no matching SQLAlchemy type")
 # E   ValueError: <class 'fundamend.models.anwendungshandbuch.Anwendungshandbuch'> has no matching SQLAlchemy type
 # => you need to keep the models in sync manually by now
+
+from .ahbtabellen_view import AhbTabellenLine, create_ahbtabellen_view
+from .ahbview import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
+from .anwendungshandbuch import (
+    Anwendungsfall,
+    Anwendungshandbuch,
+    Bedingung,
+    Code,
+    DataElement,
+    DataElementGroup,
+    Segment,
+    SegmentGroup,
+)
+
+__all__ = [
+    "create_ahb_view",
+    "AhbHierarchyMaterialized",
+    "create_db_and_populate_with_ahb_view",
+    "create_ahbtabellen_view",
+    "AhbTabellenLine",
+    "Code",
+    "DataElement",
+    "DataElementGroup",
+    "Segment",
+    "SegmentGroup",
+    "Anwendungsfall",
+    "Bedingung",
+    "Anwendungshandbuch",
+]
