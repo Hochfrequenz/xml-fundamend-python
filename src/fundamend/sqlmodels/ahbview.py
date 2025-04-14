@@ -30,6 +30,7 @@ from fundamend.sqlmodels.anwendungshandbuch import (
     SegmentGroup,
     SegmentGroupLink,
 )
+from fundamend.sqlmodels.internals import _execute_bare_sql
 
 _logger = logging.getLogger(__name__)
 
@@ -39,24 +40,8 @@ def create_ahb_view(session: Session) -> None:
     Create a materialized view for the Anwendungshandbücher using a SQLAlchemy session.
     Warning: This is only tested for SQLite!
     """
-    path_to_sql_command = Path(__file__).parent / "materialize_ahb_view.sql"
+    _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "materialize_ahb_view.sql")
 
-    with open(path_to_sql_command, "r", encoding="utf-8") as sql_file:
-        bare_sql = sql_file.read()
-
-    bare_statements = bare_sql.split(";")
-
-    for bare_statement in bare_statements:
-        statement = bare_statement.strip()
-        if statement:
-            try:
-                session.execute(sqlalchemy.text(statement))
-            except sqlalchemy.exc.IntegrityError:
-                if " UNIQUE " in bare_statement:
-                    session.execute(sqlalchemy.text(bare_statement.replace(" UNIQUE ", " ")))
-                else:
-                    raise
-    session.commit()
     number_of_inserted_rows = session.scalar(
         select(func.count(AhbHierarchyMaterialized.id))  # type:ignore[arg-type] # pylint:disable=not-callable #
     )

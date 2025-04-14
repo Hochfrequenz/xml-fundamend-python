@@ -20,7 +20,6 @@ except ImportError as import_error:
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
     raise
 
-
 from fundamend.models.anwendungshandbuch import Anwendungsfall as PydanticAnwendungsfall
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendungshandbuch
 from fundamend.models.anwendungshandbuch import Bedingung as PydanticBedingung
