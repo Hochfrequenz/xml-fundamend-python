@@ -4,7 +4,7 @@
 
 DROP TABLE IF EXISTS v_ahbtabellen; -- this is because sqlmodel tries to create a table first... it doesn't know that this is just a view. bit dirty but ok.
 DROP VIEW IF EXISTS v_ahbtabellen;
-CREATE VIEW v_ahbesser as
+CREATE VIEW v_ahbtabellen as
 SELECT id                                                                                                   as id,
        edifact_format_version                                                                               as format_version,
        pruefidentifikator                                                                                   as pruefidentifikator,
