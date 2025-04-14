@@ -27,4 +27,4 @@ SELECT id                                                                       
        sort_path                                                                                            as sort_path
 -- the bedingung column is still missing, but we'll solve this one separately
 FROM ahb_hierarchy_materialized
-WHERE type != 'dataelementgroup' and type!='dataelement';
+WHERE type != 'dataelementgroup';
