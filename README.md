@@ -146,19 +146,19 @@ Was wenn man die Datenbank als Grundlage nähme, um ein Frontend zu bauen, das A
 ```python
 # pip install fundamend[sqlmodel]
 from pathlib import Path
-from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view
-from fundamend.sqlmodels.anwendungshandbuch import AhbHierarchyMaterialized
+from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view, AhbHierarchyMaterialized
 from sqlmodel import Session, create_engine, select
+
 ahb_paths = [
     Path("UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"),
     # add more AHB XML files here
 ]
-sqlite_file = create_db_and_populate_with_ahb_view(ahb_paths) # copy the file to somewhere else if necessary
+sqlite_file = create_db_and_populate_with_ahb_view(ahb_paths)  # copy the file to somewhere else if necessary
 engine = create_engine(f"sqlite:///{sqlite_file}")
 with Session(bind=engine) as session:
     stmt = select(AhbHierarchyMaterialized).where(AhbHierarchyMaterialized.pruefidentifikator == "25001").order_by(
-            AhbHierarchyMaterialized.sort_path
-        )
+        AhbHierarchyMaterialized.sort_path
+    )
     results = session.exec(stmt).all()
 ```
 oder in plain SQL:
