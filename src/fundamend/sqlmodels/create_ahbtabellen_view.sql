@@ -26,4 +26,5 @@ SELECT id                                                                       
                                                                coalesce(segment_name, segmentgroup_name)))) as line_name,        -- e.g. 'Datums- oder Uhrzeit- oder Zeitspannen-Format, Code' or 'Produkt-Daten für Lieferant relevant'
        sort_path                                                                                            as sort_path
 -- the bedingung column is still missing, but we'll solve this one separately
-FROM ahb_hierarchy_materialized;
+FROM ahb_hierarchy_materialized
+WHERE type != 'dataelementgroup' and type!='dataelement';
