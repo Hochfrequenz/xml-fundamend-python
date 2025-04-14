@@ -5,8 +5,7 @@ import pytest
 from sqlmodel import Session, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.sqlmodels.ahbtabellen_view import AhbTabellenLine, create_ahbtabellen_view
-from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import AhbTabellenLine, create_ahbtabellen_view, create_db_and_populate_with_ahb_view
 
 
 @pytest.mark.snapshot
