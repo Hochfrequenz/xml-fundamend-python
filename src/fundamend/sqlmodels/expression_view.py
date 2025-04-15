@@ -47,8 +47,8 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Bedingung).where(
-                Bedingung.nummer.in_(bedingung_keys),
-                Bedingung.anwendungshandbuch_primary_key == ahb_pk,  # pylint:disable=no-member
+                Bedingung.nummer.in_(bedingung_keys),  # pylint:disable=no-member
+                Bedingung.anwendungshandbuch_primary_key == ahb_pk,
             )
         ).all()
     }
@@ -56,16 +56,16 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Paket).where(
-                Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk
-            )  # pylint:disable=no-member
+                Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk  # pylint:disable=no-member
+            )
         ).all()
     }
     ubbedingungen = {
         x.nummer: x.text
         for x in session.exec(
             select(UbBedingung).where(
-                UbBedingung.nummer.in_(ubbedingung_keys),
-                UbBedingung.anwendungshandbuch_primary_key == ahb_pk,  # pylint:disable=no-member
+                UbBedingung.nummer.in_(ubbedingung_keys),  # pylint:disable=no-member
+                UbBedingung.anwendungshandbuch_primary_key == ahb_pk,
             )
         ).all()
     }
