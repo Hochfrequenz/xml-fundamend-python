@@ -14,7 +14,7 @@ from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
     from sqlalchemy.sql.functions import func
-    from sqlmodel import Field, Session, SQLModel, UniqueConstraint, select
+    from sqlmodel import Field, Session, SQLModel, UniqueConstraint, col, select
 
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
@@ -31,7 +31,6 @@ except ImportError as import_error:
 _logger = logging.getLogger(__name__)
 
 
-@typing.no_type_check
 def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
     categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
     bedingung_keys = (
@@ -47,7 +46,7 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Bedingung).where(
-                Bedingung.nummer.in_(bedingung_keys),  # pylint:disable=no-member
+                col(Bedingung.nummer).in_(bedingung_keys),  # pylint:disable=no-member
                 Bedingung.anwendungshandbuch_primary_key == ahb_pk,
             )
         ).all()
@@ -56,7 +55,7 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Paket).where(
-                Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk  # pylint:disable=no-member
+                col(Paket.nummer).in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk  # pylint:disable=no-member
             )
         ).all()
     }
@@ -64,7 +63,7 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(UbBedingung).where(
-                UbBedingung.nummer.in_(ubbedingung_keys),  # pylint:disable=no-member
+                col(UbBedingung.nummer).in_(ubbedingung_keys),  # pylint:disable=no-member
                 UbBedingung.anwendungshandbuch_primary_key == ahb_pk,
             )
         ).all()
