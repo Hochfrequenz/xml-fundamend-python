@@ -35,7 +35,7 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
     json_file_path = xml_file_path.with_suffix(".json")
     with open(json_file_path, encoding="utf-8", mode="w") as outfile:
         json.dump(out_dict, outfile, indent=True, ensure_ascii=False)
-    print(f"Successfully converted {xml_file_path} file to JSON {json_file_path}")
+    typer.echo(f"Successfully converted {xml_file_path} file to JSON {json_file_path}")
     return json_file_path
 
 
