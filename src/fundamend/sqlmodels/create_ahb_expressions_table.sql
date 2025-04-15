@@ -16,30 +16,31 @@ FROM (
            format,
            pruefidentifikator,
            segmentgroup_ahb_status AS expression,
-           anwendungsfall_pk
+           anwendungshandbuch_primary_key
     FROM ahb_hierarchy_materialized
     UNION ALL
     SELECT edifact_format_version,
            format,
            pruefidentifikator,
            segment_ahb_status AS expression,
-           anwendungsfall_pk
+           anwendungshandbuch_primary_key
     FROM ahb_hierarchy_materialized
     UNION ALL
     SELECT edifact_format_version,
            format,
            pruefidentifikator,
            dataelement_ahb_status AS expression,
-           anwendungsfall_pk
+           anwendungsfall_pk,
+           anwendungshandbuch_primary_key
     FROM ahb_hierarchy_materialized
     UNION ALL
     SELECT edifact_format_version,
            format,
            pruefidentifikator,
            code_ahb_status AS expression,
-           anwendungsfall_pk
+           anwendungsfall_pk,
+           anwendungshandbuch_primary_key
     FROM ahb_hierarchy_materialized
-    
 )
 WHERE expression is not null AND TRIM(expression) = ''
 ORDER BY edifact_format_version, format, pruefidentifikator, expression;

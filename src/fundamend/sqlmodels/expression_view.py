@@ -89,6 +89,7 @@ class AhbExpression(SQLModel, table=True):
     pruefidentifikator: str | None = Field(index=True, default=None)  # might be None for CONTRL or APERAK
     expression: str = Field(index=True)  #: e.g 'Muss [1] U [2]'
     node_texts: str = Field(index=True)
+    anwendungshandbuch_primary_key:UUID = Field()
     """
     this contains the typical "[1] Foo Text\n[2] Bar Text" which explains the meaning of the nodes from inside the
     respective Expression (e.g. for expression "Muss [1] U [2]")
