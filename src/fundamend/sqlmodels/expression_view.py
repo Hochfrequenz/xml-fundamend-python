@@ -73,14 +73,7 @@ def _setup_weird_ahbicht_dependency_injection() -> None:
 
 
 def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
-    try:
-        categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
-    except SyntaxError as syntax_error:
-        _logger.info("The expression '%s' could not be parsed: %s", expression, syntax_error)
-        return ""  # I decided against returning the error message, although it's tempting - but still bad practice
-    except VisitError as visit_error:
-        _logger.info("The expression '%s' could not be parsed: %s", expression, visit_error)
-        return ""
+    categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
     bedingung_keys = (
         categorized_key_extract.format_constraint_keys
         + categorized_key_extract.requirement_constraint_keys
@@ -122,12 +115,47 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
     return node_texts
 
 
-def create_and_fill_ahb_expression_table(session: Session) -> None:
+def _get_validity_node_texts_and_error_message_cpu_intensive(
+    expression: str, session: Session, anwendungshandbuch_pk: uuid.UUID
+) -> tuple[bool, str, str | None]:
+    try:
+        is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
+        if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
+            node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
+        else:
+            node_texts = ""
+    except NotImplementedError:  # ahbicht fault/missing feature -> act like it's valid
+        node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
+        error_message = None
+    return is_valid, node_texts, error_message
+
+
+def _get_validity_node_texts_and_error_message_fast(
+    expression: str, session: Session, anwendungshandbuch_pk: uuid.UUID
+) -> tuple[bool, str, str | None]:
+    try:
+        node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
+    except SyntaxError as syntax_error:
+        _logger.info("The expression '%s' could not be parsed: %s", expression, syntax_error)
+        return (
+            False,
+            "",
+            str(syntax_error),
+        )  # I decided against returning the error message, although it's tempting - but still bad practice
+    except VisitError as visit_error:
+        _logger.info("The expression '%s' could not be parsed: %s", expression, visit_error)
+        return False, "", str(visit_error)
+    return True, node_texts, None
+
+
+def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_validity_check: bool = False) -> None:
     """
     creates and fills the ahb_expressions table. It uses the ahb_hierarchy_materialized table to extract all expressions
     and parses each expression with ahbicht. The latter has to be done in Python.
+    If the CPU intensive validity check is enabled, not only expression alone is checked but also all its possible
+    outcomes. This leads to only few additional expressions marked as invalid but is very slow.
     """
-    rows = []
+    rows: list[tuple[EdifactFormatVersion | None, str, str | None, uuid.UUID]] = []
     _setup_weird_ahbicht_dependency_injection()
     for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
@@ -135,34 +163,37 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         AhbHierarchyMaterialized.dataelement_ahb_status,
         AhbHierarchyMaterialized.code_ahb_status,
     ]:
-        stmt = select(  # type:ignore[call-overload]
+        stmt = select(
             AhbHierarchyMaterialized.edifact_format_version,
             AhbHierarchyMaterialized.format,
             ahb_status_col,
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
         )
-        rows.extend(session.exec(stmt))
-    rows = [r for r in rows if r[2] is not None and r[2].strip()]
+        rows.extend(session.exec(stmt))  # type:ignore[arg-type]
+    non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID]] = [
+        r for r in rows if r[2] is not None and r[0] is not None and r[2].strip()  # type:ignore[misc]
+    ]
     if not any(rows):
         raise ValueError(
             "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
         )
-    rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    non_empty_rows.sort(key=lambda x: (x[0], x[1], x[2]))
     seen: set[tuple[str, str, str]] = set()
-    unique_rows = [row for row in rows if (key := (row[0], row[1], row[2].strip())) not in seen and not seen.add(key)]
-    for row in unique_rows:
+    unique_rows = [
+        row
+        for row in non_empty_rows
+        if (key := (row[0], row[1], row[2].strip())) not in seen
+        and not seen.add(key)  # type:ignore[ func-returns-value]
+    ]
+    for row in unique_rows:  # there are ~3600 unique rows for FV2410+FV2504 as of 2025-04-15
         expression = row[2].strip()
-        try:
-            is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
-            if (
-                is_valid
-            ):  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
-                node_texts = _generate_node_texts(session, expression, row.anwendungshandbuch_primary_key)
-            else:
-                node_texts = ""
-        except NotImplementedError:  # ahbicht fault/missing feature -> act like it's valid
-            node_texts = _generate_node_texts(session, expression, row.anwendungshandbuch_primary_key)
-            error_message = None
+        if use_cpu_intensive_validity_check:
+            # as of 2025-04-15 I have no clue how long this actually takes for all expressions
+            _, node_texts, error_message = _get_validity_node_texts_and_error_message_cpu_intensive(
+                expression, session, row[3]
+            )
+        else:
+            _, node_texts, error_message = _get_validity_node_texts_and_error_message_fast(expression, session, row[3])
         ahb_expression_row = AhbExpression(
             edifact_format_version=row[0],
             format=row[1],
