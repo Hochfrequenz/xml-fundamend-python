@@ -158,11 +158,17 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         if similar_entry_has_been_handled:
             continue
         seen.add(key)
-        is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
-        if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
+        try:
+            is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
+            if (
+                is_valid
+            ):  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
+                node_texts = _generate_node_texts(session, expression, row.anwendungshandbuch_primary_key)
+            else:
+                node_texts = ""
+        except NotImplementedError:  # ahbicht fault/missing feature -> act like it's valid
             node_texts = _generate_node_texts(session, expression, row.anwendungshandbuch_primary_key)
-        else:
-            node_texts = ""
+            error_message = None
         ahb_expression_row = AhbExpression(
             edifact_format_version=row[0],
             format=row[1],

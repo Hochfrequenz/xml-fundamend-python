@@ -2,7 +2,7 @@
 # name: test_create_db_and_expressions_view
   list([
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss',
       'format': 'UTILTS',
@@ -10,7 +10,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': '''
         Muss [2]
@@ -21,7 +21,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss [3]',
       'format': 'UTILTS',
@@ -29,7 +29,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss [51]',
       'format': 'UTILTS',
@@ -37,7 +37,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss [5]',
       'format': 'UTILTS',
@@ -45,7 +45,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss [6]',
       'format': 'UTILTS',
@@ -53,7 +53,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Muss [7]',
       'format': 'UTILTS',
@@ -61,7 +61,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'Soll [10] ∧ [7]',
       'format': 'UTILTS',
@@ -72,7 +72,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X',
       'format': 'UTILTS',
@@ -80,7 +80,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X (([939][53]) ∨ ([940][54])) ∧ [530]',
       'format': 'UTILTS',
@@ -94,7 +94,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [11]',
       'format': 'UTILTS',
@@ -102,7 +102,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [11] ⊻ [15]',
       'format': 'UTILTS',
@@ -113,7 +113,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [13]',
       'format': 'UTILTS',
@@ -121,7 +121,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [14]',
       'format': 'UTILTS',
@@ -129,7 +129,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [18]',
       'format': 'UTILTS',
@@ -137,7 +137,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [1P0..1]',
       'format': 'UTILTS',
@@ -145,7 +145,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [1]',
       'format': 'UTILTS',
@@ -153,7 +153,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [912] ∧ [914] ∧ [915]',
       'format': 'UTILTS',
@@ -165,7 +165,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [913]',
       'format': 'UTILTS',
@@ -173,7 +173,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [913] [8]',
       'format': 'UTILTS',
@@ -184,7 +184,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [913] [8] ∧ [9]',
       'format': 'UTILTS',
@@ -196,7 +196,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [914] ∧ [969] ∧ [912]',
       'format': 'UTILTS',
@@ -208,7 +208,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [931] [500] ∧ [UB1]',
       'format': 'UTILTS',
@@ -220,7 +220,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [931][494]',
       'format': 'UTILTS',
@@ -231,7 +231,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [950] [501] ⊻ [960] [529]',
       'format': 'UTILTS',
@@ -244,7 +244,7 @@
       'pruefidentifikator': '25001',
     }),
     dict({
-      'anwendungshandbuch_primary_key': '16a78f81-104d-4b5e-998c-60093bbd29db',
+      'ahbicht_error_message': None,
       'edifact_format_version': 'FV2310',
       'expression': 'X [951] [502]',
       'format': 'UTILTS',

@@ -36,8 +36,8 @@ def test_create_db_and_expressions_view(snapshot: SnapshotAssertion) -> None:
                 del raw_result[guid_column]
     snapshot.assert_match(raw_results)
 
-
-def test_create_sqlite_from_submodule_with_validity() -> None:
+@pytest.mark.snapshot
+def test_create_expressions_table_from_submodule_with_validity(snapshot: SnapshotAssertion) -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
@@ -50,3 +50,16 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
         # just to check we don't run into any constraints or unexpected errors when using _all_ AHBs
+        stmt = (
+            select(AhbExpression)
+            .where(AhbExpression.ahbicht_error_message is not None)
+            .order_by(AhbExpression.edifact_format_version, AhbExpression.pruefidentifikator, AhbExpression.expression)
+        )
+        # as a by-product of this test we get a snapshot of all expressions that are invalid in all AHBs
+        results = session.exec(stmt).all()
+    raw_results = [r.model_dump(mode="json") for r in results]
+    for raw_result in raw_results:
+        for guid_column in ["id", "anwendungshandbuch_primary_key"]:  # there's no point to compare those
+            if guid_column in raw_result:
+                del raw_result[guid_column]
+    snapshot.assert_match(raw_results)
