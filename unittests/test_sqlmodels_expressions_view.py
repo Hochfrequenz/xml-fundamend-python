@@ -51,7 +51,7 @@ def test_create_expressions_table_from_submodule_with_validity(snapshot: Snapsho
         # just to check we don't run into any constraints or unexpected errors when using _all_ AHBs
         stmt = (
             select(AhbExpression)
-            .where(col(AhbExpression.ahbicht_error_message).isnot(None))
+            .where(col(AhbExpression.ahbicht_error_message).isnot(None))  # pylint:disable=no-member
             .order_by(AhbExpression.edifact_format_version, AhbExpression.format, AhbExpression.expression)
         )
         # as a by-product of this test we get a snapshot of all expressions that are invalid in all AHBs
