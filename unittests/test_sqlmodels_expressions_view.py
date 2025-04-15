@@ -1,5 +1,3 @@
-
-
 from datetime import date
 from pathlib import Path
 
@@ -8,7 +6,7 @@ from sqlmodel import Session, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
 from fundamend.sqlmodels import create_db_and_populate_with_ahb_view
-from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table, AhbExpression
+from fundamend.sqlmodels.expression_view import AhbExpression, create_and_fill_ahb_expression_table
 
 
 @pytest.mark.snapshot
@@ -25,10 +23,7 @@ def test_create_db_and_expressions_view(snapshot: SnapshotAssertion) -> None:
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
-        stmt = (
-            select(AhbExpression)
-            .where(AhbExpression.pruefidentifikator == "25001")
-        )
+        stmt = select(AhbExpression).where(AhbExpression.pruefidentifikator == "25001")
         results = session.exec(stmt).all()
     raw_results = [r.model_dump(mode="json") for r in results]
     for raw_result in raw_results:

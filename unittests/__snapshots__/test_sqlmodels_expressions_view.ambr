@@ -1,0 +1,258 @@
+# serializer version: 1
+# name: test_create_db_and_expressions_view
+  list([
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss',
+      'format': 'UTILTS',
+      'node_texts': '',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': '''
+        Muss [2]
+        Kann
+      ''',
+      'format': 'UTILTS',
+      'node_texts': '[2] Wenn SG5 STS+Z23+Z34 (Formel muss beim Absender angefragt werden) in einem SG5 IDE vorhanden',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [51]',
+      'format': 'UTILTS',
+      'node_texts': '[51] Wenn in SG5 LOC+172 DE3225 (Meldepunkt) die ID einer Marktlokation angegeben ist.',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [3]',
+      'format': 'UTILTS',
+      'node_texts': '[3] Wenn SG5 STS+Z23+Z33 (Formel angefügt) vorhanden',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [7]',
+      'format': 'UTILTS',
+      'node_texts': '[7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Soll [10] ∧ [7]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [10] wenn vorhanden
+        [7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [6]',
+      'format': 'UTILTS',
+      'node_texts': '[6] Wenn das SG8 RFF+Z23 (Referenz auf Rechenschritt) in derselben SG8 SEQ+Z37 nicht vorhanden',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [5]',
+      'format': 'UTILTS',
+      'node_texts': '[5] Wenn das SG8 RFF+Z19 (Referenz auf eine Messlokation) in derselben SG8 SEQ+Z37 nicht vorhanden',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X',
+      'format': 'UTILTS',
+      'node_texts': '',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931][494]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [494] Das hier genannte Datum muss der Zeitpunkt sein, zu dem das Dokument erstellt wurde, oder ein Zeitpunkt, der davor liegt.
+        [931] Format: ZZZ = +00
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [1]',
+      'format': 'UTILTS',
+      'node_texts': '[1] Nur MP-ID aus Sparte Strom',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X (([939][53]) ∨ ([940][54])) ∧ [530]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [53] Wenn im DE3155 in demselben COM der Code EM vorhanden ist
+        [530] Hinweis: Es darf nur eine Information im DE3148 übermittelt werden
+        [54] Wenn im DE3155 in demselben COM der Code TE / FX / AJ / AL vorhanden ist
+        [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
+        [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [950] [501] ⊻ [960] [529]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [501] Hinweis: Verwendung der ID der Marktlokation
+        [529] Hinweis: Verwendung der ID der Netzlokation
+        [950] Format: Marktlokations-ID
+        [960] Format: Netzlokations-ID
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] [500] ∧ [UB1]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [500] Hinweis: Zeitpunkt, ab dem die Berechnungsformel anzuwenden ist
+        [931] Format: ZZZ = +00
+        [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913] [8]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [8] Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24
+        [913] Format: Mögliche Werte: 1 bis 99999
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913]',
+      'format': 'UTILTS',
+      'node_texts': '[913] Format: Mögliche Werte: 1 bis 99999',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [951] [502]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [502] Hinweis: Verwendung der ID der Messlokation
+        [951] Format: Zählpunktbezeichnung
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913] [8] ∧ [9]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [8] Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24
+        [9] Der hier angegebene Rechenschrittidentifikator darf nicht identisch mit dem Rechenschrittidentifikator aus diesem SG8 SEQ+Z37 DE1050 sein
+        [913] Format: Mögliche Werte: 1 bis 99999
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [912] ∧ [914] ∧ [915]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [912] Format: Wert kann mit maximal 6 Nachkommastellen angegeben werden
+        [914] Format: Möglicher Wert: > 0
+        [915] Format: Möglicher Wert: ≠ 1
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [914] ∧ [969] ∧ [912]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [912] Format: Wert kann mit maximal 6 Nachkommastellen angegeben werden
+        [914] Format: Möglicher Wert: > 0
+        [969] Format: Möglicher Wer: ≤ 1
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [1P0..1]',
+      'format': 'UTILTS',
+      'node_texts': '[1P] --',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [18]',
+      'format': 'UTILTS',
+      'node_texts': '[18] Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [11] ⊻ [15]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen
+        [15] Wenn in einem SG5 IDE+24 nur eine SEQ+Z37 mit einer SG8 RFF+Z19 (Messlokation) vorhanden ist
+      ''',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [11]',
+      'format': 'UTILTS',
+      'node_texts': '[11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [13]',
+      'format': 'UTILTS',
+      'node_texts': '[13] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z80/Z81 (Divisor / Dividend) vorhanden, muss in diesem Vorgang genau eine zweite SG8 SEQ+Z37 mit identischen Rechenschrittidentifikator vorhanden sein, sodass das eine SG8 SEQ+Z37 den Operator Z80 (Divisor) und das andere SG8 SEQ+Z37 den Operator Z81 (Dividend) enthält',
+      'pruefidentifikator': '25001',
+    }),
+    dict({
+      'anwendungshandbuch_primary_key': '9615b00c-0748-4f48-859e-4d085837565f',
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [14]',
+      'format': 'UTILTS',
+      'node_texts': '[14] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z82 (Faktor) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich CAV+Z82 enthalten',
+      'pruefidentifikator': '25001',
+    }),
+  ])
+# ---

@@ -5,18 +5,16 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 import asyncio
 import logging
 import uuid
-from pathlib import Path
-from uuid import UUID
 
 from efoli import EdifactFormatVersion
+from sqlalchemy import UniqueConstraint
 
-from fundamend.sqlmodels import Bedingung
-from fundamend.sqlmodels.anwendungshandbuch import UbBedingung, Paket
-from fundamend.sqlmodels.internals import _execute_bare_sql
+from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
+from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
     from sqlalchemy.sql.functions import func
-    from sqlmodel import Field, Session, SQLModel, create_engine, select
+    from sqlmodel import Field, Session, SQLModel, select
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
@@ -32,7 +30,7 @@ except ImportError as import_error:
 _logger = logging.getLogger(__name__)
 
 
-def _generate_node_texts(session: Session, expression: str) -> str:
+def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
     categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
     bedingung_keys = (
         categorized_key_extract.format_constraint_keys
@@ -41,13 +39,29 @@ def _generate_node_texts(session: Session, expression: str) -> str:
     )
     paket_keys = categorized_key_extract.package_keys
     ubbedingung_keys = categorized_key_extract.time_condition_keys
-    # maybe it's faster to just load all pakete and all bedingungen once instead of re-selecting for each expression
+    # probably, we'd be faster if we just loaded all pakete and all bedingungen once instead of selecting over and over
+    # again for each expression
     bedingungen = {
-        x.nummer: x.text for x in session.exec(select(Bedingung).where(Bedingung.nummer.in_(bedingung_keys)).all())
+        x.nummer: x.text
+        for x in session.exec(
+            select(Bedingung).where(
+                Bedingung.nummer.in_(bedingung_keys), Bedingung.anwendungshandbuch_primary_key == ahb_pk
+            )
+        ).all()
     }
-    pakete = {x.nummer: x.text for x in session.exec(select(Paket).where(Bedingung.nummer.in_(paket_keys)).all())}
+    pakete = {
+        x.nummer: x.text
+        for x in session.exec(
+            select(Paket).where(Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk)
+        ).all()
+    }
     ubbedingungen = {
-        x.nummer: x.text for x in session.exec(select(UbBedingung).where(Bedingung.nummer.in_(ubbedingung_keys)).all())
+        x.nummer: x.text
+        for x in session.exec(
+            select(UbBedingung).where(
+                UbBedingung.nummer.in_(ubbedingung_keys), UbBedingung.anwendungshandbuch_primary_key == ahb_pk
+            )
+        ).all()
     }
     joined_dict = {**bedingungen, **pakete, **ubbedingungen}
     node_texts = "\n".join([f"[{key}] {value}" for key, value in joined_dict.items()])
@@ -59,8 +73,43 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
     creates and fills the ahb_expressions table. It uses the ahb_hierarchy_materialized table to extract all expressions
     and parses each expression with ahbicht. The latter has to be done in Python.
     """
-    _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "create_ahb_expressions_table.sql")
+    rows = []
 
+    for col in [
+        AhbHierarchyMaterialized.segmentgroup_ahb_status,
+        AhbHierarchyMaterialized.segment_ahb_status,
+        AhbHierarchyMaterialized.dataelement_ahb_status,
+        AhbHierarchyMaterialized.code_ahb_status,
+    ]:
+        stmt = select(
+            AhbHierarchyMaterialized.edifact_format_version,
+            AhbHierarchyMaterialized.format,
+            AhbHierarchyMaterialized.pruefidentifikator,
+            col,
+            AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
+        )
+        rows.extend(session.exec(stmt))
+
+    seen = set()
+    for row in rows:
+        if not row[3] or not row[3].strip():
+            continue
+        expression = row[3].strip()
+        key = (row[0], row[1], row[2], expression)
+        if key in seen:
+            continue  # Already handled
+        seen.add(key)
+        ahb_expression_row = AhbExpression(
+            edifact_format_version=row[0],
+            format=row[1],
+            pruefidentifikator=row[2],
+            expression=expression,
+            node_texts=_generate_node_texts(
+                session, expression, row.anwendungshandbuch_primary_key
+            ),  # first we create all table entries, then, in a later step we parse the expressions
+            anwendungshandbuch_primary_key=row[4],
+        )
+        session.add(ahb_expression_row)
     number_of_inserted_rows = session.scalar(
         select(func.count(AhbExpression.id))  # type:ignore[arg-type] # pylint:disable=not-callable
     )
@@ -69,9 +118,6 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         number_of_inserted_rows,
         AhbExpression.__tablename__,
     )
-    for row in session.exec(select(AhbExpression)).all():
-        row.node_texts = _generate_node_texts(session, row.expression)
-        session.add(row)
     session.commit()
 
 
@@ -83,14 +129,23 @@ class AhbExpression(SQLModel, table=True):
     """
 
     __tablename__ = "ahb_expressions"
-    id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    __table_args__ = (
+        UniqueConstraint(
+            "edifact_format_version",
+            "format",
+            "pruefidentifikator",
+            "expression",
+            name="idx_ahb_expressions_metadata_expression",
+        ),
+    )
+    id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     edifact_format_version: EdifactFormatVersion = Field(index=True)
     format: str = Field(index=True)  # the edifact format, e.g. 'UTILMD'
     pruefidentifikator: str | None = Field(index=True, default=None)  # might be None for CONTRL or APERAK
     expression: str = Field(index=True)  #: e.g 'Muss [1] U [2]'
-    node_texts: str = Field(index=True)
-    anwendungshandbuch_primary_key:UUID = Field()
+    node_texts: str = Field()
     """
     this contains the typical "[1] Foo Text\n[2] Bar Text" which explains the meaning of the nodes from inside the
     respective Expression (e.g. for expression "Muss [1] U [2]")
     """
+    anwendungshandbuch_primary_key: uuid.UUID = Field()
