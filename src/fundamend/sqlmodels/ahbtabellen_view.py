@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from uuid import UUID
 
-from efoli import EdifactFormatVersion
+from efoli import EdifactFormat, EdifactFormatVersion
 from sqlalchemy.sql.functions import func
 from sqlmodel import Field, Session, SQLModel, select
 
@@ -42,6 +42,7 @@ class AhbTabellenLine(SQLModel, table=True):
     __tablename__ = "v_ahbtabellen"
     id: UUID = Field(primary_key=True)
     format_version: EdifactFormatVersion = Field()
+    format: EdifactFormat = Field()
     pruefidentifikator: str = Field()
     path: str = Field()
     id_path: str = Field()
@@ -53,6 +54,8 @@ class AhbTabellenLine(SQLModel, table=True):
     qualifier: str | None = Field()
     line_ahb_status: str | None = Field()
     line_name: str | None = Field()
+    bedingung: str | None = Field()
+    bedingungsfehler: str | None = Field()
     sort_path: str = Field()
 
 
