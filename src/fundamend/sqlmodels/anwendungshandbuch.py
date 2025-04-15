@@ -384,7 +384,10 @@ class Anwendungsfall(SQLModel, table=True):
 class Bedingung(SQLModel, table=True):
     """Ein ConditionKeyConditionText Mapping"""
 
-    __table_args__ = (UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),)
+    __table_args__ = (
+        UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),
+        UniqueConstraint("anwendungshandbuch_primary_key", "nummer", name="IX_bedingung_nummer_once_per_ahb"),
+    )
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     nummer: str = Field(index=True)  #: e.g. '1'
     text: str  #: e.g. 'Nur MP-ID aus Sparte Strom'
@@ -405,7 +408,10 @@ class Bedingung(SQLModel, table=True):
 class UbBedingung(SQLModel, table=True):
     """Eine UB-Bedingung"""
 
-    __table_args__ = (UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),)
+    __table_args__ = (
+        UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),
+        UniqueConstraint("anwendungshandbuch_primary_key", "nummer", name="IX_ubbedingung_nummer_once_per_ahb"),
+    )
     # Example:
     # <UB_Bedingung Nummer="[UB1]">([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])</UB_Bedingung>
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
@@ -428,7 +434,10 @@ class UbBedingung(SQLModel, table=True):
 class Paket(SQLModel, table=True):
     """Ein Bedingungspaket/PackageKeyConditionText Mapping"""
 
-    __table_args__ = (UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),)
+    __table_args__ = (
+        UniqueConstraint("anwendungshandbuch_primary_key", "position", name="IX_position_once_per_ahb"),
+        UniqueConstraint("anwendungshandbuch_primary_key", "nummer", name="IX_paket_nummer_once_per_ahb"),
+    )
     # Example:
     # <Paket Nummer="[1P]">--</Paket>
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
@@ -505,10 +514,14 @@ class Anwendungshandbuch(SQLModel, table=True):
             veroeffentlichungsdatum=model.veroeffentlichungsdatum,
             autor=model.autor,
             versionsnummer=model.versionsnummer,
-            bedingungen=[Bedingung.from_model(x) for x in model.bedingungen],
-            ub_bedingungen=[UbBedingung.from_model(x) for x in model.ub_bedingungen],
-            pakete=[Paket.from_model(x) for x in model.pakete],
-            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle if not x.is_outdated],
+            bedingungen=[Bedingung.from_model(x, position=i) for i, x in enumerate(model.bedingungen)],
+            ub_bedingungen=[UbBedingung.from_model(x, position=i) for i, x in enumerate(model.ub_bedingungen)],
+            pakete=[Paket.from_model(x, position=i) for i, x in enumerate(model.pakete)],
+            anwendungsfaelle=[
+                Anwendungsfall.from_model(x, position=i)
+                for i, x in enumerate(model.anwendungsfaelle)
+                if not x.is_outdated
+            ],
         )
 
     def to_model(self) -> PydanticAnwendungshandbuch:

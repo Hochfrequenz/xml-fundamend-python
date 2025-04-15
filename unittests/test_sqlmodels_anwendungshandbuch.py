@@ -120,6 +120,7 @@ def test_create_db_and_populate_with_ahb_view(drop_raw_tables: bool, snapshot: S
     for raw_result in raw_results:
         for guid_column in [
             "anwendungsfall_pk",
+            "anwendungshandbuch_primary_key",
             "current_id",
             "dataelement_id",
             "code_id",
