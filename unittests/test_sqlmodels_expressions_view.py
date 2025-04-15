@@ -23,7 +23,9 @@ def test_create_db_and_expressions_view(snapshot: SnapshotAssertion) -> None:
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
-        stmt = select(AhbExpression).where(AhbExpression.pruefidentifikator == "25001")
+        stmt = (
+            select(AhbExpression).where(AhbExpression.pruefidentifikator == "25001").order_by(AhbExpression.expression)
+        )
         results = session.exec(stmt).all()
     raw_results = [r.model_dump(mode="json") for r in results]
     for raw_result in raw_results:

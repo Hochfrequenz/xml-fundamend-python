@@ -55,7 +55,8 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Paket).where(
-                col(Paket.nummer).in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk  # pylint:disable=no-member
+                col(Paket.nummer).in_(paket_keys),
+                Paket.anwendungshandbuch_primary_key == ahb_pk,  # pylint:disable=no-member
             )
         ).all()
     }
