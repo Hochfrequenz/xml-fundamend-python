@@ -90,14 +90,15 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         )
         rows.extend(session.exec(stmt))
 
-    seen = set()
+    seen:set[tuple] = set()
     for row in rows:
         if not row[3] or not row[3].strip():
             continue
         expression = row[3].strip()
         key = (row[0], row[1], row[2], expression)
-        if key in seen:
-            continue  # Already handled
+        similar_entry_has_been_handled = key in seen
+        if similar_entry_has_been_handled:
+            continue
         seen.add(key)
         ahb_expression_row = AhbExpression(
             edifact_format_version=row[0],
@@ -106,7 +107,7 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
             expression=expression,
             node_texts=_generate_node_texts(
                 session, expression, row.anwendungshandbuch_primary_key
-            ),  # first we create all table entries, then, in a later step we parse the expressions
+            ),
             anwendungshandbuch_primary_key=row[4],
         )
         session.add(ahb_expression_row)
