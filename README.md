@@ -208,7 +208,7 @@ ORDER BY sort_path;
 <details>
 <summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen</summary>
 <br>
-    
+
 ```sql
     with fv2504 as (SELECT *
                 FROM ahb_hierarchy_materialized
@@ -236,11 +236,11 @@ pip install fundamend[cli]
 ```
 Kann ein CLI-Tool in der entsprechenden venv installiert werden, das einzelne MIG- und AHB-XML-Dateien in entsprechende JSONs konvertiert:
 ```bash
-(myvenv): xml2json --xml-path path/to/mig.xml
+(myvenv): fundamend xml2json --xml-path path/to/mig.xml
 ```
 erzeugt `path/to/mig.json`. Und
 ```bash
-(myvenv): xml2json --xml-path path/to/my/directory
+(myvenv): fundamend xml2json --xml-path path/to/my/directory
 ```
 konvertiert alle XML-Dateien im entsprechenden Verzeichnis.
 
