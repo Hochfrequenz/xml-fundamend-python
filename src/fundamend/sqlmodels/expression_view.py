@@ -1,5 +1,5 @@
 """
-helper module to create a "materialized view" (in sqlite this means: create and populate a plain table)
+helper module to create a table with a "Bedingung" column like the one in the PDF/docx AHBs
 """
 
 import asyncio
