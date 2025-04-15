@@ -3,7 +3,6 @@ from pathlib import Path
 
 import typer
 from pydantic import RootModel
-from rich.console import Console
 from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
