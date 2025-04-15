@@ -5,8 +5,10 @@ helper module to create a table with a "Bedingung" column like the one in the PD
 import asyncio
 import logging
 import uuid
+from contextvars import ContextVar
+from typing import Optional
 
-from efoli import EdifactFormatVersion
+from efoli import EdifactFormat, EdifactFormatVersion
 
 from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
@@ -20,8 +22,16 @@ except ImportError as import_error:
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
     raise
 
+
 try:
+    import inject
+    from ahbicht.content_evaluation.evaluationdatatypes import EvaluatableData, EvaluatableDataProvider
+    from ahbicht.content_evaluation.evaluator_factory import create_content_evaluation_result_based_evaluators
+    from ahbicht.content_evaluation.expression_check import is_valid_expression
+    from ahbicht.content_evaluation.token_logic_provider import SingletonTokenLogicProvider, TokenLogicProvider
     from ahbicht.expressions.condition_expression_parser import extract_categorized_keys
+    from ahbicht.models.content_evaluation_result import ContentEvaluationResult, ContentEvaluationResultSchema
+    from lark.exceptions import VisitError
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels,ahbicht]?"
     # sqlmodel and ahbicht are only optional dependencies when fundamend is used to fill a database
@@ -29,9 +39,48 @@ except ImportError as import_error:
 
 _logger = logging.getLogger(__name__)
 
+_content_evaluation_result: ContextVar[Optional[ContentEvaluationResult]] = ContextVar(
+    "_content_evaluation_result", default=None
+)
+
+
+def _get_evaluatable_data() -> EvaluatableData[ContentEvaluationResult]:
+    """
+    returns the _content_evaluation_result context var value wrapped in a EvaluatableData container.
+    This is the kind of data that the ContentEvaluationResultBased RC/FC Evaluators, HintsProvider and Package Resolver
+    require.
+    :return:
+    """
+    cer = _content_evaluation_result.get()
+    return EvaluatableData(
+        body=ContentEvaluationResultSchema().dump(cer),
+        edifact_format=EdifactFormat.UTILMD,  # not important, something has to be here
+        edifact_format_version=EdifactFormatVersion.FV2504,  # not important, something has to be here
+    )
+
+
+def _setup_weird_ahbicht_dependency_injection() -> None:
+    def configure(binder: inject.Binder) -> None:
+        binder.bind(
+            TokenLogicProvider,
+            SingletonTokenLogicProvider(
+                [*create_content_evaluation_result_based_evaluators(EdifactFormat.UTILMD, EdifactFormatVersion.FV2504)]
+            ),
+        )
+        binder.bind_to_provider(EvaluatableDataProvider, _get_evaluatable_data)
+
+    inject.configure_once(configure)
+
 
 def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
-    categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
+    try:
+        categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
+    except SyntaxError as syntax_error:
+        _logger.info("The expression '%s' could not be parsed: %s", expression, syntax_error)
+        return ""  # I decided against returning the error message, although it's tempting - but still bad practice
+    except VisitError as visit_error:
+        _logger.info("The expression '%s' could not be parsed: %s", expression, visit_error)
+        return ""
     bedingung_keys = (
         categorized_key_extract.format_constraint_keys
         + categorized_key_extract.requirement_constraint_keys
@@ -79,7 +128,7 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
     and parses each expression with ahbicht. The latter has to be done in Python.
     """
     rows = []
-
+    _setup_weird_ahbicht_dependency_injection()
     for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
         AhbHierarchyMaterialized.segment_ahb_status,
@@ -98,6 +147,7 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         raise ValueError(
             "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
         )
+    rows.sort(key=lambda x: (x[0], x[1], x[2]))
     seen: set[tuple[str, str, str, str]] = set()
     for row in rows:
         if not row[3] or not row[3].strip():
@@ -108,15 +158,27 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         if similar_entry_has_been_handled:
             continue
         seen.add(key)
+        is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
+        if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
+            node_texts = _generate_node_texts(session, expression, row.anwendungshandbuch_primary_key)
+        else:
+            node_texts = ""
         ahb_expression_row = AhbExpression(
             edifact_format_version=row[0],
             format=row[1],
             pruefidentifikator=row[2],
             expression=expression,
-            node_texts=_generate_node_texts(session, expression, row.anwendungshandbuch_primary_key),
+            node_texts=node_texts,
             anwendungshandbuch_primary_key=row[4],
+            ahbicht_error_message=error_message,
         )
         session.add(ahb_expression_row)
+        _logger.debug(
+            "Added row (%s, %s, %s) to the ahb_expressions_table",
+            ahb_expression_row.edifact_format_version,
+            ahb_expression_row.pruefidentifikator,
+            ahb_expression_row.expression,
+        )
     number_of_inserted_rows = session.scalar(
         select(func.count(AhbExpression.id))  # type:ignore[arg-type]# pylint:disable=not-callable
     )
@@ -155,4 +217,5 @@ class AhbExpression(SQLModel, table=True):
     this contains the typical "[1] Foo Text\n[2] Bar Text" which explains the meaning of the nodes from inside the
     respective Expression (e.g. for expression "Muss [1] U [2]")
     """
+    ahbicht_error_message: str | None = Field(default=None)
     anwendungshandbuch_primary_key: uuid.UUID = Field()
