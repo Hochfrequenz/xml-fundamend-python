@@ -13,8 +13,8 @@ from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
-    from sqlmodel import Field, Session, SQLModel, select, UniqueConstraint
     from sqlalchemy.sql.functions import func
+    from sqlmodel import Field, Session, SQLModel, UniqueConstraint, select
 
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
