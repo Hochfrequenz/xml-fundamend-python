@@ -4,17 +4,18 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 
 import asyncio
 import logging
+import typing
 import uuid
 
 from efoli import EdifactFormatVersion
-from sqlalchemy import UniqueConstraint
 
 from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
+    from sqlmodel import Field, Session, SQLModel, select, UniqueConstraint
     from sqlalchemy.sql.functions import func
-    from sqlmodel import Field, Session, SQLModel, select
+
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
     # sqlmodel is only an optional dependency when fundamend is used to fill a database
@@ -30,6 +31,7 @@ except ImportError as import_error:
 _logger = logging.getLogger(__name__)
 
 
+@typing.no_type_check
 def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
     categorized_key_extract = asyncio.run(extract_categorized_keys(expression))
     bedingung_keys = (
@@ -45,21 +47,25 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
         x.nummer: x.text
         for x in session.exec(
             select(Bedingung).where(
-                Bedingung.nummer.in_(bedingung_keys), Bedingung.anwendungshandbuch_primary_key == ahb_pk
+                Bedingung.nummer.in_(bedingung_keys),
+                Bedingung.anwendungshandbuch_primary_key == ahb_pk,  # pylint:disable=no-member
             )
         ).all()
     }
     pakete = {
         x.nummer: x.text
         for x in session.exec(
-            select(Paket).where(Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk)
+            select(Paket).where(
+                Paket.nummer.in_(paket_keys), Paket.anwendungshandbuch_primary_key == ahb_pk
+            )  # pylint:disable=no-member
         ).all()
     }
     ubbedingungen = {
         x.nummer: x.text
         for x in session.exec(
             select(UbBedingung).where(
-                UbBedingung.nummer.in_(ubbedingung_keys), UbBedingung.anwendungshandbuch_primary_key == ahb_pk
+                UbBedingung.nummer.in_(ubbedingung_keys),
+                UbBedingung.anwendungshandbuch_primary_key == ahb_pk,  # pylint:disable=no-member
             )
         ).all()
     }
@@ -68,6 +74,7 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
     return node_texts
 
 
+@typing.no_type_check
 def create_and_fill_ahb_expression_table(session: Session) -> None:
     """
     creates and fills the ahb_expressions table. It uses the ahb_hierarchy_materialized table to extract all expressions
@@ -90,7 +97,7 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         )
         rows.extend(session.exec(stmt))
 
-    seen:set[tuple] = set()
+    seen: set[tuple[str, str, str, str]] = set()
     for row in rows:
         if not row[3] or not row[3].strip():
             continue
@@ -105,15 +112,11 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
             format=row[1],
             pruefidentifikator=row[2],
             expression=expression,
-            node_texts=_generate_node_texts(
-                session, expression, row.anwendungshandbuch_primary_key
-            ),
+            node_texts=_generate_node_texts(session, expression, row.anwendungshandbuch_primary_key),
             anwendungshandbuch_primary_key=row[4],
         )
         session.add(ahb_expression_row)
-    number_of_inserted_rows = session.scalar(
-        select(func.count(AhbExpression.id))  # type:ignore[arg-type] # pylint:disable=not-callable
-    )
+    number_of_inserted_rows = session.scalar(select(func.count(AhbExpression.id)))  # pylint:disable=not-callable
     _logger.info(
         "Inserted %d rows into the table %s",
         number_of_inserted_rows,
