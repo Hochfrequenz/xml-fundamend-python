@@ -55,6 +55,7 @@ class AhbTabellenLine(SQLModel, table=True):
     line_ahb_status: str | None = Field()
     line_name: str | None = Field()
     bedingung: str | None = Field()
+    bedingungsfehler: str | None = Field()
     sort_path: str = Field()
 
 

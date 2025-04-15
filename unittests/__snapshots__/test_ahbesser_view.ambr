@@ -2,7 +2,8 @@
 # name: test_create_db_and_ahbesser_view
   list([
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -19,7 +20,8 @@
       'sort_path': '00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0062',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -36,7 +38,8 @@
       'sort_path': '00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0065',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -53,7 +56,8 @@
       'sort_path': '00000-00001-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0052',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -70,7 +74,8 @@
       'sort_path': '00000-00001-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0054',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -87,7 +92,8 @@
       'sort_path': '00000-00001-00002-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0051',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -104,7 +110,8 @@
       'sort_path': '00000-00001-00003-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0057',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -121,7 +128,8 @@
       'sort_path': '00000-00001-00004-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -138,7 +146,8 @@
       'sort_path': '00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1001',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -155,7 +164,8 @@
       'sort_path': '00001-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1004',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -172,7 +182,8 @@
       'sort_path': '00001-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -189,7 +200,8 @@
       'sort_path': '00002-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_2005',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -210,6 +222,7 @@
         [494] Das hier genannte Datum muss der Zeitpunkt sein, zu dem das Dokument erstellt wurde, oder ein Zeitpunkt, der davor liegt.
         [931] Format: ZZZ = +00
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_2380',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -226,7 +239,8 @@
       'sort_path': '00002-00000-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_2379',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -243,7 +257,8 @@
       'sort_path': '00002-00000-00002-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -260,7 +275,8 @@
       'sort_path': '00003-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -277,7 +293,8 @@
       'sort_path': '00003-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3035',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -295,6 +312,7 @@
     }),
     dict({
       'bedingung': '[1] Nur MP-ID aus Sparte Strom',
+      'bedingungsfehler': None,
       'data_element': 'D_3039',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -311,7 +329,8 @@
       'sort_path': '00003-00000-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3055',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -328,7 +347,8 @@
       'sort_path': '00003-00000-00001-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3055',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -346,6 +366,7 @@
     }),
     dict({
       'bedingung': '[2] Wenn SG5 STS+Z23+Z34 (Formel muss beim Absender angefragt werden) in einem SG5 IDE vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -365,7 +386,8 @@
       'sort_path': '00003-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -382,7 +404,8 @@
       'sort_path': '00003-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3139',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -399,7 +422,8 @@
       'sort_path': '00003-00001-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3412',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -416,7 +440,8 @@
       'sort_path': '00003-00001-00000-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -440,6 +465,7 @@
         [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
         [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_3148',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -457,6 +483,7 @@
     }),
     dict({
       'bedingung': '[1P] --',
+      'bedingungsfehler': None,
       'data_element': 'D_3155',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -474,6 +501,7 @@
     }),
     dict({
       'bedingung': '[1P] --',
+      'bedingungsfehler': None,
       'data_element': 'D_3155',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -491,6 +519,7 @@
     }),
     dict({
       'bedingung': '[1P] --',
+      'bedingungsfehler': None,
       'data_element': 'D_3155',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -508,6 +537,7 @@
     }),
     dict({
       'bedingung': '[1P] --',
+      'bedingungsfehler': None,
       'data_element': 'D_3155',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -525,6 +555,7 @@
     }),
     dict({
       'bedingung': '[1P] --',
+      'bedingungsfehler': None,
       'data_element': 'D_3155',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -541,7 +572,8 @@
       'sort_path': '00003-00001-00001-00000-00001-00004-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -558,7 +590,8 @@
       'sort_path': '00003-00002-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -575,7 +608,8 @@
       'sort_path': '00003-00002-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3035',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -593,6 +627,7 @@
     }),
     dict({
       'bedingung': '[1] Nur MP-ID aus Sparte Strom',
+      'bedingungsfehler': None,
       'data_element': 'D_3039',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -609,7 +644,8 @@
       'sort_path': '00003-00002-00000-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3055',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -626,7 +662,8 @@
       'sort_path': '00003-00002-00000-00001-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3055',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -643,7 +680,8 @@
       'sort_path': '00003-00002-00000-00001-00001-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -660,7 +698,8 @@
       'sort_path': '00003-00003-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -677,7 +716,8 @@
       'sort_path': '00003-00003-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7495',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -694,7 +734,8 @@
       'sort_path': '00003-00003-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7402',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -711,7 +752,8 @@
       'sort_path': '00003-00003-00000-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -728,7 +770,8 @@
       'sort_path': '00003-00003-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_3227',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -751,6 +794,7 @@
         [950] Format: Marktlokations-ID
         [960] Format: Netzlokations-ID
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_3225',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -767,7 +811,8 @@
       'sort_path': '00003-00003-00001-00001-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -784,7 +829,8 @@
       'sort_path': '00003-00003-00002-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_2005',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -806,6 +852,7 @@
         [931] Format: ZZZ = +00
         [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_2380',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -822,7 +869,8 @@
       'sort_path': '00003-00003-00002-00000-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_2379',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -839,7 +887,8 @@
       'sort_path': '00003-00003-00002-00000-00002-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -856,7 +905,8 @@
       'sort_path': '00003-00003-00003-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_9015',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -873,7 +923,8 @@
       'sort_path': '00003-00003-00003-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_4405',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -890,7 +941,8 @@
       'sort_path': '00003-00003-00003-00001-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_4405',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -907,7 +959,8 @@
       'sort_path': '00003-00003-00003-00001-00000-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_4405',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -925,6 +978,7 @@
     }),
     dict({
       'bedingung': '[18] Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF',
+      'bedingungsfehler': None,
       'data_element': 'D_4405',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -941,7 +995,8 @@
       'sort_path': '00003-00003-00003-00001-00000-00003-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -958,7 +1013,8 @@
       'sort_path': '00003-00003-00004-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -975,7 +1031,8 @@
       'sort_path': '00003-00003-00004-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1153',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -992,7 +1049,8 @@
       'sort_path': '00003-00003-00004-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1154',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1010,6 +1068,7 @@
     }),
     dict({
       'bedingung': '[51] Wenn in SG5 LOC+172 DE3225 (Meldepunkt) die ID einer Marktlokation angegeben ist.',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1026,7 +1085,8 @@
       'sort_path': '00003-00003-00005-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1043,7 +1103,8 @@
       'sort_path': '00003-00003-00005-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7059',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1060,7 +1121,8 @@
       'sort_path': '00003-00003-00005-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1077,7 +1139,8 @@
       'sort_path': '00003-00003-00005-00000-00001-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1095,6 +1158,7 @@
     }),
     dict({
       'bedingung': '[3] Wenn SG5 STS+Z23+Z33 (Formel angefügt) vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1111,7 +1175,8 @@
       'sort_path': '00003-00003-00006-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1128,7 +1193,8 @@
       'sort_path': '00003-00003-00006-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1229',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1145,7 +1211,8 @@
       'sort_path': '00003-00003-00006-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1162,7 +1229,8 @@
       'sort_path': '00003-00003-00006-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1153',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1183,6 +1251,7 @@
         [8] Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24
         [913] Format: Mögliche Werte: 1 bis 99999
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_1154',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1200,6 +1269,7 @@
     }),
     dict({
       'bedingung': '[3] Wenn SG5 STS+Z23+Z33 (Formel angefügt) vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1216,7 +1286,8 @@
       'sort_path': '00003-00003-00007-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1233,7 +1304,8 @@
       'sort_path': '00003-00003-00007-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1229',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1251,6 +1323,7 @@
     }),
     dict({
       'bedingung': '[913] Format: Mögliche Werte: 1 bis 99999',
+      'bedingungsfehler': None,
       'data_element': 'D_1050',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1268,6 +1341,7 @@
     }),
     dict({
       'bedingung': '[6] Wenn das SG8 RFF+Z23 (Referenz auf Rechenschritt) in derselben SG8 SEQ+Z37 nicht vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1284,7 +1358,8 @@
       'sort_path': '00003-00003-00007-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1153',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1305,6 +1380,7 @@
         [502] Hinweis: Verwendung der ID der Messlokation
         [951] Format: Zählpunktbezeichnung
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_1154',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1322,6 +1398,7 @@
     }),
     dict({
       'bedingung': '[5] Wenn das SG8 RFF+Z19 (Referenz auf eine Messlokation) in derselben SG8 SEQ+Z37 nicht vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1338,7 +1415,8 @@
       'sort_path': '00003-00003-00007-00002-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_1153',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1360,6 +1438,7 @@
         [9] Der hier angegebene Rechenschrittidentifikator darf nicht identisch mit dem Rechenschrittidentifikator aus diesem SG8 SEQ+Z37 DE1050 sein
         [913] Format: Mögliche Werte: 1 bis 99999
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_1154',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1376,7 +1455,8 @@
       'sort_path': '00003-00003-00007-00002-00000-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1393,7 +1473,8 @@
       'sort_path': '00003-00003-00007-00003-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1410,7 +1491,8 @@
       'sort_path': '00003-00003-00007-00003-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1427,7 +1509,8 @@
       'sort_path': '00003-00003-00007-00003-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1448,6 +1531,7 @@
         [11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen
         [15] Wenn in einem SG5 IDE+24 nur eine SEQ+Z37 mit einer SG8 RFF+Z19 (Messlokation) vorhanden ist
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1465,6 +1549,7 @@
     }),
     dict({
       'bedingung': '[11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen',
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1482,6 +1567,7 @@
     }),
     dict({
       'bedingung': '[13] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z80/Z81 (Divisor / Dividend) vorhanden, muss in diesem Vorgang genau eine zweite SG8 SEQ+Z37 mit identischen Rechenschrittidentifikator vorhanden sein, sodass das eine SG8 SEQ+Z37 den Operator Z80 (Divisor) und das andere SG8 SEQ+Z37 den Operator Z81 (Dividend) enthält',
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1499,6 +1585,7 @@
     }),
     dict({
       'bedingung': '[13] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z80/Z81 (Divisor / Dividend) vorhanden, muss in diesem Vorgang genau eine zweite SG8 SEQ+Z37 mit identischen Rechenschrittidentifikator vorhanden sein, sodass das eine SG8 SEQ+Z37 den Operator Z80 (Divisor) und das andere SG8 SEQ+Z37 den Operator Z81 (Dividend) enthält',
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1516,6 +1603,7 @@
     }),
     dict({
       'bedingung': '[14] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z82 (Faktor) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich CAV+Z82 enthalten',
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1533,6 +1621,7 @@
     }),
     dict({
       'bedingung': '[7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1549,7 +1638,8 @@
       'sort_path': '00003-00003-00007-00004-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1566,7 +1656,8 @@
       'sort_path': '00003-00003-00007-00004-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1583,7 +1674,8 @@
       'sort_path': '00003-00003-00007-00004-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1600,7 +1692,8 @@
       'sort_path': '00003-00003-00007-00004-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1617,7 +1710,8 @@
       'sort_path': '00003-00003-00007-00004-00001-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1638,6 +1732,7 @@
         [10] wenn vorhanden
         [7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden
       ''',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1654,7 +1749,8 @@
       'sort_path': '00003-00003-00007-00005-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1671,7 +1767,8 @@
       'sort_path': '00003-00003-00007-00005-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1688,7 +1785,8 @@
       'sort_path': '00003-00003-00007-00005-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1705,7 +1803,8 @@
       'sort_path': '00003-00003-00007-00005-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1727,6 +1826,7 @@
         [914] Format: Möglicher Wert: > 0
         [915] Format: Möglicher Wert: ≠ 1
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_7110',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1747,6 +1847,7 @@
         [10] wenn vorhanden
         [7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden
       ''',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1763,7 +1864,8 @@
       'sort_path': '00003-00003-00007-00006-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1780,7 +1882,8 @@
       'sort_path': '00003-00003-00007-00006-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1797,7 +1900,8 @@
       'sort_path': '00003-00003-00007-00006-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1814,7 +1918,8 @@
       'sort_path': '00003-00003-00007-00006-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1836,6 +1941,7 @@
         [914] Format: Möglicher Wert: > 0
         [915] Format: Möglicher Wert: ≠ 1
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_7110',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1856,6 +1962,7 @@
         [10] wenn vorhanden
         [7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden
       ''',
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1872,7 +1979,8 @@
       'sort_path': '00003-00003-00007-00007-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1889,7 +1997,8 @@
       'sort_path': '00003-00003-00007-00007-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7037',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1906,7 +2015,8 @@
       'sort_path': '00003-00003-00007-00007-00000-00000-00000-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1923,7 +2033,8 @@
       'sort_path': '00003-00003-00007-00007-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_7111',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1945,6 +2056,7 @@
         [914] Format: Möglicher Wert: > 0
         [969] Format: Möglicher Wer: ≤ 1
       ''',
+      'bedingungsfehler': None,
       'data_element': 'D_7110',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1961,7 +2073,8 @@
       'sort_path': '00003-00003-00007-00007-00001-00000-00001-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': None,
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1978,7 +2091,8 @@
       'sort_path': '00004-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0074',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',
@@ -1995,7 +2109,8 @@
       'sort_path': '00004-00000-',
     }),
     dict({
-      'bedingung': '',
+      'bedingung': None,
+      'bedingungsfehler': None,
       'data_element': 'D_0062',
       'description': 'Berechnungsformel',
       'direction': 'NB an MSB / LF',

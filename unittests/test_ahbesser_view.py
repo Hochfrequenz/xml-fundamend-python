@@ -32,7 +32,9 @@ def test_create_db_and_ahbesser_view(snapshot: SnapshotAssertion) -> None:
         )
         results = session.exec(stmt).all()
     for result in results:
-        expression_contains_digit = re.search(r"\d", result.line_ahb_status) is not None
+        expression_contains_digit = (
+            result.line_ahb_status is not None and re.search(r"\d", result.line_ahb_status) is not None
+        )
         if expression_contains_digit:
             assert result.bedingung
     raw_results = [r.model_dump(mode="json") for r in results]
