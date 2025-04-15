@@ -24,7 +24,8 @@ WITH RECURSIVE
                              ah.gueltig_bis,
                              af.beschreibung,
                              af.kommunikation_von,
-                             ah.edifact_format_version
+                             ah.edifact_format_version,
+                             af.anwendungshandbuch_primary_key
                       FROM segmentgroup sg
                                JOIN anwendungsfall af ON sg.anwendungsfall_primary_key = af.primary_key
                                JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -46,8 +47,8 @@ WITH RECURSIVE
                              ah.gueltig_bis,
                              af.beschreibung,
                              af.kommunikation_von,
-                             ah.edifact_format_version
-
+                             ah.edifact_format_version,
+                             af.anwendungshandbuch_primary_key
                       FROM segment s
                                JOIN anwendungsfall af ON s.anwendungsfall_primary_key = af.primary_key
                                JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -60,19 +61,19 @@ WITH RECURSIVE
                                             ) AS root_order
                                  FROM ordered_roots),
 
-    root_hierarchy AS (SELECT o.anwendungsfall_primary_key                                         AS anwendungsfall_pk,
-                              o.primary_key                                                        AS current_id,
-                              o.primary_key                                                        AS root_id,
-                              NULL                                                                 AS parent_id,
-                              0                                                                    AS depth,
+    root_hierarchy AS (SELECT o.anwendungsfall_primary_key                                                       AS anwendungsfall_pk,
+                              o.primary_key                                                                      AS current_id,
+                              o.primary_key                                                                      AS root_id,
+                              NULL                                                                               AS parent_id,
+                              0                                                                                  AS depth,
                               o.position,
-                              o.name                                                               AS path,
-                              o.name                                                               AS parent_path,
+                              o.name                                                                             AS path,
+                              o.name                                                                             AS parent_path,
                               o.root_order,
                               o.type,
-                              o.primary_key                                                        AS source_id,
-                              substr('00000' || o.position, -5) || '-'                             AS sort_path,
-                              o.root_id_text || '>'                                                AS id_path,
+                              o.primary_key                                                                      AS source_id,
+                              substr('00000' || o.position, -5) || '-'                                           AS sort_path,
+                              o.root_id_text || '>'                                                              AS id_path,
                               o.pruefidentifikator,
                               o.format,
                               o.versionsnummer,
@@ -81,36 +82,37 @@ WITH RECURSIVE
                               o.beschreibung,
                               o.kommunikation_von,
                               o.edifact_format_version,
+                              o.anwendungshandbuch_primary_key,
 
-                              CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END AS segmentgroup_id,
-                              CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END         AS segmentgroup_name,
-                              CASE WHEN o.type = 'segment_group' THEN o.ahb_status ELSE NULL END   AS segmentgroup_ahb_status,
-                              CASE WHEN o.type = 'segment_group' THEN o.position ELSE NULL END     AS segmentgroup_position,
+                              CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END               AS segmentgroup_id,
+                              CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END                       AS segmentgroup_name,
+                              CASE WHEN o.type = 'segment_group' THEN o.ahb_status ELSE NULL END                 AS segmentgroup_ahb_status,
+                              CASE WHEN o.type = 'segment_group' THEN o.position ELSE NULL END                   AS segmentgroup_position,
                               CASE
                                   WHEN o.type = 'segment_group' THEN o.anwendungsfall_primary_key
-                                  ELSE NULL END                                                    AS segmentgroup_anwendungsfall_primary_key,
+                                  ELSE NULL END                                                                  AS segmentgroup_anwendungsfall_primary_key,
 
-                              CASE WHEN o.type = 'segment' THEN o.root_id_text ELSE NULL END       AS segment_id,
-                              CASE WHEN o.type = 'segment' THEN o.name ELSE NULL END               AS segment_name,
-                              CASE WHEN o.type = 'segment' THEN o.number ELSE NULL END             AS segment_number,
-                              CASE WHEN o.type = 'segment' THEN o.ahb_status ELSE NULL END         AS segment_ahb_status,
-                              CASE WHEN o.type = 'segment' THEN o.position ELSE NULL END           AS segment_position,
+                              CASE WHEN o.type = 'segment' THEN o.root_id_text ELSE NULL END                     AS segment_id,
+                              CASE WHEN o.type = 'segment' THEN o.name ELSE NULL END                             AS segment_name,
+                              CASE WHEN o.type = 'segment' THEN o.number ELSE NULL END                           AS segment_number,
+                              CASE WHEN o.type = 'segment' THEN o.ahb_status ELSE NULL END                       AS segment_ahb_status,
+                              CASE WHEN o.type = 'segment' THEN o.position ELSE NULL END                         AS segment_position,
 
-                              NULL                                                                 AS dataelementgroup_id,
-                              NULL                                                                 AS dataelementgroup_name,
-                              NULL                                                                 AS dataelementgroup_position,
+                              NULL                                                                               AS dataelementgroup_id,
+                              NULL                                                                               AS dataelementgroup_name,
+                              NULL                                                                               AS dataelementgroup_position,
 
-                              NULL                                                                 AS dataelement_id,
-                              NULL                                                                 AS dataelement_name,
-                              NULL                                                                 AS dataelement_position,
-                              NULL                                                                 AS dataelement_ahb_status,
+                              NULL                                                                               AS dataelement_id,
+                              NULL                                                                               AS dataelement_name,
+                              NULL                                                                               AS dataelement_position,
+                              NULL                                                                               AS dataelement_ahb_status,
 
-                              NULL                                                                 AS code_id,
-                              NULL                                                                 AS code_name,
-                              NULL                                                                 AS code_description,
-                              NULL                                                                 AS code_value,
-                              NULL                                                                 AS code_ahb_status,
-                              NULL                                                                 AS code_position
+                              NULL                                                                               AS code_id,
+                              NULL                                                                               AS code_name,
+                              NULL                                                                               AS code_description,
+                              NULL                                                                               AS code_value,
+                              NULL                                                                               AS code_ahb_status,
+                              NULL                                                                               AS code_position
                        FROM ordered_roots_with_order o),
 
     hierarchy AS (SELECT *
@@ -129,8 +131,8 @@ WITH RECURSIVE
                          h.root_order,
                          'segment_group',
                          h.source_id,
-                         h.sort_path || substr('00000' || child.position, -5) || '-' AS sort_path,
-                         h.id_path || 'SG' || child.id || '>'                        AS id_path,
+                         h.sort_path || substr('00000' || child.position, -5) || '-',
+                         h.id_path || 'SG' || child.id || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -139,6 +141,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          child.id,
                          child.name,
@@ -185,8 +188,8 @@ WITH RECURSIVE
                          h.root_order,
                          'segment',
                          h.source_id,
-                         h.sort_path || substr('00000' || s.position, -5) || '-' AS sort_path,
-                         h.id_path || s.id || '>'                                AS id_path,
+                         h.sort_path || substr('00000' || s.position, -5) || '-',
+                         h.id_path || s.id || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -195,6 +198,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          h.segmentgroup_id,
                          h.segmentgroup_name,
@@ -240,8 +244,8 @@ WITH RECURSIVE
                          h.root_order,
                          'dataelementgroup',
                          h.source_id,
-                         h.sort_path || substr('00000' || deg.position, -5) || '-' AS sort_path,
-                         h.id_path || deg.id || '>'                                AS id_path,
+                         h.sort_path || substr('00000' || deg.position, -5) || '-',
+                         h.id_path || deg.id || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -250,6 +254,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          h.segmentgroup_id,
                          h.segmentgroup_name,
@@ -295,8 +300,8 @@ WITH RECURSIVE
                          h.root_order,
                          'dataelement',
                          h.source_id,
-                         h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-                         h.id_path || de.id || '>'                                AS id_path,
+                         h.sort_path || substr('00000' || de.position, -5) || '-',
+                         h.id_path || de.id || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -305,6 +310,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          h.segmentgroup_id,
                          h.segmentgroup_name,
@@ -351,8 +357,8 @@ WITH RECURSIVE
                          h.root_order,
                          'dataelement',
                          h.source_id,
-                         h.sort_path || substr('00000' || de.position, -5) || '-' AS sort_path,
-                         h.id_path || de.id || '>'                                AS id_path,
+                         h.sort_path || substr('00000' || de.position, -5) || '-',
+                         h.id_path || de.id || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -361,6 +367,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          h.segmentgroup_id,
                          h.segmentgroup_name,
@@ -406,8 +413,8 @@ WITH RECURSIVE
                          h.root_order,
                          'code',
                          h.source_id,
-                         h.sort_path || substr('00000' || c.position, -5) || '-' AS sort_path,
-                         h.id_path || c.value || '>'                             AS id_path,
+                         h.sort_path || substr('00000' || c.position, -5) || '-',
+                         h.id_path || c.value || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -416,6 +423,7 @@ WITH RECURSIVE
                          h.beschreibung,
                          h.kommunikation_von,
                          h.edifact_format_version,
+                         h.anwendungshandbuch_primary_key,
 
                          h.segmentgroup_id,
                          h.segmentgroup_name,

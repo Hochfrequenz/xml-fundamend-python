@@ -175,6 +175,7 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     __tablename__ = "ahb_hierarchy_materialized"
     id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     anwendungsfall_pk: UUID = Field(index=True)
+    anwendungshandbuch_primary_key: UUID = Field(index=True)
     current_id: UUID
     root_id: UUID
     parent_id: Optional[UUID] = None
