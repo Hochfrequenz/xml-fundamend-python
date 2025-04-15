@@ -28,6 +28,9 @@ sqlmodels = [
   "sqlmodel>=0.0.22",
   "sqlalchemy[mypy]>=2.0.37"
 ]
+ahbicht = [
+    "ahbicht>=0.13.2"
+]
 coverage = [
     "coverage==7.8.0"
 ]

@@ -1,0 +1,778 @@
+# serializer version: 1
+# name: test_create_db_and_expressions_view
+  list([
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Kann',
+      'format': 'UTILTS',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss',
+      'format': 'UTILTS',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [2001]',
+      'format': 'UTILTS',
+      'node_texts': '[2001] Segment bzw. Segmentgruppe ist genau einmal anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [22]',
+      'format': 'UTILTS',
+      'node_texts': '[22] Wenn MP-ID in SG2 NAD+MS (Nachrichtenabsender) in der Rolle NB',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [22] ∧ [25]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [22] Wenn MP-ID in SG2 NAD+MS (Nachrichtenabsender) in der Rolle NB
+        [25] Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [22] ∧ [27]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [22] Wenn MP-ID in SG2 NAD+MS (Nachrichtenabsender) in der Rolle NB
+        [27] Wenn in SG9 CAV+ZD4+Z26 (keine Verwendung des Hochlastzeitfensters) vorhanden
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [24]',
+      'format': 'UTILTS',
+      'node_texts': '[24] Wenn SG5 STS+Z36+Z45 (Definitionen werden verwendet) vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': '''
+        Muss [29]
+        Soll [36] ∧ [37]
+      ''',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [29] Wenn in SG8 SEQ+Z43 DTM+Z33 (Zählzeitänderungszeitpunkt) im DE2379 der Code 303 vorhanden
+        [36] Wenn in SG8 SEQ+Z43 DTM+Z33 (Zählzeitänderungszeitpunkt) im DE2379 der Code 401 vorhanden
+        [37] Wenn ein Gültigkeitsende bereits angegeben werden kann.
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': '''
+        Muss [2]
+        Kann
+      ''',
+      'format': 'UTILTS',
+      'node_texts': '[2] Wenn SG5 STS+Z23+Z34 (Formel muss beim Absender angefragt werden) in einem SG5 IDE vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [3]',
+      'format': 'UTILTS',
+      'node_texts': '[3] Wenn SG5 STS+Z23+Z33 (Formel angefügt) vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [41] ∧ [2002]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [2002] Für jeden Code der Zählzeit aus SG8 SEQ+Z42 (Zählzeitdefinition) SG9 CCI+Z39 (Code der Zählzeitdefinition) sind mindestens zwei Register anzugeben, bei denen in dieser SG8 das SG8 RFF+Z27 mit diesem Code gefüllt ist
+        [41] Wenn SG8 SEQ+Z42 (Zählzeitdefinition) vorhanden
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': '''
+        Muss [46]
+        Soll [47] ∧ [37]
+      ''',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [37] Wenn ein Gültigkeitsende bereits angegeben werden kann.
+        [46] Wenn in SG8 SEQ+Z73 DTM+Z44 (Schaltzeitänderungszeitpunkt) im DE2379 der Code 303 vorhanden
+        [47] Wenn in SG8 SEQ+Z73 DTM+Z44 (Schaltzeitänderungszeitpunkt) im DE2379 der Code 401 vorhanden
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': '''
+        Muss [48]
+        Soll [49] ∧ [37]
+      ''',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [37] Wenn ein Gültigkeitsende bereits angegeben werden kann.
+        [48] Wenn in SG8 SEQ+Z74 DTM+Z45 (Leistungskurvenänderungszeitpunkt) im DE2379 der Code 303 vorhanden
+        [49] Wenn in SG8 SEQ+Z74 DTM+Z45 (Leistungskurvenänderungszeitpunkt) im DE2379 der Code 401 vorhanden
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [4]',
+      'format': 'UTILTS',
+      'node_texts': '[4] Wenn in dieser SG5 das STS+E01++A99 (Ablehnung Sonstiges) vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [505]',
+      'format': 'UTILTS',
+      'node_texts': '[505] Hinweis: Jede ausgerollte Zählzeitdefinition ist in einem eigenen IDE anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [510] ∧ [511] ∧ ([512] ⊻ [513])',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [510] Hinweis: Für jeden Zählzeitänderungszeitpunkt (SG8 DTM+Z33) ist diese Sementgruppe einmal anzugeben
+        [511] Hinweis: Der Zählzeitänderungszeitpunkt (SG8DTM+Z33) dieser SG8 darf in keiner anderen SG8 „Zählzeitdefinition“ wiederholt werden
+        [512] Hinweis: Wenn der Code 303 im DE2379 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) genutzt wird, muss genau ein Wert im DE2380 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein
+        [513] Hinweis: Wenn der Code 401 im DE2379 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) genutzt wird, muss genau ein Wert = 0000 im DE2380 des Zählzeitänderungszeitpunkt (SG8 DTM+Z33) sein
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [514] ∧ [515] ∧ ([516] ⊻ [517])',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [514] Hinweis: Für jeden Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) ist diese Sementgruppe einmal anzugeben
+        [515] Hinweis: Kein Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) darf mehrfach vorkommen
+        [516] Hinweis: Wenn der Code 303 im DE2379 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) genutzt wird, muss genau ein Wert im DE2380 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein
+        [517] Hinweis: Wenn der Code 401 im DE2379 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) genutzt wird, muss genau ein Wert = 0000 im DE2380 des Schaltzeitänderungszeitpunkt (SG8 DTM+Z44) sein
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [518] ∧ [519] ∧ ([520] ⊻ [521])',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [518] Hinweis: Für jeden Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) ist diese Sementgruppe einmal anzugeben
+        [519] Hinweis: Kein Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) darf mehrfach vorkommen
+        [520] Hinweis: Wenn der Code 303 im DE2379 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) genutzt wird, muss genau ein Wert im DE2380 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45) identisch mit dem Wert aus DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein
+        [521] Hinweis: Wenn der Code 401 im DE2379 des Leistungskurvenänderungszeitpunkt (SG8 DTM+Z45)
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [51]',
+      'format': 'UTILTS',
+      'node_texts': '[51] Wenn in SG5 LOC+172 DE3225 (Meldepunkt) die ID einer Marktlokation angegeben ist.',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [522]',
+      'format': 'UTILTS',
+      'node_texts': '[522] Hinweis: Jede ausgerollte Schaltzeitdefinition ist in einem eigenen IDE anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [523]',
+      'format': 'UTILTS',
+      'node_texts': '[523] Hinweis: Jede ausgerollte Leistungskurvendefinition ist in einem eigenen IDE anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [5]',
+      'format': 'UTILTS',
+      'node_texts': '[5] Wenn das SG8 RFF+Z19 (Referenz auf eine Messlokation) in derselben SG8 SEQ+Z37 nicht vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [6]',
+      'format': 'UTILTS',
+      'node_texts': '[6] Wenn das SG8 RFF+Z23 (Referenz auf Rechenschritt) in derselben SG8 SEQ+Z37 nicht vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Muss [7]',
+      'format': 'UTILTS',
+      'node_texts': '[7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Soll [10] ∧ [7]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [10] wenn vorhanden
+        [7] Wenn in derselben SG8 SEQ+Z37 das SG8 RFF+Z19 (Referenz auf eine Messlokation) vorhanden
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'Soll [26]',
+      'format': 'UTILTS',
+      'node_texts': '[26] sofern per ORDERS reklamiert',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X',
+      'format': 'UTILTS',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X (([939][53]) ∨ ([940][54])) ∧ [530]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [53] Wenn im DE3155 in demselben COM der Code EM vorhanden ist
+        [530] Hinweis: Es darf nur eine Information im DE3148 übermittelt werden
+        [54] Wenn im DE3155 in demselben COM der Code TE / FX / AJ / AL vorhanden ist
+        [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
+        [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X ([931] [31] ∧ [32] ∧ [33]) ⊻ (([964] ∧ [965] [34]) ∧ [507])',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [31] Wenn im DE2379 dieses Segments der Code 303 vorhanden
+        [32] Der Zeitpunkt in diesem DE muss ≥ dem Zeitpunkt aus dem DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein
+        [33] Der Zeitpunkt in diesem DE muss ≤ dem Zeitpunkt aus dem DE2380 des Gültigkeitsende der ausgerollten Definition (SG5 DTM+Z35) sein
+        [34] Wenn im DE2379 dieses Segments der Code 401 vorhanden
+        [507] Hinweis: Es ist die Zeit nach der deutschen gesetzlichen Zeit anzugeben
+        [931] Format: ZZZ = +00
+        [964] Format: HHMM ≥ 0000
+        [965] Format: HHMM ≤ 2359
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X ([931] [31] ∧ [32] ∧ [33]) ⊻ (([964] ∧ [965]) [34] ∧ [507])',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [31] Wenn im DE2379 dieses Segments der Code 303 vorhanden
+        [32] Der Zeitpunkt in diesem DE muss ≥ dem Zeitpunkt aus dem DE2380 des Gültigkeitsbeginn der ausgerollten Definition (SG5 DTM+Z34) sein
+        [33] Der Zeitpunkt in diesem DE muss ≤ dem Zeitpunkt aus dem DE2380 des Gültigkeitsende der ausgerollten Definition (SG5 DTM+Z35) sein
+        [34] Wenn im DE2379 dieses Segments der Code 401 vorhanden
+        [507] Hinweis: Es ist die Zeit nach der deutschen gesetzlichen Zeit anzugeben
+        [931] Format: ZZZ = +00
+        [964] Format: HHMM ≥ 0000
+        [965] Format: HHMM ≤ 2359
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [11]',
+      'format': 'UTILTS',
+      'node_texts': '[11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [11] ⊻ [15]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [11] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z69/Z70 (Addition / Subtraktion) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich die Operatoren Z69/Z70 enthalten dürfen
+        [15] Wenn in einem SG5 IDE+24 nur eine SEQ+Z37 mit einer SG8 RFF+Z19 (Messlokation) vorhanden ist
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [13]',
+      'format': 'UTILTS',
+      'node_texts': '[13] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z80/Z81 (Divisor / Dividend) vorhanden, muss in diesem Vorgang genau eine zweite SG8 SEQ+Z37 mit identischen Rechenschrittidentifikator vorhanden sein, sodass das eine SG8 SEQ+Z37 den Operator Z80 (Divisor) und das andere SG8 SEQ+Z37 den Operator Z81 (Dividend) enthält',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [14]',
+      'format': 'UTILTS',
+      'node_texts': '[14] Wenn in SG8 SEQ+Z37 SG9 CCI+++Z86 CAV+Z82 (Faktor) vorhanden, darf es in dem Vorgang beliebig viele weitere SG8 SEQ+Z37 mit identischem Rechenschrittidentifikator geben, die jedoch ausschließlich CAV+Z82 enthalten',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [16]',
+      'format': 'UTILTS',
+      'node_texts': '[16] Der hier angegebene Code des Prüfschritt muss im EBD dem Cluster Zustimmung zugeordnet sein',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [17]',
+      'format': 'UTILTS',
+      'node_texts': '[17] Der hier angegebene Code des Prüfschritt muss im EBD dem Cluster Ablehnung zugeordnet sein',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [18]',
+      'format': 'UTILTS',
+      'node_texts': '[18] Wenn MP-ID in SG2 NAD+MR (Nachrichtenempfänger) in der Rolle LF',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [1P0..1]',
+      'format': 'UTILTS',
+      'node_texts': '[1P] --',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [1]',
+      'format': 'UTILTS',
+      'node_texts': '[1] Nur MP-ID aus Sparte Strom',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [21]',
+      'format': 'UTILTS',
+      'node_texts': '[21] Wenn in dieser CAV+ZD3 der Wert im DE7110 mit Z32 (sonstiger Zählzeitdefinitionstyp) vorhanden ist',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [42]',
+      'format': 'UTILTS',
+      'node_texts': '[42] Der in diesem Datenlement angegebene Code der Schaltzeitdefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [43]',
+      'format': 'UTILTS',
+      'node_texts': '[43] Der in diesem Datenlement angegebene Code der Leistungskurvendefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [44]',
+      'format': 'UTILTS',
+      'node_texts': '[44] Der in diesem Datenlement angegebene Code der Zählzeitdefinition muss innerhalb eines Vorgangs (IDE) eindeutig sein.',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [504]',
+      'format': 'UTILTS',
+      'node_texts': '[504] Hinweis: Wert aus BGM+Z55 DE1004 der ORDERS mit der die Reklamation einer Definition erfolgt ist',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [50] ∧ [527]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [50] In jedem DE2379 dieses DTM-Segments innerhalb eines IDE+24 (Vorgangs) muss der gleiche Code angegeben werden
+        [527] Hinweis: Dieser Code ist anzugeben, wenn es sich um eine einmalig zu übermittelnde Definition handelt
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [50] ∧ [528]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [50] In jedem DE2379 dieses DTM-Segments innerhalb eines IDE+24 (Vorgangs) muss der gleiche Code angegeben werden
+        [528] Hinweis: Dieser Code ist anzugeben, wenn es sich um eine jährlich zu übermittelnde Definition handelt
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [524]',
+      'format': 'UTILTS',
+      'node_texts': '[524] Hinweis: Es ist der Code einer Zählzeitdefinition anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [525]',
+      'format': 'UTILTS',
+      'node_texts': '[525] Hinweis: Es ist der Code einer Schaltzeitdefinition anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [526]',
+      'format': 'UTILTS',
+      'node_texts': '[526] Hinweis: Es ist der Code einer Leistungskurvendefinition anzugeben',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [912] ∧ [914] ∧ [915]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [912] Format: Wert kann mit maximal 6 Nachkommastellen angegeben werden
+        [914] Format: Möglicher Wert: > 0
+        [915] Format: Möglicher Wert: ≠ 1
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913]',
+      'format': 'UTILTS',
+      'node_texts': '[913] Format: Mögliche Werte: 1 bis 99999',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913] [8]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [8] Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24
+        [913] Format: Mögliche Werte: 1 bis 99999
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [913] [8] ∧ [9]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [8] Rechenschrittidentifikator aus einem SG8 SEQ+Z37 (Bestandteil des Rechenschritts) DE1050 desselben SG5 IDE+24
+        [9] Der hier angegebene Rechenschrittidentifikator darf nicht identisch mit dem Rechenschrittidentifikator aus diesem SG8 SEQ+Z37 DE1050 sein
+        [913] Format: Mögliche Werte: 1 bis 99999
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [914] ∧ [969] ∧ [912]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [912] Format: Wert kann mit maximal 6 Nachkommastellen angegeben werden
+        [914] Format: Möglicher Wert: > 0
+        [969] Format: Möglicher Wer: ≤ 1
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [930] ∧ [963]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [930] Format: max. 2 Nachkommastellen
+        [963] Format: Möglicher Wert: ≤ 100
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931]',
+      'format': 'UTILTS',
+      'node_texts': '[931] Format: ZZZ = +00',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] [500] ∧ [UB1]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [500] Hinweis: Zeitpunkt, ab dem die Berechnungsformel anzuwenden ist
+        [931] Format: ZZZ = +00
+        [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] [506] ∧ [UB1]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [506] Hinweis: Zeitpunkt, ab dem die Übersicht der Zählzeitdefinitionen gültig ist
+        [931] Format: ZZZ = +00
+        [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] [508] ∧ [UB1]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [508] Hinweis: Zeitpunkt, ab dem die Übersicht der Schaltzeitdefinitionen gültig ist
+        [931] Format: ZZZ = +00
+        [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] [509] ∧ [UB1]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [509] Hinweis: Zeitpunkt, ab dem die Übersicht der Leistungskurvendefinition gültig ist
+        [931] Format: ZZZ = +00
+        [UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] ∧ [947]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [931] Format: ZZZ = +00
+        [947] Format: MMDDHHMM = 12312300
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931] ∧ [947] [30]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [30] Der Wert von CCYY in diesem DE muss genau um eins höher sein, als der Wert CCYY des SG5 DTM+Z34 (Gültigkeitsbeginn) DE2380
+        [931] Format: ZZZ = +00
+        [947] Format: MMDDHHMM = 12312300
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [931][494]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [494] Das hier genannte Datum muss der Zeitpunkt sein, zu dem das Dokument erstellt wurde, oder ein Zeitpunkt, der davor liegt.
+        [931] Format: ZZZ = +00
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [950] [501] ⊻ [960] [529]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [501] Hinweis: Verwendung der ID der Marktlokation
+        [529] Hinweis: Verwendung der ID der Netzlokation
+        [950] Format: Marktlokations-ID
+        [960] Format: Netzlokations-ID
+      ''',
+    }),
+    dict({
+      'ahbicht_error_message': None,
+      'edifact_format_version': 'FV2310',
+      'expression': 'X [951] [502]',
+      'format': 'UTILTS',
+      'node_texts': '''
+        [502] Hinweis: Verwendung der ID der Messlokation
+        [951] Format: Zählpunktbezeichnung
+      ''',
+    }),
+  ])
+# ---
+# name: test_create_expressions_table_from_submodule_with_validity
+  list([
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53]) Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53])
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2410',
+      'expression': 'X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53])',
+      'format': 'INVOIC',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        Error trying to process rule "CONDITION_EXPRESSION":
+        
+        
+                    condition expression:  ([446] ∧ ([465] ∨ [466]) ∧ [467] ∧ ([468] ⊻ ([469] ∧ [470])) ⊻ [448]
+        
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2410',
+      'expression': '''
+        Muss ([446] ∧ ([465] ∨ [466]) ∧ [467] ∧ ([468] ⊻ ([469] ∧ [470])) ⊻ [448]
+        Soll [165]
+      ''',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53]) Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53])
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X ([950] [509] ∧ ([64] V [70])) V ([960] [522] ∧ [71] ∧ [53])',
+      'format': 'INVOIC',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        Error trying to process rule "CONDITION_EXPRESSION":
+        
+        
+                    condition expression:  ([62] ∧ [108]) ⊻ ([148] ∨ ([149] ∧ [150])
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'Muss ([62] ∧ [108]) ⊻ ([148] ∨ ([149] ∧ [150])',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [1P0..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [1P0..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [1P0..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [1P1..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [1P1..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [1P1..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [2P0..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [2P0..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [2P0..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [3P0..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [3P0..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [3P0..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [4P0..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [4P0..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [4P0..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+    dict({
+      'ahbicht_error_message': '''
+        ahb expression: X [5P0..n] Please make sure that the ahb_expression starts with a requirement indicator (i.e Muss/M, Soll/S, Kann/K, X, O, U) and the condition expressions consist of only the following characters: [ ] ( ) U ∧ O ∨ X ⊻ and digits. 
+                    condition expression: X [5P0..n]
+                    Please make sure that:
+                     * all conditions have the form [INT]
+                     * all packages have the form [INTPn..m]
+                     * no conditions are empty
+                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
+                     * all open brackets are closed again and vice versa
+                     
+      ''',
+      'edifact_format_version': 'FV2504',
+      'expression': 'X [5P0..n]',
+      'format': 'UTILMD',
+      'node_texts': '',
+    }),
+  ])
+# ---
