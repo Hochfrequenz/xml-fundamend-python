@@ -4,27 +4,52 @@
 
 DROP TABLE IF EXISTS v_ahbtabellen; -- this is because sqlmodel tries to create a table first... it doesn't know that this is just a view. bit dirty but ok.
 DROP VIEW IF EXISTS v_ahbtabellen;
-CREATE VIEW v_ahbtabellen as
-SELECT id                                                                                                   as id,
-       edifact_format_version                                                                               as format_version,
-       pruefidentifikator                                                                                   as pruefidentifikator,
-       path,
-       id_path,
-       kommunikation_von                                                                                    as direction,
-       beschreibung                                                                                         as description,
-       'SG' || segmentgroup_id                                                                              as segmentgroup_key, -- eg 'SG6'
-       segment_id                                                                                           as segment_code,     -- e.g 'NAD'
-       dataelement_id                                                                                       as data_element,     -- e.g 'D_3035'
+
+CREATE VIEW v_ahbtabellen AS
+WITH consolidated_ahm AS (SELECT id,
+                                 edifact_format_version,
+                                 format,
+                                 pruefidentifikator,
+                                 path,
+                                 id_path,
+                                 kommunikation_von,
+                                 beschreibung,
+                                 segmentgroup_id,
+                                 segment_id,
+                                 dataelement_id,
+                                 code_value,
+                                 sort_path,
+                                 trim(coalesce(code_ahb_status, coalesce(dataelement_ahb_status,
+                                                                         coalesce(segment_ahb_status, segmentgroup_ahb_status))))     AS line_ahb_status,
+                                 coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
+                                                                                         coalesce(segment_name, segmentgroup_name)))) AS line_name
+                          FROM ahb_hierarchy_materialized ahm
+                          WHERE ahm.TYPE != 'dataelementgroup'
+                            AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
+
+SELECT c.id                      as id,
+       c.edifact_format_version  as format_version,
+       c.format                  as format,
+       c.pruefidentifikator      as pruefidentifikator,
+       c.path,
+       c.id_path,
+       c.kommunikation_von       as direction,
+       c.beschreibung            as description,
+       'SG' || c.segmentgroup_id as segmentgroup_key, -- eg 'SG6'
+       c.segment_id              as segment_code,     -- e.g 'NAD'
+       c.dataelement_id          as data_element,     -- e.g 'D_3035'
        --CASE
        --    WHEN dataelement_id IS NOT NULL THEN SUBSTR(dataelement_id, 3)
        --    END                                                                                              AS dataelement_without_leading_d_, -- e.g '3035'
-       code_value                                                                                           as qualifier,
+       c.code_value              as qualifier,
+       c.line_ahb_status         as line_ahb_status,  -- e.g. 'Muss [28] ∧ [64]'
+       c.line_name               as line_name,        -- e.g. 'Datums- oder Uhrzeit- oder Zeitspannen-Format, Code' or 'Produkt-Daten für Lieferant relevant'
+       c.sort_path               as sort_path,
+       ahe.node_texts            as bedingung
+FROM consolidated_ahm as c
+         LEFT JOIN ahb_expressions as ahe
+                   ON ahe.edifact_format_version = c.edifact_format_version
+                       AND ahe.format = c.format
+                       AND ahe.expression = c.line_ahb_status;
 
-       coalesce(code_ahb_status, coalesce(dataelement_ahb_status,
-                                          coalesce(segment_ahb_status, segmentgroup_ahb_status)))           as line_ahb_status,  -- e.g. 'Muss [28] ∧ [64]'
-       coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
-                                                               coalesce(segment_name, segmentgroup_name)))) as line_name,        -- e.g. 'Datums- oder Uhrzeit- oder Zeitspannen-Format, Code' or 'Produkt-Daten für Lieferant relevant'
-       sort_path                                                                                            as sort_path
--- the bedingung column is still missing, but we'll solve this one separately
-FROM ahb_hierarchy_materialized
-WHERE TYPE != 'dataelementgroup' AND (TYPE != 'dataelement' OR dataelement_ahb_status IS NOT Null) ;
+
