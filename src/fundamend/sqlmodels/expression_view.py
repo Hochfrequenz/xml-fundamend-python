@@ -4,7 +4,6 @@ helper module to create a table with a "Bedingung" column like the one in the PD
 
 import asyncio
 import logging
-import typing
 import uuid
 
 from efoli import EdifactFormatVersion
@@ -74,7 +73,6 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
     return node_texts
 
 
-@typing.no_type_check
 def create_and_fill_ahb_expression_table(session: Session) -> None:
     """
     creates and fills the ahb_expressions table. It uses the ahb_hierarchy_materialized table to extract all expressions
@@ -82,21 +80,24 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
     """
     rows = []
 
-    for col in [
+    for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
         AhbHierarchyMaterialized.segment_ahb_status,
         AhbHierarchyMaterialized.dataelement_ahb_status,
         AhbHierarchyMaterialized.code_ahb_status,
     ]:
-        stmt = select(
+        stmt = select(  # type:ignore[call-overload]
             AhbHierarchyMaterialized.edifact_format_version,
             AhbHierarchyMaterialized.format,
             AhbHierarchyMaterialized.pruefidentifikator,
-            col,
+            ahb_status_col,
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
         )
         rows.extend(session.exec(stmt))
-
+    if not any(rows):
+        raise ValueError(
+            "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
+        )
     seen: set[tuple[str, str, str, str]] = set()
     for row in rows:
         if not row[3] or not row[3].strip():
@@ -116,7 +117,9 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
             anwendungshandbuch_primary_key=row[4],
         )
         session.add(ahb_expression_row)
-    number_of_inserted_rows = session.scalar(select(func.count(AhbExpression.id)))  # pylint:disable=not-callable
+    number_of_inserted_rows = session.scalar(
+        select(func.count(AhbExpression.id))  # type:ignore[arg-type]# pylint:disable=not-callable
+    )
     _logger.info(
         "Inserted %d rows into the table %s",
         number_of_inserted_rows,
