@@ -514,10 +514,14 @@ class Anwendungshandbuch(SQLModel, table=True):
             veroeffentlichungsdatum=model.veroeffentlichungsdatum,
             autor=model.autor,
             versionsnummer=model.versionsnummer,
-            bedingungen=[Bedingung.from_model(x) for x in model.bedingungen],
-            ub_bedingungen=[UbBedingung.from_model(x) for x in model.ub_bedingungen],
-            pakete=[Paket.from_model(x) for x in model.pakete],
-            anwendungsfaelle=[Anwendungsfall.from_model(x) for x in model.anwendungsfaelle if not x.is_outdated],
+            bedingungen=[Bedingung.from_model(x, position=i) for i, x in enumerate(model.bedingungen)],
+            ub_bedingungen=[UbBedingung.from_model(x, position=i) for i, x in enumerate(model.ub_bedingungen)],
+            pakete=[Paket.from_model(x, position=i) for i, x in enumerate(model.pakete)],
+            anwendungsfaelle=[
+                Anwendungsfall.from_model(x, position=i)
+                for i, x in enumerate(model.anwendungsfaelle)
+                if not x.is_outdated
+            ],
         )
 
     def to_model(self) -> PydanticAnwendungshandbuch:
