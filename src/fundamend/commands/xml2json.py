@@ -11,7 +11,7 @@ from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 
-app = typer.Typer(name="xml2json", help="Convert XML(s) by BDEW to JSON(s)")
+app = typer.Typer()
 
 
 def _convert_to_json_file(xml_file_path: Path) -> Path:
@@ -40,7 +40,7 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
 
 
 @app.command()
-def main(
+def xml2json(
     xml_path: Annotated[
         Path,
         typer.Option(
