@@ -48,7 +48,7 @@ SELECT c.id                                  as id,
        NULLIF(ahe.node_texts, '')            as bedingung,
        NULLIF(ahe.ahbicht_error_message, '') as bedingungsfehler
 FROM consolidated_ahm as c
-         LEFT JOIN ahb_expressions as ahe
+         LEFT JOIN ahb_expressions as ahe -- if this table is missing, call create_and_fill_ahb_expression_table(...) first
                    ON ahe.edifact_format_version = c.edifact_format_version
                        AND ahe.format = c.format
                        AND ahe.expression = c.line_ahb_status;
