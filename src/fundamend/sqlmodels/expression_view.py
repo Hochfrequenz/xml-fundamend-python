@@ -138,26 +138,20 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         stmt = select(  # type:ignore[call-overload]
             AhbHierarchyMaterialized.edifact_format_version,
             AhbHierarchyMaterialized.format,
-            AhbHierarchyMaterialized.pruefidentifikator,
             ahb_status_col,
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
         )
         rows.extend(session.exec(stmt))
+    rows = [r for r in rows if r[2] is not None and r[2].strip()]
     if not any(rows):
         raise ValueError(
             "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
         )
     rows.sort(key=lambda x: (x[0], x[1], x[2]))
-    seen: set[tuple[str, str, str, str]] = set()
-    for row in rows:
-        if not row[3] or not row[3].strip():
-            continue
-        expression = row[3].strip()
-        key = (row[0], row[1], row[2], expression)
-        similar_entry_has_been_handled = key in seen
-        if similar_entry_has_been_handled:
-            continue
-        seen.add(key)
+    seen: set[tuple[str, str, str]] = set()
+    unique_rows = [row for row in rows if (key := (row[0], row[1], row[2].strip())) not in seen and not seen.add(key)]
+    for row in unique_rows:
+        expression = row[2].strip()
         try:
             is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
             if (
@@ -172,17 +166,16 @@ def create_and_fill_ahb_expression_table(session: Session) -> None:
         ahb_expression_row = AhbExpression(
             edifact_format_version=row[0],
             format=row[1],
-            pruefidentifikator=row[2],
             expression=expression,
             node_texts=node_texts,
-            anwendungshandbuch_primary_key=row[4],
+            anwendungshandbuch_primary_key=row[3],
             ahbicht_error_message=error_message,
         )
         session.add(ahb_expression_row)
         _logger.debug(
             "Added row (%s, %s, %s) to the ahb_expressions_table",
             ahb_expression_row.edifact_format_version,
-            ahb_expression_row.pruefidentifikator,
+            ahb_expression_row.format,
             ahb_expression_row.expression,
         )
     number_of_inserted_rows = session.scalar(
@@ -208,7 +201,6 @@ class AhbExpression(SQLModel, table=True):
         UniqueConstraint(
             "edifact_format_version",
             "format",
-            "pruefidentifikator",
             "expression",
             name="idx_ahb_expressions_metadata_expression",
         ),
@@ -216,7 +208,7 @@ class AhbExpression(SQLModel, table=True):
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     edifact_format_version: EdifactFormatVersion = Field(index=True)
     format: str = Field(index=True)  # the edifact format, e.g. 'UTILMD'
-    pruefidentifikator: str | None = Field(index=True, default=None)  # might be None for CONTRL or APERAK
+    # expressions and conditions are always interpreted on a per-format basis (no pruefidentifikator required)
     expression: str = Field(index=True)  #: e.g 'Muss [1] U [2]'
     node_texts: str = Field()
     """

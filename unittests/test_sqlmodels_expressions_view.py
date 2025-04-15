@@ -26,7 +26,7 @@ def test_create_db_and_expressions_view(snapshot: SnapshotAssertion) -> None:
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
         stmt = (
-            select(AhbExpression).where(AhbExpression.pruefidentifikator == "25001").order_by(AhbExpression.expression)
+            select(AhbExpression).where(AhbExpression.format=="UTILTS").order_by(AhbExpression.expression)
         )
         results = session.exec(stmt).all()
     raw_results = [r.model_dump(mode="json") for r in results]
@@ -53,7 +53,7 @@ def test_create_expressions_table_from_submodule_with_validity(snapshot: Snapsho
         stmt = (
             select(AhbExpression)
             .where(AhbExpression.ahbicht_error_message is not None)
-            .order_by(AhbExpression.edifact_format_version, AhbExpression.pruefidentifikator, AhbExpression.expression)
+            .order_by(AhbExpression.edifact_format_version, AhbExpression.format, AhbExpression.expression)
         )
         # as a by-product of this test we get a snapshot of all expressions that are invalid in all AHBs
         results = session.exec(stmt).all()
