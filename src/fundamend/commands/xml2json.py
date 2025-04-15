@@ -1,3 +1,7 @@
+"""
+Contains the command to convert XML files to JSON files.
+"""
+
 import json
 from pathlib import Path
 
