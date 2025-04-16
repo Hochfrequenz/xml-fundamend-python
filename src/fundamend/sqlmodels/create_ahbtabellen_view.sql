@@ -22,7 +22,8 @@ WITH consolidated_ahm AS (SELECT id,
                                  trim(coalesce(code_ahb_status, coalesce(dataelement_ahb_status,
                                                                          coalesce(segment_ahb_status, segmentgroup_ahb_status))))     AS line_ahb_status,
                                  coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
-                                                                                         coalesce(segment_name, segmentgroup_name)))) AS line_name
+                                                                                         coalesce(segment_name, segmentgroup_name)))) AS line_name,
+                                type as line_type
                           FROM ahb_hierarchy_materialized ahm
                           WHERE ahm.TYPE != 'dataelementgroup'
                             AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
@@ -44,6 +45,7 @@ SELECT c.id                                  as id,
        c.code_value                          as qualifier,
        c.line_ahb_status                     as line_ahb_status,  -- e.g. 'Muss [28] ∧ [64]'
        c.line_name                           as line_name,        -- e.g. 'Datums- oder Uhrzeit- oder Zeitspannen-Format, Code' or 'Produkt-Daten für Lieferant relevant'
+       c.line_type                           as line_type,
        c.sort_path                           as sort_path,
        NULLIF(ahe.node_texts, '')            as bedingung,
        NULLIF(ahe.ahbicht_error_message, '') as bedingungsfehler
