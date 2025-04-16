@@ -50,6 +50,7 @@ class AhbTabellenLine(SQLModel, table=True):
     description: str = Field()
     segmentgroup_key: str | None = Field()
     segment_code: str | None = Field()
+    is_segment_or_group_change:bool=Field()
     data_element: str | None = Field()
     qualifier: str | None = Field()
     line_ahb_status: str | None = Field()

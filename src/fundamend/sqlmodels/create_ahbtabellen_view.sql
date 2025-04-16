@@ -19,10 +19,11 @@ WITH consolidated_ahm AS (SELECT id,
                                  dataelement_id,
                                  code_value,
                                  sort_path,
-                                 trim(coalesce(code_ahb_status, coalesce(dataelement_ahb_status,
-                                                                         coalesce(segment_ahb_status, segmentgroup_ahb_status))))     AS line_ahb_status,
-                                 coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
-                                                                                         coalesce(segment_name, segmentgroup_name)))) AS line_name
+                                 (type != LAG(type) OVER (ORDER BY sort_path)) AND type!='code' AS is_segment_or_group_change,
+                                 trim(coalesce(code_ahb_status, dataelement_ahb_status, segment_ahb_status,
+                                               segmentgroup_ahb_status)) AS line_ahb_status,
+                                 coalesce(code_name, dataelement_name, dataelementgroup_name, segment_name,
+                                          segmentgroup_name)             AS line_name
                           FROM ahb_hierarchy_materialized ahm
                           WHERE ahm.TYPE != 'dataelementgroup'
                             AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
@@ -45,6 +46,7 @@ SELECT c.id                                  as id,
        c.line_ahb_status                     as line_ahb_status,  -- e.g. 'Muss [28] ∧ [64]'
        c.line_name                           as line_name,        -- e.g. 'Datums- oder Uhrzeit- oder Zeitspannen-Format, Code' or 'Produkt-Daten für Lieferant relevant'
        c.sort_path                           as sort_path,
+       is_segment_or_group_change            as is_segment_or_group_change,
        NULLIF(ahe.node_texts, '')            as bedingung,
        NULLIF(ahe.ahbicht_error_message, '') as bedingungsfehler
 FROM consolidated_ahm as c
