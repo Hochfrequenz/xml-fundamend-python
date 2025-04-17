@@ -3,6 +3,8 @@
 from datetime import date
 from enum import StrEnum
 
+from efoli import EdifactFormat
+
 from .base import FundamendBaseModel
 
 # I didn't invent the data model ;)
@@ -168,6 +170,6 @@ class MessageImplementationGuide(FundamendBaseModel):
     versionsnummer: str
     """e.g. '1.1c'"""
 
-    format: str  #: e.g. 'UTILTS'
+    format: EdifactFormat  #: e.g. 'UTILTS'
 
     elements: tuple[Segment | SegmentGroup, ...]

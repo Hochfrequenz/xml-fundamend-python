@@ -238,7 +238,7 @@ class AhbExpression(SQLModel, table=True):
     )
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     edifact_format_version: EdifactFormatVersion = Field(index=True)
-    format: str = Field(index=True)  # the edifact format, e.g. 'UTILMD'
+    format: EdifactFormat = Field(index=True)  # the edifact format, e.g. 'UTILMD'
     # expressions and conditions are always interpreted on a per-format basis (no pruefidentifikator required)
     expression: str = Field(index=True)  #: e.g 'Muss [1] U [2]'
     node_texts: str = Field()

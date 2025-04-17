@@ -5,6 +5,8 @@
 
 from datetime import date
 
+from efoli import EdifactFormat
+
 from fundamend.models.base import FundamendBaseModel
 
 
@@ -128,7 +130,7 @@ class Anwendungsfall(FundamendBaseModel):
     pruefidentifikator: str  #: e.g. '25001'
     beschreibung: str  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
-    format: str  #: e.g. 'UTILTS'
+    format: EdifactFormat  #: e.g. 'UTILTS'
     elements: tuple[Segment | SegmentGroup, ...]
 
     @property
