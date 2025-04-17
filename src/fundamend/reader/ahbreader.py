@@ -252,7 +252,7 @@ class AhbReader:
         if _is_uebertragungsdatei(format_element):
             format_element = original_element[0][0]
         if not format_element.tag.startswith("M_"):
-            format_element = next((child for child in original_element[0] if child.tag.startswith("M_")), None)
+            format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
