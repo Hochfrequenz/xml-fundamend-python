@@ -5,7 +5,7 @@ from datetime import date
 from typing import Optional, Union
 from uuid import UUID
 
-from efoli import EdifactFormatVersion, EdifactFormat
+from efoli import EdifactFormat, EdifactFormatVersion
 
 # pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
 
