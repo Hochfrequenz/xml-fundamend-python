@@ -6,6 +6,8 @@ import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from pathlib import Path
 
+from efoli import EdifactFormat
+
 from fundamend.models.messageimplementationguide import (
     Code,
     DataElement,
@@ -160,12 +162,12 @@ class MigReader:
         root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
         return root.attrib["Versionsnummer"]
 
-    def get_format(self) -> str:
+    def get_format(self) -> EdifactFormat:
         """returns the format of the message implementation guide, e.g. 'UTILTS'"""
         root = self._element_tree.getroot()
         if _is_uebertragungsdatei(root):
             root = _get_first_tag_starting_with_m(root)
-        return lstrip("M_", root.tag)  # converts 'M_UTILTS' to 'UTILTS'
+        return EdifactFormat(lstrip("M_", root.tag))  # converts 'M_UTILTS' to 'UTILTS'
 
     def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""

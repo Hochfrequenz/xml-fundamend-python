@@ -5,7 +5,7 @@ from datetime import date
 from typing import Optional, Union
 from uuid import UUID
 
-from efoli import EdifactFormatVersion
+from efoli import EdifactFormatVersion, EdifactFormat
 
 # pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
 
@@ -338,7 +338,7 @@ class Anwendungsfall(SQLModel, table=True):
     pruefidentifikator: str = Field(index=True)  #: e.g. '25001'
     beschreibung: str = Field(index=True)  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
-    format: str = Field(index=True)  #: e.g. 'UTILTS'
+    format: EdifactFormat = Field(index=True)  #: e.g. 'UTILTS'
     segments: list[Segment] = Relationship(back_populates="anwendungsfall")
     segment_groups: list[SegmentGroup] = Relationship(back_populates="anwendungsfall")
     position: Optional[int] = Field(default=None, index=True)

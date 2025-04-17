@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from pathlib import Path
 
+from efoli import EdifactFormat
+
 from fundamend.models.anwendungshandbuch import (
     Anwendungsfall,
     Anwendungshandbuch,
@@ -249,11 +251,13 @@ class AhbReader:
         format_element = original_element[0]
         if _is_uebertragungsdatei(format_element):
             format_element = original_element[0][0]
+        if not format_element.tag.startswith("M_"):
+            format_element = next((child for child in original_element[0] if child.tag.startswith("M_")), None)
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
             beschreibung=original_element.attrib["Beschreibung"],
             kommunikation_von=original_element.attrib["Kommunikation_von"],
-            format=lstrip("M_", format_element.tag),
+            format=EdifactFormat(lstrip("M_", format_element.tag)),
             elements=tuple(segments_and_groups),
         )
 
