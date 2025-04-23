@@ -184,6 +184,7 @@ class Segment(SQLModel, table=True):
     name: str = Field(index=True)  #: e.g. 'Beginn der Nachricht'
     number: str = Field(index=True)  #: e.g. '00002'
     ahb_status: str | None  #: e.g. 'Muss'
+    is_on_uebertragungsdatei_level: bool
     data_elements: list[DataElement] = Relationship(back_populates="segment")
     data_element_groups: list[DataElementGroup] = Relationship(back_populates="segment")
     position: Optional[int] = Field(default=None, index=True)
@@ -202,6 +203,7 @@ class Segment(SQLModel, table=True):
             number=model.number,
             ahb_status=model.ahb_status,
             position=position,
+            is_on_uebertragungsdatei_level=model.is_on_uebertragungsdatei_level,
         )
         for _position, element in enumerate(model.data_elements):
             if isinstance(element, PydanticDataElement):
@@ -225,6 +227,7 @@ class Segment(SQLModel, table=True):
                     key=lambda y: y.position or 0,
                 )
             ),
+            is_on_uebertragungsdatei_level=self.is_on_uebertragungsdatei_level,
         )
 
 
