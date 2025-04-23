@@ -121,6 +121,17 @@ class Segment(FundamendBaseModel):
     status_specification: MigStatus  # e.g. M
     example: str | None  #: e.g. "NAD+MS+9900259000002::293'"
     data_elements: tuple[DataElement | DataElementGroup, ...]
+    is_on_uebertragungsdatei_level: bool = False
+    """
+    true only for those segments that are on the 'UEBERTRAGUNGSDATEI' level (meaning, outside the <M_FORMAT> tag).
+    Similar to the corresponding AHB tag, we decided against replicating this XML level in the fundamend data model.
+    This is the case for the UNA and UNZ segments in UTILMD, REMADV or INVOIC.
+    But other formats like UTILTS or ORDERS have no such level at all.
+    Basically this flag describes on which level you may aggregate single "Geschäftsvorfälle"/transactions in a single
+    Übertragungsdatei.
+    You may, for example, send multiple UTILMDs oR MSCONS messages batched/aggregated in one file, but not multiple
+    ORDERs.
+    """
 
 
 class SegmentGroup(FundamendBaseModel):
