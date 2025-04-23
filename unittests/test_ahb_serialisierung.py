@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pytest
 
+from fundamend import MessageImplementationGuide
+from fundamend.models.messageimplementationguide import Segment, Uebertragungsdatei
 from fundamend.reader import AhbReader, MigReader
 
 from .conftest import is_private_submodule_checked_out
@@ -48,7 +50,8 @@ def test_read_mig_xml(mig_xml_file_path: Path, expected_date: date) -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     reader = MigReader(mig_xml_file_path)
-    actual = reader.get_publishing_date()
+    mig = reader.read()
+    actual = mig.veroeffentlichungsdatum
     assert actual == expected_date
 
 
@@ -57,4 +60,17 @@ def test_deserializing_all_migs() -> None:
         pytest.skip("Skipping test because of missing private submodule")
     for mig_file_path in data_path.rglob("**/*MIG*.xml"):
         reader = MigReader(mig_file_path)
-        _ = reader.read()  # must not crash
+        actual = reader.read()  # must not crash
+        if isinstance(actual, Uebertragungsdatei):
+            assert any(
+                isinstance(elem, Segment) for elem in actual.elements
+            ), "Uebertragungsdatei must contain segments before and after the MIG"
+            assert any(
+                isinstance(elem, MessageImplementationGuide) for elem in actual.elements
+            ), "Uebertragungsdatei must contain a MIG"
+            mig = [elem for elem in actual.elements if isinstance(elem, MessageImplementationGuide)][0]
+        elif isinstance(actual, MessageImplementationGuide):
+            mig = actual
+        else:
+            raise ValueError(f"unexpected type: {type(actual)}")
+        assert any(mig.elements)

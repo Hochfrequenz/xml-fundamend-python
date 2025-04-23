@@ -173,3 +173,18 @@ class MessageImplementationGuide(FundamendBaseModel):
     format: EdifactFormat  #: e.g. 'UTILTS'
 
     elements: tuple[Segment | SegmentGroup, ...]
+
+
+class Uebertragungsdatei(FundamendBaseModel):
+    """sometimes the MIG data structure is wrapped in side an Uebertragungsdatei root element"""
+
+    veroeffentlichungsdatum: date
+    """publishing date"""
+
+    autor: str
+    """author, most likely 'BDEW'"""
+
+    versionsnummer: str
+    """e.g. '1.1c'"""
+
+    elements: tuple[Segment | MessageImplementationGuide, ...]

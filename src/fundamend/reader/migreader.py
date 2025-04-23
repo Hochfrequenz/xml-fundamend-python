@@ -16,11 +16,13 @@ from fundamend.models.messageimplementationguide import (
     MigStatus,
     Segment,
     SegmentGroup,
+    Uebertragungsdatei,
 )
 from fundamend.reader.element_distinction import (
     _is_code,
     _is_data_element,
     _is_data_element_group,
+    _is_format,
     _is_segment,
     _is_segment_group,
     _is_uebertragungsdatei,
@@ -97,6 +99,90 @@ def _to_segment(element: ET.Element) -> Segment:
     )
 
 
+def _iter_segments_and_segment_groups(element: ET.Element) -> list[SegmentGroup | Segment]:
+    """recursive function that builds a list of all segments and segment groups"""
+    result: list[Segment | SegmentGroup] = []
+    if _is_segment_group(element):
+        result.append(_to_segment_group(element))
+    elif _is_segment(element):
+        result.append(_to_segment(element))
+    return result
+
+
+def get_publishing_date(element: ET.Element) -> date:
+    """
+    returns the publishing date of the message implementation guide
+    """
+    raw_value = element.attrib["Veroeffentlichungsdatum"]  # e.g. '24.10.2023'
+    result = datetime.strptime(raw_value, "%d.%m.%Y").date()
+    return result
+
+
+def get_author(element: ET.Element) -> str:
+    """
+    returns the author of the message implementation guide
+    """
+    return element.attrib["Author"]
+
+
+def get_version(element: ET.Element) -> str:
+    """
+    returns the version of the message implementation guide
+    """
+    return element.attrib["Versionsnummer"]
+
+
+def get_format(element: ET.Element) -> EdifactFormat:
+    """returns the format of the message implementation guide, e.g. 'UTILTS'"""
+    return EdifactFormat(lstrip("M_", element.tag))  # converts 'M_UTILTS' to 'UTILTS'
+
+
+def _to_message_implementation_guide(
+    element: ET.Element,
+    veroeffentlichungsdatum: date | None = None,
+    autor: str | None = None,
+    versionsnummer: str | None = None,
+) -> MessageImplementationGuide:
+    assert _is_format(element)
+    segments_and_groups: list[Segment | SegmentGroup] = []
+    for child in element:
+        segments_and_groups.extend(_iter_segments_and_segment_groups(child))
+
+    result = MessageImplementationGuide(
+        veroeffentlichungsdatum=veroeffentlichungsdatum or get_publishing_date(element),
+        autor=autor or get_author(element),
+        versionsnummer=versionsnummer or get_version(element),
+        format=get_format(element),
+        elements=tuple(segments_and_groups),
+    )
+    return result
+
+
+def _to_uebertragungsdatei(element: ET.Element) -> Uebertragungsdatei:
+    assert _is_uebertragungsdatei(element)
+    sub_elements: list[Segment | MessageImplementationGuide] = []
+    veroeffentlichungsdatum = get_publishing_date(element)
+    autor = get_author(element)
+    versionsnummer = get_version(element)
+    for child in element:
+        if _is_segment(child):
+            sub_elements.append(_to_segment(child))
+        elif _is_format(child):
+            sub_elements.append(
+                _to_message_implementation_guide(
+                    child, veroeffentlichungsdatum=veroeffentlichungsdatum, autor=autor, versionsnummer=versionsnummer
+                )
+            )
+        else:
+            raise ValueError(f"unexpected element: {child.tag}")
+    return Uebertragungsdatei(
+        veroeffentlichungsdatum=veroeffentlichungsdatum,
+        autor=autor,
+        versionsnummer=versionsnummer,
+        elements=tuple(sub_elements),
+    )
+
+
 def _to_segment_group(element: ET.Element) -> SegmentGroup:
     assert _is_segment_group(element)
     segments_and_groups: list[SegmentGroup | Segment] = []
@@ -120,13 +206,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
     )
 
 
-def _get_first_tag_starting_with_m(element: ET.Element) -> ET.Element:
-    for elem in element.iter():
-        if elem.tag.startswith("M_"):
-            return elem
-    raise ValueError("No element starting with M_ found")
-
-
+# pylint:disable=too-few-public-methods
 class MigReader:
     """
     Accesses information from an XML based message implementation guide
@@ -139,64 +219,14 @@ class MigReader:
         self._xml_path = xml_path
         self._element_tree = ET.parse(self._xml_path)
 
-    def get_publishing_date(self) -> date:
+    def read(self) -> MessageImplementationGuide | Uebertragungsdatei:
         """
-        returns the publishing date of the message implementation guide
+        read the entire file and convert it to a MessageImplementationGuide or Uebertragungsdatei instance
         """
-        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
-        raw_value = root.attrib["Veroeffentlichungsdatum"]  # e.g. '24.10.2023'
-        result = datetime.strptime(raw_value, "%d.%m.%Y").date()
-        return result
 
-    def get_author(self) -> str:
-        """
-        returns the author of the message implementation guide
-        """
-        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
-        return root.attrib["Author"]
-
-    def get_version(self) -> str:
-        """
-        returns the version of the message implementation guide
-        """
-        root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
-        return root.attrib["Versionsnummer"]
-
-    def get_format(self) -> EdifactFormat:
-        """returns the format of the message implementation guide, e.g. 'UTILTS'"""
         root = self._element_tree.getroot()
         if _is_uebertragungsdatei(root):
-            root = _get_first_tag_starting_with_m(root)
-        return EdifactFormat(lstrip("M_", root.tag))  # converts 'M_UTILTS' to 'UTILTS'
-
-    def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
-        """recursive function that builds a list of all segments and segment groups"""
-        result: list[Segment | SegmentGroup] = []
-        if _is_segment_group(element):
-            result.append(_to_segment_group(element))
-        elif _is_segment(element):
-            result.append(_to_segment(element))
-        return result
-
-    def read(self) -> MessageImplementationGuide:
-        """
-        read the entire file and convert it to a MessageImplementationGuid instance
-        """
-        segments_and_groups = []
-        root = self._element_tree.getroot()
-        if _is_uebertragungsdatei(root):
-            for elem in root.iter():
-                if elem.tag.startswith("M_"):
-                    root = elem
-                    break
-        for element in root:
-            segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
-
-        result = MessageImplementationGuide(
-            veroeffentlichungsdatum=self.get_publishing_date(),
-            autor=self.get_author(),
-            versionsnummer=self.get_version(),
-            format=self.get_format(),
-            elements=tuple(segments_and_groups),
-        )
-        return result
+            return _to_uebertragungsdatei(root)
+        if _is_format(root):
+            return _to_message_implementation_guide(root)
+        raise ValueError(f"unexpected root element: {root.tag}")

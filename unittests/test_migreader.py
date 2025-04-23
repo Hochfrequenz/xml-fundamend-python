@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.models.messageimplementationguide import MessageImplementationGuide
+from fundamend.models.messageimplementationguide import MessageImplementationGuide, Uebertragungsdatei
 from fundamend.reader import MigReader
 
 
@@ -18,11 +18,18 @@ from fundamend.reader import MigReader
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml",
             date(2024, 4, 2),
         ),
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            date(2024, 4, 2),
+        ),
     ],
 )
 def test_get_publishing_date(mig_xml_file_path: Path, expected_date: date) -> None:
     reader = MigReader(mig_xml_file_path)
-    actual = reader.get_publishing_date()
+    mig = reader.read()
+    actual = mig.veroeffentlichungsdatum
     assert actual == expected_date
 
 
@@ -33,11 +40,18 @@ def test_get_publishing_date(mig_xml_file_path: Path, expected_date: date) -> No
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml", "BDEW"
         ),
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            "BDEW",
+        ),
     ],
 )
 def test_get_author(mig_xml_file_path: Path, expected: str) -> None:
     reader = MigReader(mig_xml_file_path)
-    actual = reader.get_author()
+    mig = reader.read()
+    actual = mig.autor
     assert actual == expected
 
 
@@ -48,11 +62,18 @@ def test_get_author(mig_xml_file_path: Path, expected: str) -> None:
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml", "1.1d"
         ),
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            "1.1d",
+        ),
     ],
 )
 def test_get_version(mig_xml_file_path: Path, expected: str) -> None:
     reader = MigReader(mig_xml_file_path)
-    actual = reader.get_version()
+    mig = reader.read()
+    actual = mig.versionsnummer
     assert actual == expected
 
 
@@ -63,11 +84,23 @@ def test_get_version(mig_xml_file_path: Path, expected: str) -> None:
         pytest.param(
             Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02.xml", "UTILTS"
         ),
+        pytest.param(
+            Path(__file__).parent
+            / "example_files"
+            / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml",
+            "UTILTS",
+        ),
     ],
 )
 def test_get_format(mig_xml_file_path: Path, expected: str) -> None:
     reader = MigReader(mig_xml_file_path)
-    actual = reader.get_format()
+    mig = reader.read()
+    if isinstance(mig, MessageImplementationGuide):
+        actual = mig.format
+    elif isinstance(mig, Uebertragungsdatei):
+        actual = [x for x in mig.elements if isinstance(x, MessageImplementationGuide)][0].format
+    else:
+        raise ValueError(f"unexpected type: {type(mig)}")
     assert actual == expected
 
 
@@ -95,7 +128,7 @@ def test_read_mig(mig_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
     reader = MigReader(mig_xml_file_path)
     actual = reader.read()
     assert actual is not None
-    assert isinstance(actual, MessageImplementationGuide)
+    assert isinstance(actual, (MessageImplementationGuide, Uebertragungsdatei))
     snapshot.assert_match(actual)
 
 
@@ -113,7 +146,7 @@ def test_read_mig(mig_xml_file_path: Path, snapshot: SnapshotAssertion) -> None:
 def test_mig_hashable(mig_xml_file_path: Path) -> None:
     reader = MigReader(mig_xml_file_path)
     mig = reader.read()
-    assert isinstance(mig, MessageImplementationGuide)
+    assert isinstance(mig, (MessageImplementationGuide, Uebertragungsdatei))
     hash_code = hash(mig)
     assert isinstance(hash_code, int)
     hash_collection = set()

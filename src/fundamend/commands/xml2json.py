@@ -10,6 +10,7 @@ from pydantic import RootModel
 from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
+from fundamend.models.messageimplementationguide import Uebertragungsdatei
 
 app = typer.Typer()
 
@@ -22,13 +23,18 @@ def _convert_to_json_file(xml_file_path: Path) -> Path:
     is_mig = "mig" in xml_file_path.stem.lower()
     if is_ahb and is_mig:
         raise ValueError(f"Cannot detect if {xml_file_path} is an AHB or MIG")
-    root_model: RootModel[Anwendungshandbuch] | RootModel[MessageImplementationGuide]
+    root_model: RootModel[Anwendungshandbuch] | RootModel[MessageImplementationGuide] | RootModel[Uebertragungsdatei]
     if is_ahb:
         ahb_model = AhbReader(xml_file_path).read()
         root_model = RootModel[Anwendungshandbuch](ahb_model)
     elif is_mig:
         mig_model = MigReader(xml_file_path).read()
-        root_model = RootModel[MessageImplementationGuide](mig_model)
+        if isinstance(mig_model, Uebertragungsdatei):
+            root_model = RootModel[Uebertragungsdatei](mig_model)
+        elif isinstance(mig_model, MessageImplementationGuide):
+            root_model = RootModel[MessageImplementationGuide](mig_model)
+        else:
+            raise ValueError(f"Unexpected type {type(mig_model)}")
     else:
         raise ValueError(f"Seems like {xml_file_path} is neither an AHB nor a MIG")
     out_dict = root_model.model_dump(mode="json")
