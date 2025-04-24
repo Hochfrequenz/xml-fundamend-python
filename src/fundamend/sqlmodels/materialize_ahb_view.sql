@@ -145,6 +145,7 @@ WITH RECURSIVE
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
+
                          child.id,
                          child.name,
                          child.ahb_status,
@@ -201,7 +202,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-                         h.is_on_uebertragungsdatei_level,
+                         s.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,
