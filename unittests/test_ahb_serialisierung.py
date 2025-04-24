@@ -62,7 +62,6 @@ def test_deserializing_all_migs() -> None:
         _ = reader.read()  # must not crash
 
 
-
 def test_uebertragungsdatei_level_flag_is_set_ahb() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
@@ -76,6 +75,7 @@ def test_uebertragungsdatei_level_flag_is_set_ahb() -> None:
     assert unb_segment.is_on_uebertragungsdatei_level
     assert unz_segment.is_on_uebertragungsdatei_level
     assert not unh_segment.is_on_uebertragungsdatei_level
+
 
 def test_uebertragungsdatei_flag_is_set_mig() -> None:
     if not is_private_submodule_checked_out():
