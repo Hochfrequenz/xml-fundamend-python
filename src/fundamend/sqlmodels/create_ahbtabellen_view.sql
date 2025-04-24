@@ -36,7 +36,7 @@ SELECT c.id                                  as id,
        c.id_path,
        c.kommunikation_von                   as direction,
        c.beschreibung                        as description,
-       'SG' || c.segmentgroup_id             as segmentgroup_key, -- eg 'SG6'
+       c.segmentgroup_id                     as segmentgroup_key, -- eg 'SG6'
        c.segment_id                          as segment_code,     -- e.g 'NAD'
        c.dataelement_id                      as data_element,     -- e.g 'D_3035'
        --CASE

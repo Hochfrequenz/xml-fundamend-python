@@ -143,7 +143,7 @@ WITH RECURSIVE
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
 
-                         child.id,
+                         'SG' || child.id,
                          child.name,
                          child.ahb_status,
                          child.position,
