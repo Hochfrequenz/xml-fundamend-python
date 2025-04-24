@@ -23,7 +23,7 @@ WITH consolidated_ahm AS (SELECT id,
                                                                          coalesce(segment_ahb_status, segmentgroup_ahb_status))))     AS line_ahb_status,
                                  coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
                                                                                          coalesce(segment_name, segmentgroup_name)))) AS line_name,
-                                type as line_type
+                                 type                                                                                                 as line_type
                           FROM ahb_hierarchy_materialized ahm
                           WHERE ahm.TYPE != 'dataelementgroup'
                             AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
@@ -36,7 +36,7 @@ SELECT c.id                                  as id,
        c.id_path,
        c.kommunikation_von                   as direction,
        c.beschreibung                        as description,
-       'SG' || c.segmentgroup_id             as segmentgroup_key, -- eg 'SG6'
+       c.segmentgroup_id                     as segmentgroup_key, -- eg 'SG6'
        c.segment_id                          as segment_code,     -- e.g 'NAD'
        c.dataelement_id                      as data_element,     -- e.g 'D_3035'
        --CASE

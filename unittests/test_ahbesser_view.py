@@ -37,6 +37,9 @@ def test_create_db_and_ahbesser_view(snapshot: SnapshotAssertion) -> None:
         )
         if expression_contains_digit:
             assert result.bedingung
+        assert result.segmentgroup_key is None or (
+            result.segmentgroup_key.startswith("SG") and not result.segmentgroup_key.startswith("SGSG")
+        )
     raw_results = [r.model_dump(mode="json") for r in results]
     for raw_result in raw_results:
         for guid_column in ["id"]:  # there's no point to compare those
