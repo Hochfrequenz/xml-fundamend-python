@@ -25,7 +25,8 @@ WITH RECURSIVE
                              af.beschreibung,
                              af.kommunikation_von,
                              ah.edifact_format_version,
-                             af.anwendungshandbuch_primary_key
+                             af.anwendungshandbuch_primary_key,
+                             null            as is_on_uebertragungsdatei_level
                       FROM segmentgroup sg
                                JOIN anwendungsfall af ON sg.anwendungsfall_primary_key = af.primary_key
                                JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -34,8 +35,8 @@ WITH RECURSIVE
 
                       SELECT s.primary_key,
                              s.position,
-                             'segment' AS type,
-                             s.id      AS root_id_text,
+                             'segment'                        AS type,
+                             s.id                             AS root_id_text,
                              s.name,
                              s.ahb_status,
                              s.anwendungsfall_primary_key,
@@ -48,7 +49,8 @@ WITH RECURSIVE
                              af.beschreibung,
                              af.kommunikation_von,
                              ah.edifact_format_version,
-                             af.anwendungshandbuch_primary_key
+                             af.anwendungshandbuch_primary_key,
+                             s.is_on_uebertragungsdatei_level as is_on_uebertragungsdatei_level
                       FROM segment s
                                JOIN anwendungsfall af ON s.anwendungsfall_primary_key = af.primary_key
                                JOIN anwendungshandbuch ah ON af.anwendungshandbuch_primary_key = ah.primary_key
@@ -83,7 +85,7 @@ WITH RECURSIVE
                               o.kommunikation_von,
                               o.edifact_format_version,
                               o.anwendungshandbuch_primary_key,
-
+                              o.is_on_uebertragungsdatei_level,
                               CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END AS segmentgroup_id,
                               CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END         AS segmentgroup_name,
                               CASE WHEN o.type = 'segment_group' THEN o.ahb_status ELSE NULL END   AS segmentgroup_ahb_status,
@@ -142,6 +144,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
+                         h.is_on_uebertragungsdatei_level,
 
                          'SG' || child.id,
                          child.name,
@@ -199,7 +202,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-
+                         s.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,
@@ -255,7 +258,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-
+                         h.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,
@@ -311,7 +314,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-
+                         h.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,
@@ -368,7 +371,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-
+                         h.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,
@@ -424,7 +427,7 @@ WITH RECURSIVE
                          h.kommunikation_von,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
-
+                         h.is_on_uebertragungsdatei_level,
                          h.segmentgroup_id,
                          h.segmentgroup_name,
                          h.segmentgroup_ahb_status,

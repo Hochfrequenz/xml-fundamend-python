@@ -52,6 +52,7 @@ class AhbTabellenLine(SQLModel, table=True):
     segment_code: str | None = Field()
     data_element: str | None = Field()
     qualifier: str | None = Field()
+    is_on_uebertragungsdatei_level: bool | None = Field()  #: !=null as soon as at least one segment is part of the path
     line_ahb_status: str | None = Field()
     line_name: str | None = Field()
     line_type: str | None = Field()  # 'code' or 'dataelement' or 'segment' or 'segmentgroup' or 'dataelementgroup'
