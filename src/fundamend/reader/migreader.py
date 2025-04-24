@@ -71,7 +71,7 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
     )
 
 
-def _to_segment(element: ET.Element) -> Segment:
+def _to_segment(element: ET.Element, is_on_uebertragungsdatei_level: bool = False) -> Segment:
     assert _is_segment(element)
     data_elements: list[DataElement | DataElementGroup] = []
     for child in element:
@@ -94,6 +94,7 @@ def _to_segment(element: ET.Element) -> Segment:
         example=element.attrib["Example"] or None,
         number=element.attrib["Number"],
         data_elements=tuple(data_elements),
+        is_on_uebertragungsdatei_level=is_on_uebertragungsdatei_level,
     )
 
 
@@ -180,18 +181,22 @@ class MigReader:
 
     def read(self) -> MessageImplementationGuide:
         """
-        read the entire file and convert it to a MessageImplementationGuid instance
+        read the entire file and convert it to a MessageImplementationGuide instance
         """
-        segments_and_groups = []
+        segments_and_groups: list[Segment | SegmentGroup] = []
         root = self._element_tree.getroot()
         if _is_uebertragungsdatei(root):
-            for elem in root.iter():
-                if elem.tag.startswith("M_"):
-                    root = elem
-                    break
-        for element in root:
-            segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
-
+            for elem in root:
+                if _is_segment(elem):
+                    segments_and_groups.append(_to_segment(elem, is_on_uebertragungsdatei_level=True))
+                elif elem.tag.startswith("M_"):
+                    for element in elem:
+                        segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
+                else:
+                    raise ValueError(f"unexpected element: {elem.tag}")
+        else:
+            for element in root:
+                segments_and_groups.extend(self._iter_segments_and_segment_groups(element))
         result = MessageImplementationGuide(
             veroeffentlichungsdatum=self.get_publishing_date(),
             autor=self.get_author(),
