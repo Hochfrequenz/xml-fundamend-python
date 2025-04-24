@@ -212,7 +212,7 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     segment_number: Optional[str] = Field(default=None, index=True)
     segment_ahb_status: Optional[str] = Field(default=None)
     segment_position: Optional[int] = Field(default=None, index=True)
-    is_on_uebertragungsdatei_level: Optional[bool] = Field(default=None, index=False)
+    is_on_uebertragungsdatei_level: Optional[bool] = Field(default=None, index=False)  #: null for SG only (no segment)
 
     # Data Element Group
     dataelementgroup_id: Optional[str] = Field(default=None, index=True)
