@@ -146,7 +146,7 @@ WITH RECURSIVE
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
 
-                         child.id,
+                         'SG' || child.id,
                          child.name,
                          child.ahb_status,
                          child.position,

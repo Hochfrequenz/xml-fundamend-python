@@ -301,7 +301,7 @@
       'pruefidentifikator': '25001',
       'qualifier': None,
       'segment_code': None,
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-',
     }),
     dict({
@@ -321,7 +321,7 @@
       'pruefidentifikator': '25001',
       'qualifier': None,
       'segment_code': 'NAD',
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-00000-',
     }),
     dict({
@@ -341,7 +341,7 @@
       'pruefidentifikator': '25001',
       'qualifier': 'MS',
       'segment_code': 'NAD',
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-00000-00000-00000-',
     }),
     dict({
@@ -361,7 +361,7 @@
       'pruefidentifikator': '25001',
       'qualifier': None,
       'segment_code': 'NAD',
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-00000-00001-00000-',
     }),
     dict({
@@ -381,7 +381,7 @@
       'pruefidentifikator': '25001',
       'qualifier': '9',
       'segment_code': 'NAD',
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-00000-00001-00001-00000-',
     }),
     dict({
@@ -401,7 +401,7 @@
       'pruefidentifikator': '25001',
       'qualifier': '293',
       'segment_code': 'NAD',
-      'segmentgroup_key': 'SGSG2',
+      'segmentgroup_key': 'SG2',
       'sort_path': '00003-00000-00001-00001-00001-',
     }),
     dict({
