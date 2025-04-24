@@ -87,6 +87,13 @@ class Segment(FundamendBaseModel):
     number: str  #: e.g. '00002'
     ahb_status: str | None  #: e.g. 'Muss'
     data_elements: tuple[DataElement | DataElementGroup, ...]
+    is_on_uebertragungsdatei_level: bool = False
+    """
+    true for e.g. S_UNA, S_UNB or S_UNZ which occur outside the regular AHB <M_FORMAT> structure.
+    We decided against introducing another (mostly useless) layer around the actual body of the Anwendungsfall.
+    This is only relevant (true) for MSCONS AHBs as of 2025-04-23 although the MIGs read like this _might_ also be true
+    for REMADV and INVOIC. We all know, how (self-)consistent BDEW documents are, even if you pay for them.
+    """
 
 
 class SegmentGroup(FundamendBaseModel):

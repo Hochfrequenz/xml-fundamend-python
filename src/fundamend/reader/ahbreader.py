@@ -119,7 +119,7 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
     )
 
 
-def _to_segment(element: ET.Element) -> Segment:
+def _to_segment(element: ET.Element, is_uebertragungsdatei_level: bool = False) -> Segment:
     assert _is_segment(element)
     data_elements: list[DataElement | DataElementGroup] = []
     for child in element:
@@ -138,6 +138,7 @@ def _to_segment(element: ET.Element) -> Segment:
         number=element.attrib["Number"],
         ahb_status=ahb_status,
         data_elements=tuple(data_elements),
+        is_on_uebertragungsdatei_level=is_uebertragungsdatei_level,
     )
 
 
@@ -231,17 +232,22 @@ class AhbReader:
             result.append(self._read_anwendungsfall(element))
         return result
 
-    def _iter_segments_and_segment_groups(self, element: ET.Element) -> list[SegmentGroup | Segment]:
+    def _iter_segments_and_segment_groups(
+        self, element: ET.Element, is_uebertragungsdatei_level: bool = False
+    ) -> list[SegmentGroup | Segment]:
         """recursive function that builds a list of all segments and segment groups"""
         result: list[Segment | SegmentGroup] = []
-        should_go_deeper = _is_anwendungsfall(element) or _is_format(element) or _is_uebertragungsdatei(element)
+        should_go_deeper = _is_anwendungsfall(element) or _is_format(element)
         if should_go_deeper:
             for sub_element in element:
                 result.extend(self._iter_segments_and_segment_groups(sub_element))
-        if _is_segment_group(element):
+        if _is_uebertragungsdatei(element):
+            for sub_element in element:
+                result.extend(self._iter_segments_and_segment_groups(sub_element, is_uebertragungsdatei_level=True))
+        elif _is_segment_group(element):
             result.append(_to_segment_group(element))
         elif _is_segment(element):
-            result.append(_to_segment(element))
+            result.append(_to_segment(element, is_uebertragungsdatei_level=is_uebertragungsdatei_level))
         return result
 
     def _read_anwendungsfall(self, original_element: ET.Element) -> Anwendungsfall:
