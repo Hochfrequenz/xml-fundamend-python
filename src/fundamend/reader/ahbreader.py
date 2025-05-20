@@ -153,7 +153,7 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
         else:
             raise ValueError(f"unexpected element: {child.tag}")
     return SegmentGroup(
-        id=lstrip("G_SG", element.tag),
+        id=lstrip("G_", element.tag),
         name=element.attrib["Name"],
         ahb_status=(
             element.attrib["AHB_Status"].strip() or None
