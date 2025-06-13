@@ -2,10 +2,7 @@
 Contains the commands for the CLI.
 """
 
-import typer
+import fundamend.commands.xml2json
+from fundamend.commands.app import app
 
-from fundamend.commands.xml2json import app as xml2json_app
-
-app = typer.Typer()
-
-app.add_typer(xml2json_app)
+__all__ = ["app"]
