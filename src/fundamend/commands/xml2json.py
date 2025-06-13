@@ -11,9 +11,8 @@ import typer
 from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
+from fundamend.commands.app import app
 from fundamend.sanitize import sanitize_ahb
-
-app = typer.Typer()
 
 
 def _write_model_to_json_file(

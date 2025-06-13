@@ -7,7 +7,7 @@ try:
     from typer.testing import CliRunner
 
     runner = CliRunner()
-    from fundamend.cli import app
+    from fundamend.__main__ import app
 except ImportError:
     _SKIP_TESTS = True
 
