@@ -113,10 +113,11 @@ def xml2json_file_mode(xml_path: Path, sanitize: bool = False, compressed: bool 
             f"Multiple other XML files found in the same directory as {xml_path} matching pattern "
             f"{pattern_other}: {other_matches}"
         )
-    mig, ahb = _convert_to_json_files(other_matches[0], xml_path, sanitize=sanitize)
     if match_type == "MIG":
+        mig, ahb = _convert_to_json_files(xml_path, other_matches[0], sanitize=sanitize)
         _write_model_to_json_file(mig, xml_path.with_suffix(".json"), compressed=compressed)
     else:
+        mig, ahb = _convert_to_json_files(other_matches[0], xml_path, sanitize=sanitize)
         _write_model_to_json_file(ahb, xml_path.with_suffix(".json"), compressed=compressed)
 
 
