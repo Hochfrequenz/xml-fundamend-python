@@ -4,6 +4,7 @@ from fundamend.commands import app
 
 
 def main():
+    """entry point of the script defined in pyproject.toml"""
     app()
 
 

@@ -1,3 +1,7 @@
+"""
+Contains the Typer app of the fundamend CLI tool.
+"""
+
 import typer
 from rich.console import Console
 

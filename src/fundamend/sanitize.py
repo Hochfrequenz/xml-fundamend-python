@@ -1,3 +1,14 @@
+"""
+This module provides functions to sanitize the AHB (Anwendungshandbuch) by adding
+unused MIG (Message Implementation Guide) elements to the AHB.
+They will be marked with an ahb_status of ``X [2499]`` which should always evaluate to false aka "must not"
+in the AHB expression language.
+
+Note that to save a big chunk of irrelevant data, elements which are marked with ``X [2499]`` will never contain
+the sub elements from the MIG. Except for the leading segment of a segment group - this helps to build search indices
+for segment groups by using the leading segment's number.
+"""
+
 from types import MethodType
 from typing import Any, Iterator, overload
 
@@ -5,22 +16,6 @@ from pydantic import BaseModel
 
 from fundamend.models import anwendungshandbuch as ahb
 from fundamend.models import messageimplementationguide as mig
-
-TRAVERSE_FIELD_NAMES = {
-    ahb.Anwendungshandbuch: "anwendungsfaelle",
-    ahb.Anwendungsfall: "elements",
-    ahb.SegmentGroup: "elements",
-    ahb.Segment: "data_elements",
-    ahb.DataElementGroup: "data_elements",
-    ahb.DataElement: "codes",
-    mig.MessageImplementationGuide: "elements",
-    mig.SegmentGroup: "elements",
-    mig.Segment: "data_elements",
-    mig.DataElementGroup: "data_elements",
-    mig.DataElement: "codes",
-}
-SEGMENT_INDEX_AHB = dict[str, ahb.Segment]
-SEGMENT_INDEX_MIG = dict[str, mig.Segment]
 
 
 def _disabled_hash(_) -> int:
@@ -144,8 +139,12 @@ def parallel_iter_segment_or_data_element_group(
     tuple[mig.DataElementGroup, ahb.DataElementGroup | None] | tuple[mig.DataElement, ahb.DataElement | None]
 ]:
     """
-    If a element is unused in AHB, i.e. if it has MigStatus.N or if it is part of a degenerated element set which
+    If an element is unused in AHB, i.e. if it has MigStatus.N or if it is part of a degenerated element set which
     would result in an IndexError, the MIG element will be yielded with ``None`` as the AHB counterpart.
+
+    :param mig_segment_or_group: The MIG segment or data element group to iterate over.
+    :param ahb_segment_or_group: The AHB segment or data element group to iterate over.
+    :returns: An iterator yielding pairs of MIG and AHB elements.
     """
     assert len(mig_segment_or_group.data_elements) > 0
     # assert len(mig_segment_or_group.data_elements) > 0 and len(ahb_segment_or_group.data_elements) > 0
@@ -154,7 +153,9 @@ def parallel_iter_segment_or_data_element_group(
     mig_elements = iter(mig_segment_or_group.data_elements)
     ahb_elements = iter(ahb_segment_or_group.data_elements)
 
-    cur_mig_element = next(mig_elements)
+    cur_mig_element = next(mig_elements)  # pylint: disable=stop-iteration-return
+    # This statement actually cannot raise a StopIteration, because we already checked that the MIG segment
+    # or data element group has at least one element.
     cur_ahb_element = next(ahb_elements, None)
 
     while True:
@@ -190,12 +191,22 @@ def parallel_iter_segment_group_or_root(
     mig_segment_group_or_root: mig.MessageImplementationGuide | mig.SegmentGroup,
     ahb_segment_group_or_root: ahb.Anwendungshandbuch | ahb.SegmentGroup,
 ) -> Iterator[tuple[mig.SegmentGroup, ahb.SegmentGroup | None] | tuple[mig.Segment, ahb.Segment | None]]:
+    """
+    Iterates over the elements of the MIG and AHB segment group or root, yielding pairs of MIG and AHB elements.
+    If a MIG element is unused in the AHB, it will be yielded with ``None`` as the AHB counterpart.
+
+    :param mig_segment_group_or_root: The MIG segment group or root to iterate over.
+    :param ahb_segment_group_or_root: The AHB segment group or root to iterate over.
+    :returns: An iterator yielding pairs of MIG and AHB elements.
+    """
     assert len(mig_segment_group_or_root.elements) > 0 and len(ahb_segment_group_or_root.elements) > 0
     mig_elements = iter(mig_segment_group_or_root.elements)
     ahb_elements = iter(ahb_segment_group_or_root.elements)
 
-    cur_mig_element = next(mig_elements)
-    cur_ahb_element = next(ahb_elements)
+    cur_mig_element = next(mig_elements)  # pylint: disable=stop-iteration-return
+    cur_ahb_element = next(ahb_elements)  # pylint: disable=stop-iteration-return
+    # This statement actually cannot raise a StopIteration, because we already checked that the MIG segment
+    # or data element group has at least one element.
 
     while True:
         mig_number = get_number(cur_mig_element)
@@ -214,12 +225,12 @@ def parallel_iter_segment_group_or_root(
         ahb_element_id = (
             f"{ahb_segment_group_or_root.id}'{get_number(ahb_segment_group_or_root)}'"
             if isinstance(ahb_segment_group_or_root, ahb.SegmentGroup)
-            else f"root"
+            else "root"
         )
         mig_element_id = (
             f"{mig_segment_group_or_root.id}'{get_number(mig_segment_group_or_root)}'"
             if isinstance(mig_segment_group_or_root, mig.SegmentGroup)
-            else f"root"
+            else "root"
         )
         raise ValueError(f"AHB {ahb_element_id} has more elements than MIG {mig_element_id}.")
     except StopIteration:
@@ -230,11 +241,15 @@ def create_ahb_data_element_from_mig(mig_data_element: mig.DataElement) -> ahb.D
     """
     Creates an AHB data element from a MIG data element.
     This is used to add unused MIG data elements to the AHB.
+
+    Sometimes a MIG data element can have a list of codes, but is still unused in the AHB. An example for this is
+    ``CONTRL UCI D_0085``.
+    In this case, we still don't add the codes to the AHB data element, because the data element will be forbidden
+    by the AHB expression anyway.
+
+    :param mig_data_element: The MIG data element to convert.
+    :return: An AHB data element with the same ID and name, but with an ahb_status of ``X [2499]`` and no codes.
     """
-    # Sometimes a MIG data element can have a list of codes, but is still unused in the AHB. An example for this is
-    # CONTRL UCI D_0085
-    # In this case, we still don't add the codes to the AHB data element, because the data element will be forbidden
-    # by the AHB expression anyway.
     return ahb.DataElement(
         id=mig_data_element.id,
         name=mig_data_element.name,
@@ -247,6 +262,10 @@ def create_ahb_data_element_group_from_mig(mig_data_element_group: mig.DataEleme
     """
     Creates an AHB data element group from a MIG data element group.
     This is used to add unused MIG data element groups to the AHB.
+
+    :param mig_data_element_group: The MIG data element group to convert.
+    :return: An AHB data element group with the same ID and name. The data elements of the MIG data element group
+        are converted to AHB data elements by ``create_ahb_data_element_from_mig``.
     """
     return ahb.DataElementGroup(
         id=mig_data_element_group.id,
@@ -262,6 +281,11 @@ def create_ahb_segment_from_mig(mig_segment: mig.Segment) -> ahb.Segment:
     """
     Creates an AHB segment from a MIG segment.
     This is used to add unused MIG segments to the AHB.
+
+    :param mig_segment: The MIG segment to convert.
+    :return: An AHB segment with the same ID, name and number, but with an ahb_status of ``X [2499]`` and
+        no data elements. We can safely omit the data elements here, because an application can detect
+        the unused segment by the ``ahb_status`` and stop further traversal.
     """
     return ahb.Segment(
         id=mig_segment.id,
@@ -269,23 +293,26 @@ def create_ahb_segment_from_mig(mig_segment: mig.Segment) -> ahb.Segment:
         number=mig_segment.number,
         ahb_status="X [2499]",
         data_elements=(),
-        # We don't need to add data elements here, because an application can detect the unused segment here and
-        # stop further traversal.
     )
 
 
 def create_ahb_segment_group_from_mig(mig_segment_group: mig.SegmentGroup) -> ahb.SegmentGroup:
     """
-    Creates an AHB segment from a MIG segment.
-    This is used to add unused MIG segments to the AHB.
+    Creates an AHB segment group from a MIG segment group.
+    This is used to add unused MIG segment groups to the AHB.
+
+    :param mig_segment_group: The MIG segment group to convert.
+    :return: An AHB segment group with the same ID and name, but with an ahb_status of ``X [2499]``. To enable
+        building search indices for segment groups based on the leading segments number, the first segment of the
+        MIG segment group is also converted to an AHB segment and added to the AHB segment group. All other segments
+        will be omitted since an application can detect the unused segment group by the ``ahb_status`` and stop further
+        traversal.
     """
     return ahb.SegmentGroup(
         id=mig_segment_group.id,
         name=mig_segment_group.name,
         ahb_status="X [2499]",
         elements=(create_ahb_segment_from_mig(mig_segment_group.elements[0]),),
-        # We only need to add the first segment here, because an application can detect the unused segment group here
-        # and stop further traversal. The first segment is used for the segment number.
     )
 
 
@@ -293,8 +320,11 @@ def add_unused_data_elements_or_groups_to_ahb(
     mig_element: mig.Segment | mig.DataElementGroup, ahb_element: ahb.Segment | ahb.DataElementGroup
 ) -> None:
     """
-    Adds unused MIG data elements to the AHB data element group.
-    This ensures that all MIG elements are present in the AHB for parallel iteration.
+    Adds unused MIG data elements or data element groups to the AHB data element group or segment.
+    This ensures that all MIG elements are present in the AHB for easy parallel iteration of applications.
+
+    :param mig_element: The MIG segment or data element group to add unused elements from.
+    :param ahb_element: The AHB segment or data element group to add unused elements to.
     """
     edited_ahb_elements = list(ahb_element.data_elements)
     index = 0
@@ -317,7 +347,15 @@ def add_unused_data_elements_or_groups_to_ahb(
 def add_unused_segment_or_groups_to_ahb(
     mig_root: mig.MessageImplementationGuide | mig.SegmentGroup, ahb_root: ahb.Anwendungsfall | ahb.SegmentGroup
 ) -> None:
-    """ """
+    """
+    Adds unused MIG segments or segment groups to the AHB segment group or root element.
+    This ensures that all MIG elements are present in the AHB for easy parallel iteration of applications.
+    The ``add_unused_data_elements_or_groups_to_ahb`` function is called recursively for segments which are present
+    in both the MIG and AHB.
+
+    :param mig_root: The MIG segment group or root to add unused elements from.
+    :param ahb_root: The AHB segment group or root to add unused elements to.
+    """
     edited_ahb_elements = list(ahb_root.elements)
     index = 0
     for mig_element, ahb_element in parallel_iter_segment_group_or_root(mig_root, ahb_root):
@@ -340,6 +378,12 @@ def add_unused_segment_or_groups_to_ahb(
 
 
 def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> None:
+    """
+    Adds the condition for the must-not pattern to the AHB conditions.
+    This condition is used to mark elements which are unused in the AHB and should not be provided in a message.
+
+    :param ahb_root: The AHB root element to add the condition to.
+    """
     for condition in ahb_root.bedingungen:
         if condition.nummer == "2499":
             raise ValueError(
@@ -362,7 +406,17 @@ def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> 
 
 def sanitize_ahb(mig_root: mig.MessageImplementationGuide, ahb_root: ahb.Anwendungshandbuch) -> None:
     """
-    Sanitizes the AHB by adding unused MIG data elements and groups to the AHB.
+    Sanitizes the AHB by adding unused MIG elements to the AHB.
+    This function will add the following elements to the AHB:
+
+    - Unused MIG data elements and data element groups to the AHB segment or data element group.
+    - Unused MIG segments and segment groups to the AHB segment group or root.
+
+    It will also add a condition to the AHB root element which is used to mark elements which are unused in the AHB
+    and should not be provided in a message. The respective elements will have an ``ahb_status`` of ``X [2499]``.
+
+    :param mig_root: The MIG root element to add unused elements from.
+    :param ahb_root: The AHB root element to add unused elements to.
     """
     add_must_not_pattern_to_ahb_conditions(ahb_root)
     for anwendungsfall in ahb_root.anwendungsfaelle:

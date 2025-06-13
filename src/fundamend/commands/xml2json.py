@@ -14,6 +14,8 @@ from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide,
 from fundamend.commands.app import app
 from fundamend.sanitize import sanitize_ahb
 
+FORMAT_AND_TYPE_REGEX = re.compile(r"^([A-Z]+)_(AHB|MIG)_(?:(Gas|Strom)_)?")
+
 
 def _write_model_to_json_file(
     model: Anwendungshandbuch | MessageImplementationGuide, xml_file_path: Path, *, compressed: bool = False
@@ -42,6 +44,78 @@ def _convert_to_json_files(
         sanitize_ahb(mig_model, ahb_model)
 
     return mig_model, ahb_model
+
+
+def xml2json_dir_mode(xml_path: Path, sanitize: bool = False, compressed: bool = False) -> None:
+    """
+    Converts all XML files in the given directory to JSON files.
+    The function expects to find pairs of MIG and AHB XML files in the directory.
+    The XML file names must match the pattern `<FORMAT>_<AHB|MIG>_[<Gas|Strom>_]*.xml`.
+    """
+
+    def groupby_key(path_and_match: tuple[Path, re.Match[str] | None]) -> str:
+        assert path_and_match[1] is not None
+        return path_and_match[1].group(1) + (path_and_match[1].group(3) or "")
+
+    def xmls_and_matches() -> Iterator[tuple[Path, re.Match[str]]]:
+        for _xml_path in xml_path.rglob("*.xml"):
+            match = FORMAT_AND_TYPE_REGEX.match(_xml_path.name)
+            if match is None:
+                raise ValueError("XML file name does not match expected format: " + str(_xml_path))
+            yield _xml_path, match
+
+    for _, _xmls_and_matches in groupby(sorted(xmls_and_matches(), key=groupby_key), key=groupby_key):
+        _xmls_and_matches_list = list(_xmls_and_matches)
+        assert (
+            len(_xmls_and_matches_list) == 2
+        ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
+        if _xmls_and_matches_list[0][1].group(2) == "AHB":
+            assert (
+                _xmls_and_matches_list[1][1].group(2) == "MIG"
+            ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
+            ahb_path = _xmls_and_matches_list[0][0]
+            mig_path = _xmls_and_matches_list[1][0]
+        else:
+            assert (
+                _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(1) == "AHB"
+            ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
+            mig_path = _xmls_and_matches_list[0][0]
+            ahb_path = _xmls_and_matches_list[1][0]
+        mig, ahb = _convert_to_json_files(mig_path, ahb_path, sanitize=sanitize)
+        _write_model_to_json_file(mig, mig_path.with_suffix(".json"), compressed=compressed)
+        _write_model_to_json_file(ahb, ahb_path.with_suffix(".json"), compressed=compressed)
+
+
+def xml2json_file_mode(xml_path: Path, sanitize: bool = False, compressed: bool = False) -> None:
+    """
+    Converts a single XML file to JSON.
+    The function expects to find the corresponding AHB or MIG file in the same directory.
+
+    The XML file names must match the pattern `<FORMAT>_<AHB|MIG>_[<Gas|Strom>_]*.xml`.
+    """
+    match = FORMAT_AND_TYPE_REGEX.match(xml_path.name)
+    match_type: Literal["MIG", "AHB"] = match.group(2)
+    match_type_other: Literal["MIG", "AHB"] = "AHB" if match_type == "MIG" else "MIG"
+    pattern_other = f"{match.group(1)}_{match_type_other}_"
+    if match.group(3) is not None:
+        pattern_other += f"{match.group(3)}_"
+    pattern_other += "*.xml"
+
+    other_matches = list(xml_path.parent.glob(pattern_other))
+    if len(other_matches) == 0:
+        raise ValueError(
+            f"No other XML file found in the same directory as {xml_path} matching pattern {pattern_other}"
+        )
+    if len(other_matches) > 1:
+        raise ValueError(
+            f"Multiple other XML files found in the same directory as {xml_path} matching pattern "
+            f"{pattern_other}: {other_matches}"
+        )
+    mig, ahb = _convert_to_json_files(other_matches[0], xml_path, sanitize=sanitize)
+    if match_type == "MIG":
+        _write_model_to_json_file(mig, xml_path.with_suffix(".json"), compressed=compressed)
+    else:
+        _write_model_to_json_file(ahb, xml_path.with_suffix(".json"), compressed=compressed)
 
 
 @app.command()
@@ -86,65 +160,12 @@ def xml2json(
     ] = False,
 ) -> None:
     """
-    converts the xml file from xml_in_path to a json file next to the .xml
+    Converts the xml file(s) from `xml_in_path` to a json file next to the `*.xml`.
+    If `xml_in_path` is a directory, it will search for all XML files in the directory and its subdirectories.
+
+    All xml files must follow the naming convention `/^(?P<FORMAT>[A-Z]+)_(AHB|MIG)_((Gas|Strom)_)?.*\\.xml$/`
     """
-    assert xml_path.exists()  # ensured by typer
-    format_and_type_regex = re.compile(r"^([A-Z]+)_(AHB|MIG)_(?:(Gas|Strom)_)?")
     if xml_path.is_dir():
-
-        def groupby_key(path_and_match: tuple[Path, re.Match[str] | None]) -> str:
-            assert path_and_match[1] is not None
-            return path_and_match[1].group(1) + (path_and_match[1].group(3) or "")
-
-        def xmls_and_matches() -> Iterator[tuple[Path, re.Match[str]]]:
-            for _xml_path in xml_path.rglob("*.xml"):
-                match = format_and_type_regex.match(_xml_path.name)
-                if match is None:
-                    raise ValueError("XML file name does not match expected format: " + str(_xml_path))
-                yield _xml_path, match
-
-        for key, _xmls_and_matches in groupby(sorted(xmls_and_matches(), key=groupby_key), key=groupby_key):
-            _xmls_and_matches_list = list(_xmls_and_matches)
-            assert (
-                len(_xmls_and_matches_list) == 2
-            ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-            if _xmls_and_matches_list[0][1].group(2) == "AHB":
-                assert (
-                    _xmls_and_matches_list[1][1].group(2) == "MIG"
-                ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-                ahb_path = _xmls_and_matches_list[0][0]
-                mig_path = _xmls_and_matches_list[1][0]
-            else:
-                assert (
-                    _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(1) == "AHB"
-                ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-                mig_path = _xmls_and_matches_list[0][0]
-                ahb_path = _xmls_and_matches_list[1][0]
-            mig, ahb = _convert_to_json_files(mig_path, ahb_path, sanitize=sanitize)
-            _write_model_to_json_file(mig, mig_path.with_suffix(".json"), compressed=compressed)
-            _write_model_to_json_file(ahb, ahb_path.with_suffix(".json"), compressed=compressed)
-
+        xml2json_dir_mode(xml_path, sanitize=sanitize, compressed=compressed)
     else:
-        match = format_and_type_regex.match(xml_path.name)
-        match_type: Literal["MIG", "AHB"] = match.group(2)
-        match_type_other: Literal["MIG", "AHB"] = "AHB" if match_type == "MIG" else "MIG"
-        pattern_other = f"{match.group(1)}_{match_type_other}_"
-        if match.group(3) is not None:
-            pattern_other += f"{match.group(3)}_"
-        pattern_other += "*.xml"
-
-        other_matches = list(xml_path.parent.glob(pattern_other))
-        if len(other_matches) == 0:
-            raise ValueError(
-                f"No other XML file found in the same directory as {xml_path} matching pattern {pattern_other}"
-            )
-        elif len(other_matches) > 1:
-            raise ValueError(
-                f"Multiple other XML files found in the same directory as {xml_path} matching pattern "
-                f"{pattern_other}: {other_matches}"
-            )
-        mig, ahb = _convert_to_json_files(other_matches[0], xml_path, sanitize=sanitize)
-        if match_type == "MIG":
-            _write_model_to_json_file(mig, xml_path.with_suffix(".json"), compressed=compressed)
-        else:
-            _write_model_to_json_file(ahb, xml_path.with_suffix(".json"), compressed=compressed)
+        xml2json_file_mode(xml_path, sanitize=sanitize, compressed=compressed)
