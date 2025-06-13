@@ -34,27 +34,50 @@ def _set(model: BaseModel, field_name: str, field_value: Any) -> None:
     # the model as a hashable object.
 
 
-def segment_number_search_index(
-    root: ahb.Anwendungsfall | mig.MessageImplementationGuide | ahb.SegmentGroup | mig.SegmentGroup,
-) -> SEGMENT_INDEX_AHB | SEGMENT_INDEX_MIG:
+@overload
+def leading_segment(segment_group: ahb.SegmentGroup) -> ahb.Segment: ...
+
+
+@overload
+def leading_segment(segment_group: mig.SegmentGroup) -> mig.Segment: ...
+
+
+def leading_segment(
+    segment_group: ahb.SegmentGroup | mig.SegmentGroup,
+) -> ahb.Segment | mig.Segment:
     """
-    Creates a search index for segment numbers in the given AHB or MIG root.
-    The index maps segment numbers to their position in the root's elements list.
+    Return the first segment of the segment group.
+
+    :param segment_group: The segment group.
+    :returns: The first segment of the segment group.
+    :raises TypeError: If the segment group doesn't start with a segment. This shouldn't happen if our assumptions are
+        correct.
     """
-    index = {}
-    for element in root.elements:
-        if isinstance(element, (ahb.Segment, mig.Segment)):
-            assert (
-                element.number not in index
-            ), f"Duplicate segment number found: {element.number} in {root.__class__.__name__}"
-            index[element.number] = element
-        if isinstance(element, (ahb.SegmentGroup, mig.SegmentGroup)):
-            sub_index = segment_number_search_index(element)
-            assert all(
-                sub_key not in index for sub_key in sub_index
-            ), f"Duplicate segment number found in sub-index: {list(sub_index.keys())} in {root.__class__.__name__}"
-            index.update(sub_index)
-    return index
+
+    if not isinstance(segment_group.elements[0], (ahb.Segment, mig.Segment)):
+        raise TypeError(
+            f"Expected segment group to start with a segment, got {type(segment_group.elements[0])} instead."
+        )
+    return segment_group.elements[0]  # type: ignore[return-value]
+
+
+def get_number(obj: mig.SegmentGroup | mig.Segment | ahb.SegmentGroup | ahb.Segment) -> str:
+    """
+    Get the number of the given segment or segment group.
+
+    In case of a segment group, the number of the leading segment is returned.
+
+    :param obj: The object to get the number from.
+    :returns: The number of the segment or the segment groups leading segment.
+    :raises ValueError: If the object type is unexpected.
+    """
+    match obj:
+        case mig.SegmentGroup() | ahb.SegmentGroup():
+            return leading_segment(obj).number
+        case mig.Segment() | ahb.Segment():
+            return obj.number
+        case _:
+            raise ValueError(f"Unexpected object type: {type(obj)}")
 
 
 def match_ahb_data_element_with_mig_data_element(
@@ -67,11 +90,7 @@ def match_ahb_data_element_with_mig_data_element(
     :param mig_data_element: The MIG data element to check against.
     :return: ``True`` if the AHB element matches the MIG data element, ``False`` otherwise.
     """
-    return (
-        ahb_data_element.id == mig_data_element.id
-        and ahb_data_element.name == mig_data_element.name
-        and set(code.value for code in ahb_data_element.codes) <= set(code.value for code in mig_data_element.codes)
-    )
+    return ahb_data_element.id == mig_data_element.id
 
 
 def match_ahb_data_element_group_with_mig_data_element_group(
@@ -89,7 +108,7 @@ def match_ahb_data_element_group_with_mig_data_element_group(
         return False
     _all_data_elements_in_mig_data_element_group = all(
         any(
-            match_ahb_data_element_with_mig_data_element(ahb_data_element, mig_data_element)
+            match_ahb_data_element_with_mig_data_element(mig_data_element, ahb_data_element)
             for mig_data_element in mig_data_element_group.data_elements
         )
         for ahb_data_element in ahb_data_element_group.data_elements
@@ -128,23 +147,26 @@ def parallel_iter_segment_or_data_element_group(
     If a element is unused in AHB, i.e. if it has MigStatus.N or if it is part of a degenerated element set which
     would result in an IndexError, the MIG element will be yielded with ``None`` as the AHB counterpart.
     """
-    assert len(mig_segment_or_group.data_elements) > 0 and len(ahb_segment_or_group.data_elements) > 0
+    assert len(mig_segment_or_group.data_elements) > 0
+    # assert len(mig_segment_or_group.data_elements) > 0 and len(ahb_segment_or_group.data_elements) > 0
+    # This assertion doesn't have to always hold. Counter example:
+    # ORDERS 17112 G_SG29 LIN'00072'
     mig_elements = iter(mig_segment_or_group.data_elements)
     ahb_elements = iter(ahb_segment_or_group.data_elements)
 
     cur_mig_element = next(mig_elements)
-    cur_ahb_element = next(ahb_elements)
+    cur_ahb_element = next(ahb_elements, None)
 
     while True:
         if isinstance(cur_mig_element, mig.DataElement):
             ahb_match = isinstance(cur_ahb_element, ahb.DataElement) and match_ahb_data_element_with_mig_data_element(
-                cur_ahb_element, cur_mig_element
+                cur_mig_element, cur_ahb_element
             )
         else:
             assert isinstance(cur_mig_element, mig.DataElementGroup)
             ahb_match = isinstance(
                 cur_ahb_element, ahb.DataElementGroup
-            ) and match_ahb_data_element_group_with_mig_data_element_group(cur_ahb_element, cur_mig_element)
+            ) and match_ahb_data_element_group_with_mig_data_element_group(cur_mig_element, cur_ahb_element)
         if ahb_match:
             yield cur_mig_element, cur_ahb_element
             cur_ahb_element = next(ahb_elements, None)
@@ -164,12 +186,55 @@ def parallel_iter_segment_or_data_element_group(
         pass
 
 
+def parallel_iter_segment_group_or_root(
+    mig_segment_group_or_root: mig.MessageImplementationGuide | mig.SegmentGroup,
+    ahb_segment_group_or_root: ahb.Anwendungshandbuch | ahb.SegmentGroup,
+) -> Iterator[tuple[mig.SegmentGroup, ahb.SegmentGroup | None] | tuple[mig.Segment, ahb.Segment | None]]:
+    assert len(mig_segment_group_or_root.elements) > 0 and len(ahb_segment_group_or_root.elements) > 0
+    mig_elements = iter(mig_segment_group_or_root.elements)
+    ahb_elements = iter(ahb_segment_group_or_root.elements)
+
+    cur_mig_element = next(mig_elements)
+    cur_ahb_element = next(ahb_elements)
+
+    while True:
+        mig_number = get_number(cur_mig_element)
+        ahb_number = cur_ahb_element and get_number(cur_ahb_element)
+        if mig_number == ahb_number:
+            yield cur_mig_element, cur_ahb_element
+            cur_ahb_element = next(ahb_elements, None)
+        else:
+            yield cur_mig_element, None
+        try:
+            cur_mig_element = next(mig_elements)
+        except StopIteration:
+            break
+    try:
+        next(ahb_elements)
+        ahb_element_id = (
+            f"{ahb_segment_group_or_root.id}'{get_number(ahb_segment_group_or_root)}'"
+            if isinstance(ahb_segment_group_or_root, ahb.SegmentGroup)
+            else f"root"
+        )
+        mig_element_id = (
+            f"{mig_segment_group_or_root.id}'{get_number(mig_segment_group_or_root)}'"
+            if isinstance(mig_segment_group_or_root, mig.SegmentGroup)
+            else f"root"
+        )
+        raise ValueError(f"AHB {ahb_element_id} has more elements than MIG {mig_element_id}.")
+    except StopIteration:
+        pass
+
+
 def create_ahb_data_element_from_mig(mig_data_element: mig.DataElement) -> ahb.DataElement:
     """
     Creates an AHB data element from a MIG data element.
     This is used to add unused MIG data elements to the AHB.
     """
-    assert len(mig_data_element.codes) == 0, "Expected MIG data element to have no codes if it is unused in AHB."
+    # Sometimes a MIG data element can have a list of codes, but is still unused in the AHB. An example for this is
+    # CONTRL UCI D_0085
+    # In this case, we still don't add the codes to the AHB data element, because the data element will be forbidden
+    # by the AHB expression anyway.
     return ahb.DataElement(
         id=mig_data_element.id,
         name=mig_data_element.name,
@@ -193,7 +258,38 @@ def create_ahb_data_element_group_from_mig(mig_data_element_group: mig.DataEleme
     )
 
 
-def add_unused_elements_to_ahb_elements(
+def create_ahb_segment_from_mig(mig_segment: mig.Segment) -> ahb.Segment:
+    """
+    Creates an AHB segment from a MIG segment.
+    This is used to add unused MIG segments to the AHB.
+    """
+    return ahb.Segment(
+        id=mig_segment.id,
+        name=mig_segment.name,
+        number=mig_segment.number,
+        ahb_status="X [2499]",
+        data_elements=(),
+        # We don't need to add data elements here, because an application can detect the unused segment here and
+        # stop further traversal.
+    )
+
+
+def create_ahb_segment_group_from_mig(mig_segment_group: mig.SegmentGroup) -> ahb.SegmentGroup:
+    """
+    Creates an AHB segment from a MIG segment.
+    This is used to add unused MIG segments to the AHB.
+    """
+    return ahb.SegmentGroup(
+        id=mig_segment_group.id,
+        name=mig_segment_group.name,
+        ahb_status="X [2499]",
+        elements=(create_ahb_segment_from_mig(mig_segment_group.elements[0]),),
+        # We only need to add the first segment here, because an application can detect the unused segment group here
+        # and stop further traversal. The first segment is used for the segment number.
+    )
+
+
+def add_unused_data_elements_or_groups_to_ahb(
     mig_element: mig.Segment | mig.DataElementGroup, ahb_element: ahb.Segment | ahb.DataElementGroup
 ) -> None:
     """
@@ -201,9 +297,8 @@ def add_unused_elements_to_ahb_elements(
     This ensures that all MIG elements are present in the AHB for parallel iteration.
     """
     edited_ahb_elements = list(ahb_element.data_elements)
-    for index, (cur_mig_element, cur_ahb_element) in enumerate(
-        parallel_iter_segment_or_data_element_group(mig_element, ahb_element)
-    ):
+    index = 0
+    for cur_mig_element, cur_ahb_element in parallel_iter_segment_or_data_element_group(mig_element, ahb_element):
         if cur_ahb_element is None:
             # MIG element is unused in AHB, add it to AHB
             if isinstance(cur_mig_element, mig.DataElement):
@@ -213,19 +308,35 @@ def add_unused_elements_to_ahb_elements(
                 edited_ahb_elements.insert(index, create_ahb_data_element_group_from_mig(cur_mig_element))
         elif isinstance(cur_mig_element, mig.DataElementGroup):
             assert isinstance(cur_ahb_element, ahb.DataElementGroup)
-            add_unused_elements_to_ahb_elements(cur_mig_element, cur_ahb_element)
+            add_unused_data_elements_or_groups_to_ahb(cur_mig_element, cur_ahb_element)
+        index += 1
     _set(ahb_element, "data_elements", tuple(edited_ahb_elements))
     assert len(ahb_element.data_elements) == len(mig_element.data_elements)
 
 
-def add_unused_elements_to_ahb(mig_segment_index: SEGMENT_INDEX_MIG, ahb_segment_index: SEGMENT_INDEX_AHB) -> None:
-    """
-    Adds unused MIG data elements and groups to the AHB segment index.
-    This ensures that all MIG elements are present in the AHB for parallel iteration.
-    """
-    for number, mig_segment in mig_segment_index.items():
-        ahb_segment = ahb_segment_index[number]
-        add_unused_elements_to_ahb_elements(mig_segment, ahb_segment)
+def add_unused_segment_or_groups_to_ahb(
+    mig_root: mig.MessageImplementationGuide | mig.SegmentGroup, ahb_root: ahb.Anwendungsfall | ahb.SegmentGroup
+) -> None:
+    """ """
+    edited_ahb_elements = list(ahb_root.elements)
+    index = 0
+    for mig_element, ahb_element in parallel_iter_segment_group_or_root(mig_root, ahb_root):
+        if ahb_element is None:
+            if isinstance(mig_element, mig.Segment):
+                edited_ahb_elements.insert(index, create_ahb_segment_from_mig(mig_element))
+            else:
+                assert isinstance(mig_element, mig.SegmentGroup)
+                edited_ahb_elements.insert(index, create_ahb_segment_group_from_mig(mig_element))
+        else:
+            if isinstance(mig_element, mig.Segment):
+                assert isinstance(ahb_element, ahb.Segment)
+                add_unused_data_elements_or_groups_to_ahb(mig_element, ahb_element)
+            elif isinstance(mig_element, mig.SegmentGroup):
+                assert isinstance(ahb_element, ahb.SegmentGroup)
+                add_unused_segment_or_groups_to_ahb(mig_element, ahb_element)
+        index += 1
+    _set(ahb_root, "elements", tuple(edited_ahb_elements))
+    assert len(ahb_root.elements) == len(mig_root.elements)
 
 
 def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> None:
@@ -249,12 +360,10 @@ def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> 
     )
 
 
-def sanitize_ahb(ahb_root: ahb.Anwendungshandbuch, mig_root: mig.MessageImplementationGuide) -> None:
+def sanitize_ahb(mig_root: mig.MessageImplementationGuide, ahb_root: ahb.Anwendungshandbuch) -> None:
     """
     Sanitizes the AHB by adding unused MIG data elements and groups to the AHB.
     """
     add_must_not_pattern_to_ahb_conditions(ahb_root)
     for anwendungsfall in ahb_root.anwendungsfaelle:
-        mig_search_index = segment_number_search_index(mig_root)
-        ahb_search_index = segment_number_search_index(anwendungsfall)
-        add_unused_elements_to_ahb(mig_search_index, ahb_search_index)
+        add_unused_segment_or_groups_to_ahb(mig_root, anwendungsfall)

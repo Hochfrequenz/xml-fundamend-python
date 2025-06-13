@@ -16,11 +16,13 @@ from fundamend.sanitize import sanitize_ahb
 app = typer.Typer()
 
 
-def _write_model_to_json_file(model: Anwendungshandbuch | MessageImplementationGuide, xml_file_path: Path) -> None:
+def _write_model_to_json_file(
+    model: Anwendungshandbuch | MessageImplementationGuide, xml_file_path: Path, *, compressed: bool = False
+) -> None:
     """Writes the given model to a JSON file at the specified path."""
     json_file_path = xml_file_path.with_suffix(".json")
     with open(json_file_path, encoding="utf-8", mode="w") as outfile:
-        outfile.write(model.model_dump_json(indent=4))
+        outfile.write(model.model_dump_json(indent=None if compressed else 1))
     typer.echo(f"Successfully converted {xml_file_path} to JSON {json_file_path}")
 
 
@@ -38,7 +40,7 @@ def _convert_to_json_files(
 
     # Do sanitization if requested
     if sanitize:
-        sanitize_ahb(ahb_model, mig_model)
+        sanitize_ahb(mig_model, ahb_model)
 
     return mig_model, ahb_model
 
@@ -48,6 +50,9 @@ def xml2json(
     xml_path: Annotated[
         Path,
         typer.Option(
+            ...,
+            "--xml-path",
+            "-p",
             exists=True,
             file_okay=True,
             dir_okay=True,
@@ -59,7 +64,8 @@ def xml2json(
     sanitize: Annotated[
         bool,
         typer.Option(
-            False,
+            ...,
+            "--sanitize",
             "-s",
             help="Sanitize the MIG or AHB before writing the resulting JSON. As of now, it does two things:\n"
             '1) Data elements or groups which are stated as "unused" in the MIG are missing in the AHB. '
@@ -68,7 +74,17 @@ def xml2json(
             'description "Name". The sanitization will add four extra D_3036 data elements to prevent reading'
             "raster errors.",
         ),
-    ],
+    ] = False,
+    compressed: Annotated[
+        bool,
+        typer.Option(
+            ...,
+            "--compressed",
+            "-c",
+            help="If set, the output JSON files will contain no whitespace outside of strings. If not set"
+            " (default), the output JSON files will be pretty-printed with an indentation of one space.",
+        ),
+    ] = False,
 ) -> None:
     """
     converts the xml file from xml_in_path to a json file next to the .xml
@@ -79,7 +95,7 @@ def xml2json(
 
         def groupby_key(path_and_match: tuple[Path, re.Match[str] | None]) -> str:
             assert path_and_match[1] is not None
-            return path_and_match[1].group(1) + path_and_match[1].group(3)
+            return path_and_match[1].group(1) + (path_and_match[1].group(3) or "")
 
         def xmls_and_matches() -> Iterator[tuple[Path, re.Match[str]]]:
             for _xml_path in xml_path.rglob("*.xml"):
@@ -93,21 +109,21 @@ def xml2json(
             assert (
                 len(_xmls_and_matches_list) == 2
             ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-            if _xmls_and_matches_list[0][1].group(1) == "AHB":
+            if _xmls_and_matches_list[0][1].group(2) == "AHB":
                 assert (
-                    _xmls_and_matches_list[1][1].group(1) == "MIG"
+                    _xmls_and_matches_list[1][1].group(2) == "MIG"
                 ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
                 ahb_path = _xmls_and_matches_list[0][0]
                 mig_path = _xmls_and_matches_list[1][0]
             else:
                 assert (
-                    _xmls_and_matches_list[0][1].group(1) == "MIG" and _xmls_and_matches_list[1][1].group(1) == "AHB"
+                    _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(1) == "AHB"
                 ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
                 mig_path = _xmls_and_matches_list[0][0]
                 ahb_path = _xmls_and_matches_list[1][0]
             mig, ahb = _convert_to_json_files(mig_path, ahb_path, sanitize=sanitize)
-            _write_model_to_json_file(mig, mig_path.with_suffix("json"))
-            _write_model_to_json_file(ahb, ahb_path.with_suffix("json"))
+            _write_model_to_json_file(mig, mig_path.with_suffix(".json"), compressed=compressed)
+            _write_model_to_json_file(ahb, ahb_path.with_suffix(".json"), compressed=compressed)
 
     else:
         match = format_and_type_regex.match(xml_path.name)
@@ -128,8 +144,8 @@ def xml2json(
                 f"Multiple other XML files found in the same directory as {xml_path} matching pattern "
                 f"{pattern_other}: {other_matches}"
             )
-        mig, ahb = _convert_to_json_files(xml_path, other_matches[0], sanitize=sanitize)
+        mig, ahb = _convert_to_json_files(other_matches[0], xml_path, sanitize=sanitize)
         if match_type == "MIG":
-            _write_model_to_json_file(mig, xml_path.with_suffix(".json"))
+            _write_model_to_json_file(mig, xml_path.with_suffix(".json"), compressed=compressed)
         else:
-            _write_model_to_json_file(ahb, xml_path.with_suffix(".json"))
+            _write_model_to_json_file(ahb, xml_path.with_suffix(".json"), compressed=compressed)
