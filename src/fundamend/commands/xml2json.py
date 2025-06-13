@@ -77,7 +77,7 @@ def xml2json_dir_mode(xml_path: Path, sanitize: bool = False, compressed: bool =
             mig_path = _xmls_and_matches_list[1][0]
         else:
             assert (
-                _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(1) == "AHB"
+                _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(2) == "AHB"
             ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
             mig_path = _xmls_and_matches_list[0][0]
             ahb_path = _xmls_and_matches_list[1][0]
