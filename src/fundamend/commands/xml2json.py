@@ -94,7 +94,9 @@ def xml2json_file_mode(xml_path: Path, sanitize: bool = False, compressed: bool 
     The XML file names must match the pattern `<FORMAT>_<AHB|MIG>_[<Gas|Strom>_]*.xml`.
     """
     match = FORMAT_AND_TYPE_REGEX.match(xml_path.name)
-    match_type: Literal["MIG", "AHB"] = match.group(2)
+    if match is None:
+        raise ValueError("XML file name does not match expected format: " + str(xml_path))
+    match_type: Literal["MIG", "AHB"] = match.group(2)  # type: ignore[assignment]
     match_type_other: Literal["MIG", "AHB"] = "AHB" if match_type == "MIG" else "MIG"
     pattern_other = f"{match.group(1)}_{match_type_other}_"
     if match.group(3) is not None:

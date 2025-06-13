@@ -18,7 +18,7 @@ from fundamend.models import anwendungshandbuch as ahb
 from fundamend.models import messageimplementationguide as mig
 
 
-def _disabled_hash(_) -> int:
+def _disabled_hash(_: Any) -> int:
     raise ValueError("Hash function is disabled for this model as some attribute was overridden by object.__setattr__.")
 
 
@@ -53,7 +53,7 @@ def leading_segment(
         raise TypeError(
             f"Expected segment group to start with a segment, got {type(segment_group.elements[0])} instead."
         )
-    return segment_group.elements[0]  # type: ignore[return-value]
+    return segment_group.elements[0]
 
 
 def get_number(obj: mig.SegmentGroup | mig.Segment | ahb.SegmentGroup | ahb.Segment) -> str:
@@ -169,10 +169,12 @@ def parallel_iter_segment_or_data_element_group(
                 cur_ahb_element, ahb.DataElementGroup
             ) and match_ahb_data_element_group_with_mig_data_element_group(cur_mig_element, cur_ahb_element)
         if ahb_match:
-            yield cur_mig_element, cur_ahb_element
+            yield cur_mig_element, cur_ahb_element  # type: ignore[misc]
+            # No assertion needed here, because we already checked the instance types through the `ahb_match` variable.
             cur_ahb_element = next(ahb_elements, None)
         else:
-            yield cur_mig_element, None
+            yield cur_mig_element, None  # type: ignore[misc]
+            # mypy is not smart enough to understand the union construction here
         try:
             cur_mig_element = next(mig_elements)
         except StopIteration:
@@ -189,7 +191,7 @@ def parallel_iter_segment_or_data_element_group(
 
 def parallel_iter_segment_group_or_root(
     mig_segment_group_or_root: mig.MessageImplementationGuide | mig.SegmentGroup,
-    ahb_segment_group_or_root: ahb.Anwendungshandbuch | ahb.SegmentGroup,
+    ahb_segment_group_or_root: ahb.Anwendungsfall | ahb.SegmentGroup,
 ) -> Iterator[tuple[mig.SegmentGroup, ahb.SegmentGroup | None] | tuple[mig.Segment, ahb.Segment | None]]:
     """
     Iterates over the elements of the MIG and AHB segment group or root, yielding pairs of MIG and AHB elements.
@@ -212,10 +214,18 @@ def parallel_iter_segment_group_or_root(
         mig_number = get_number(cur_mig_element)
         ahb_number = cur_ahb_element and get_number(cur_ahb_element)
         if mig_number == ahb_number:
-            yield cur_mig_element, cur_ahb_element
-            cur_ahb_element = next(ahb_elements, None)
+            assert (
+                isinstance(cur_mig_element, mig.Segment)
+                and isinstance(cur_ahb_element, ahb.Segment)
+                or isinstance(cur_mig_element, mig.SegmentGroup)
+                and isinstance(cur_ahb_element, ahb.SegmentGroup)
+            )
+            yield cur_mig_element, cur_ahb_element  # type: ignore[misc]
+            # mypy is not smart enough to understand the union construction here
+            cur_ahb_element = next(ahb_elements, None)  # type: ignore[arg-type]
         else:
-            yield cur_mig_element, None
+            yield cur_mig_element, None  # type: ignore[misc]
+            # mypy is not smart enough to understand the union construction here
         try:
             cur_mig_element = next(mig_elements)
         except StopIteration:
@@ -312,7 +322,7 @@ def create_ahb_segment_group_from_mig(mig_segment_group: mig.SegmentGroup) -> ah
         id=mig_segment_group.id,
         name=mig_segment_group.name,
         ahb_status="X [2499]",
-        elements=(create_ahb_segment_from_mig(mig_segment_group.elements[0]),),
+        elements=(create_ahb_segment_from_mig(leading_segment(mig_segment_group)),),
     )
 
 

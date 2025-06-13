@@ -2,8 +2,10 @@
 
 from fundamend.commands import app
 
+__all__ = ["app"]
 
-def main():
+
+def main() -> None:
     """entry point of the script defined in pyproject.toml"""
     app()
 
