@@ -31,9 +31,9 @@ def _convert_to_json_files(
     mig_xml_file_path: Path, ahb_xml_file_path: Path, sanitize: bool = False
 ) -> tuple[MessageImplementationGuide, Anwendungshandbuch]:
     """converts the given XML file to a JSON file and returns the path of the latter"""
-    if not mig_xml_file_path.is_file():
+    if not mig_xml_file_path.is_file():  # pragma: no cover
         raise ValueError(f"The given path {mig_xml_file_path.absolute()} is not a file")
-    if not ahb_xml_file_path.is_file():
+    if not ahb_xml_file_path.is_file():  # pragma: no cover
         raise ValueError(f"The given path {ahb_xml_file_path.absolute()} is not a file")
 
     mig_model = MigReader(mig_xml_file_path).read()
@@ -57,30 +57,28 @@ def xml2json_dir_mode(xml_path: Path, sanitize: bool = False, compressed: bool =
         assert path_and_match[1] is not None
         return path_and_match[1].group(1) + (path_and_match[1].group(3) or "")
 
+    def sort_key(path_and_match: tuple[Path, re.Match[str] | None]) -> str:
+        assert path_and_match[1] is not None
+        return groupby_key(path_and_match) + path_and_match[1].group(2)
+
     def xmls_and_matches() -> Iterator[tuple[Path, re.Match[str]]]:
         for _xml_path in xml_path.rglob("*.xml"):
             match = FORMAT_AND_TYPE_REGEX.match(_xml_path.name)
-            if match is None:
+            if match is None:  # pragma: no cover
                 raise ValueError("XML file name does not match expected format: " + str(_xml_path))
             yield _xml_path, match
 
-    for _, _xmls_and_matches in groupby(sorted(xmls_and_matches(), key=groupby_key), key=groupby_key):
+    for _, _xmls_and_matches in groupby(sorted(xmls_and_matches(), key=sort_key), key=groupby_key):
         _xmls_and_matches_list = list(_xmls_and_matches)
+        assert len(_xmls_and_matches_list) == 2, (
+            "Expected exactly two XML files (AHB + MIG) for each format and powert type, but found: "
+            f"{_xmls_and_matches_list}"
+        )
         assert (
-            len(_xmls_and_matches_list) == 2
-        ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-        if _xmls_and_matches_list[0][1].group(2) == "AHB":
-            assert (
-                _xmls_and_matches_list[1][1].group(2) == "MIG"
-            ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-            ahb_path = _xmls_and_matches_list[0][0]
-            mig_path = _xmls_and_matches_list[1][0]
-        else:
-            assert (
-                _xmls_and_matches_list[0][1].group(2) == "MIG" and _xmls_and_matches_list[1][1].group(2) == "AHB"
-            ), f"Expected exactly two XML files for each MIG/AHB type, but found: {_xmls_and_matches_list}"
-            mig_path = _xmls_and_matches_list[0][0]
-            ahb_path = _xmls_and_matches_list[1][0]
+            _xmls_and_matches_list[0][1].group(2) == "AHB" and _xmls_and_matches_list[1][1].group(2) == "MIG"
+        ), f"Expected AHB on first and a MIG on second position, but found: {_xmls_and_matches_list}"
+        ahb_path = _xmls_and_matches_list[0][0]
+        mig_path = _xmls_and_matches_list[1][0]
         mig, ahb = _convert_to_json_files(mig_path, ahb_path, sanitize=sanitize)
         _write_model_to_json_file(mig, mig_path.with_suffix(".json"), compressed=compressed)
         _write_model_to_json_file(ahb, ahb_path.with_suffix(".json"), compressed=compressed)
@@ -94,7 +92,7 @@ def xml2json_file_mode(xml_path: Path, sanitize: bool = False, compressed: bool 
     The XML file names must match the pattern `<FORMAT>_<AHB|MIG>_[<Gas|Strom>_]*.xml`.
     """
     match = FORMAT_AND_TYPE_REGEX.match(xml_path.name)
-    if match is None:
+    if match is None:  # pragma: no cover
         raise ValueError("XML file name does not match expected format: " + str(xml_path))
     match_type: Literal["MIG", "AHB"] = match.group(2)  # type: ignore[assignment]
     match_type_other: Literal["MIG", "AHB"] = "AHB" if match_type == "MIG" else "MIG"
@@ -104,11 +102,11 @@ def xml2json_file_mode(xml_path: Path, sanitize: bool = False, compressed: bool 
     pattern_other += "*.xml"
 
     other_matches = list(xml_path.parent.glob(pattern_other))
-    if len(other_matches) == 0:
+    if len(other_matches) == 0:  # pragma: no cover
         raise ValueError(
             f"No other XML file found in the same directory as {xml_path} matching pattern {pattern_other}"
         )
-    if len(other_matches) > 1:
+    if len(other_matches) > 1:  # pragma: no cover
         raise ValueError(
             f"Multiple other XML files found in the same directory as {xml_path} matching pattern "
             f"{pattern_other}: {other_matches}"

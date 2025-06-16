@@ -18,7 +18,7 @@ from fundamend.models import anwendungshandbuch as ahb
 from fundamend.models import messageimplementationguide as mig
 
 
-def _disabled_hash(_: Any) -> int:
+def _disabled_hash(_: Any) -> int:  # pragma: no cover
     raise ValueError("Hash function is disabled for this model as some attribute was overridden by object.__setattr__.")
 
 
@@ -49,7 +49,7 @@ def leading_segment(
         correct.
     """
 
-    if not isinstance(segment_group.elements[0], (ahb.Segment, mig.Segment)):
+    if not isinstance(segment_group.elements[0], (ahb.Segment, mig.Segment)):  # pragma: no cover
         raise TypeError(
             f"Expected segment group to start with a segment, got {type(segment_group.elements[0])} instead."
         )
@@ -71,7 +71,7 @@ def get_number(obj: mig.SegmentGroup | mig.Segment | ahb.SegmentGroup | ahb.Segm
             return leading_segment(obj).number
         case mig.Segment() | ahb.Segment():
             return obj.number
-        case _:
+        case _:  # pragma: no cover
             raise ValueError(f"Unexpected object type: {type(obj)}")
 
 
@@ -179,7 +179,7 @@ def parallel_iter_segment_or_data_element_group(
             cur_mig_element = next(mig_elements)
         except StopIteration:
             break
-    try:
+    try:  # pragma: no cover
         next(ahb_elements)
         raise ValueError(
             f"AHB segment or group {ahb_segment_or_group.id} has more data elements than "
@@ -230,7 +230,7 @@ def parallel_iter_segment_group_or_root(
             cur_mig_element = next(mig_elements)
         except StopIteration:
             break
-    try:
+    try:  # pragma: no cover
         next(ahb_elements)
         ahb_element_id = (
             f"{ahb_segment_group_or_root.id}'{get_number(ahb_segment_group_or_root)}'"
@@ -395,7 +395,7 @@ def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> 
     :param ahb_root: The AHB root element to add the condition to.
     """
     for condition in ahb_root.bedingungen:
-        if condition.nummer == "2499":
+        if condition.nummer == "2499":  # pragma: no cover
             raise ValueError(
                 "Condition 2499 is used as a must-not pattern after sanitization of the AHB. "
                 "Please check the AHB for correctness."
