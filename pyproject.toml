@@ -79,10 +79,9 @@ max-line-length = 120
 markers = ["snapshot: mark a test as a snapshot test"]
 
 [project.scripts]
-xml2json = "fundamend.cli:cli"
+xml2json = "fundamend.__main__:main"
 # fundamend is the package in the src directory
-# .cli means the cli.py module inside the fundamend package
-# :cli means the def cli() function inside the cli.py module
+# With no further specification, the entry point is fundamend.__main__ which is then called as main script
 
 [mypy]
 truethy-bool = true
