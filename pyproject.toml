@@ -32,7 +32,7 @@ ahbicht = [
     "ahbicht>=0.16.0"
 ]
 coverage = [
-    "coverage==7.8.2"
+    "coverage==7.9.1"
 ]
 formatting = [
     "black==25.1.0",
@@ -52,11 +52,11 @@ test_packaging = [
     "twine==6.1.0"
 ]
 tests = [
-    "pytest==8.4.0",
+    "pytest==8.4.1",
     "syrupy==4.9.1"
 ]
 type_check = [
-    "mypy==1.16.0"
+    "mypy==1.16.1"
 ]
 
 
