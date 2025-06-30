@@ -16,8 +16,8 @@ data_path: Path = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     "ahb_xml_file_path, expected_date",
     [
         pytest.param(
-            data_path / "FV2410" / "UTILTS_AHB_1_0_Fehlerkorrektur_20250218.xml",
-            date(2025, 2, 18),
+            data_path / "FV2410" / "UTILTS_AHB_1_1a_und_1.0f_außerordentliche_20240726.xml",
+            date(2024, 7, 26),
         ),
     ],
 )
@@ -41,7 +41,7 @@ def test_deserializing_all_ahbs() -> None:
     "mig_xml_file_path, expected_date",
     [
         pytest.param(
-            data_path / "FV2410" / "UTILTS_MIG_1.1e_Fehlerkorrektur_20241213.xml",
+            data_path / "FV2410" / "UTILTS_MIG_1.1c_Fehlerkorrektur_20241213.xml",
             date(2024, 12, 13),
         ),
     ],
@@ -65,7 +65,7 @@ def test_deserializing_all_migs() -> None:
 def test_uebertragungsdatei_level_flag_is_set_ahb() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
-    reader = AhbReader(data_path / "FV2504" / "MSCONS_AHB_3_1f_Fehlerkorrektur_20250320.xml")
+    reader = AhbReader(data_path / "FV2504" / "MSCONS_AHB_3_1f_Fehlerkorrektur_20250417.xml")
     ahb13012 = [awf for awf in reader.read().anwendungsfaelle if awf.pruefidentifikator == "13012"][0]
     unb_segment = ahb13012.elements[0]
     assert isinstance(unb_segment, AhbSegment) and unb_segment.id == "UNB"

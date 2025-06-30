@@ -93,13 +93,11 @@ def _to_data_element(element: ET.Element) -> DataElement:
             codes.append(_to_code(child))
         else:
             raise ValueError(f"unexpected element: {child.tag}")
-    ahb_status: str | None = None
-    if "AHB_Status" in element.attrib and element.attrib["AHB_Status"].strip():
-        ahb_status = element.attrib["AHB_Status"]
+
     return DataElement(
         id=element.tag,
-        name=element.attrib["Name"],
-        ahb_status=ahb_status,
+        name=element.attrib["Name"].strip(),
+        ahb_status=element.attrib.get("AHB_Status", "").strip() or None,
         codes=tuple(codes),
     )
 
@@ -114,7 +112,7 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
             raise ValueError(f"unexpected element: {child.tag}")
     return DataElementGroup(
         id=element.tag,
-        name=element.attrib["Name"],
+        name=element.attrib["Name"].strip(),
         data_elements=tuple(data_elements),
     )
 
@@ -129,14 +127,11 @@ def _to_segment(element: ET.Element, is_uebertragungsdatei_level: bool = False) 
             data_elements.append(_to_data_element(child))
         else:
             raise ValueError(f"unexpected element: {child.tag}")
-    ahb_status: str | None = None
-    if "AHB_Status" in element.attrib and element.attrib["AHB_Status"].strip():
-        ahb_status = element.attrib["AHB_Status"]
     return Segment(
         id=lstrip("S_", element.tag),
-        name=element.attrib["Name"],
-        number=element.attrib["Number"],
-        ahb_status=ahb_status,
+        name=element.attrib["Name"].strip(),
+        number=element.attrib["Number"].strip(),
+        ahb_status=element.attrib.get("AHB_Status", "").strip() or None,
         data_elements=tuple(data_elements),
         is_on_uebertragungsdatei_level=is_uebertragungsdatei_level,
     )
@@ -154,12 +149,8 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
             raise ValueError(f"unexpected element: {child.tag}")
     return SegmentGroup(
         id=lstrip("G_", element.tag),
-        name=element.attrib["Name"],
-        ahb_status=(
-            element.attrib["AHB_Status"].strip() or None
-            if "AHB_Status" in element.attrib and element.attrib["AHB_Status"] is not None
-            else None
-        ),
+        name=element.attrib["Name"].strip(),
+        ahb_status=element.attrib.get("AHB_Status", "").strip() or None,
         elements=tuple(list(segments_and_groups)),
     )
 
@@ -261,8 +252,8 @@ class AhbReader:
             format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
-            beschreibung=original_element.attrib["Beschreibung"],
-            kommunikation_von=original_element.attrib["Kommunikation_von"],
+            beschreibung=original_element.attrib["Beschreibung"].strip(),
+            kommunikation_von=original_element.attrib["Kommunikation_von"].strip(),
             format=EdifactFormat(lstrip("M_", format_element.tag)),
             elements=tuple(segments_and_groups),
         )

@@ -30,7 +30,11 @@ from fundamend.utils import lstrip
 
 def _to_code(element: ET.Element) -> Code:
     assert _is_code(element)
-    return Code(name=element.attrib["Name"], description=element.attrib["Description"] or None, value=element.text)
+    return Code(
+        name=element.attrib["Name"].strip(),
+        description=element.attrib["Description"].strip() or None,
+        value=element.text and element.text.strip(),
+    )
 
 
 def _to_data_element(element: ET.Element) -> DataElement:
@@ -43,12 +47,12 @@ def _to_data_element(element: ET.Element) -> DataElement:
             raise ValueError(f"unexpected element: {child.tag}")
     return DataElement(
         id=element.tag,
-        name=element.attrib["Name"],
-        description=element.attrib["Description"] or None,
-        status_std=MigStatus(element.attrib["Status_Std"]),
-        status_specification=MigStatus(element.attrib["Status_Specification"]),
-        format_std=element.attrib["Format_Std"],
-        format_specification=element.attrib["Format_Specification"],
+        name=element.attrib["Name"].strip(),
+        description=element.attrib["Description"].strip() or None,
+        status_std=MigStatus(element.attrib["Status_Std"].strip()),
+        status_specification=MigStatus(element.attrib["Status_Specification"].strip()),
+        format_std=element.attrib["Format_Std"].strip(),
+        format_specification=element.attrib["Format_Specification"].strip(),
         codes=tuple(codes),
     )
 
@@ -63,10 +67,10 @@ def _to_data_element_group(element: ET.Element) -> DataElementGroup:
             raise ValueError(f"unexpected element: {child.tag}")
     return DataElementGroup(
         id=element.tag,
-        name=element.attrib["Name"],
-        description=element.attrib["Description"] or None,
-        status_std=MigStatus(element.attrib["Status_Std"]),
-        status_specification=MigStatus(element.attrib["Status_Specification"]),
+        name=element.attrib["Name"].strip(),
+        description=element.attrib["Description"].strip() or None,
+        status_std=MigStatus(element.attrib["Status_Std"].strip()),
+        status_specification=MigStatus(element.attrib["Status_Specification"].strip()),
         data_elements=tuple(data_elements),
     )
 
@@ -83,16 +87,16 @@ def _to_segment(element: ET.Element, is_on_uebertragungsdatei_level: bool = Fals
             raise ValueError(f"unexpected element: {child.tag}")
     return Segment(
         id=lstrip("S_", element.tag),
-        name=element.attrib["Name"],
-        description=element.attrib["Description"] or None,
-        counter=element.attrib["Counter"],
-        level=int(element.attrib["Level"]),
-        max_rep_std=int(element.attrib["MaxRep_Std"]),
-        max_rep_specification=int(element.attrib["MaxRep_Specification"]),
-        status_std=MigStatus(element.attrib["Status_Std"]),
-        status_specification=MigStatus(element.attrib["Status_Specification"]),
-        example=element.attrib["Example"] or None,
-        number=element.attrib["Number"],
+        name=element.attrib["Name"].strip(),
+        description=element.attrib["Description"].strip() or None,
+        counter=element.attrib["Counter"].strip(),
+        level=int(element.attrib["Level"].strip()),
+        max_rep_std=int(element.attrib["MaxRep_Std"].strip()),
+        max_rep_specification=int(element.attrib["MaxRep_Specification"].strip()),
+        status_std=MigStatus(element.attrib["Status_Std"].strip()),
+        status_specification=MigStatus(element.attrib["Status_Specification"].strip()),
+        example=element.attrib["Example"].strip() or None,
+        number=element.attrib["Number"].strip(),
         data_elements=tuple(data_elements),
         is_on_uebertragungsdatei_level=is_on_uebertragungsdatei_level,
     )
@@ -110,13 +114,13 @@ def _to_segment_group(element: ET.Element) -> SegmentGroup:
             raise ValueError(f"unexpected element: {child.tag}")
     return SegmentGroup(
         id=lstrip("G_", element.tag),
-        name=element.attrib["Name"],
-        status_std=MigStatus(element.attrib["Status_Std"]),
-        status_specification=MigStatus(element.attrib["Status_Specification"]),
-        counter=element.attrib["Counter"],
-        level=int(element.attrib["Level"]),
-        max_rep_std=int(element.attrib["MaxRep_Std"]),
-        max_rep_specification=int(element.attrib["MaxRep_Specification"]),
+        name=element.attrib["Name"].strip(),
+        status_std=MigStatus(element.attrib["Status_Std"].strip()),
+        status_specification=MigStatus(element.attrib["Status_Specification"].strip()),
+        counter=element.attrib["Counter"].strip(),
+        level=int(element.attrib["Level"].strip()),
+        max_rep_std=int(element.attrib["MaxRep_Std"].strip()),
+        max_rep_specification=int(element.attrib["MaxRep_Specification"].strip()),
         elements=tuple(segments_and_groups),
     )
 
@@ -154,14 +158,14 @@ class MigReader:
         returns the author of the message implementation guide
         """
         root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
-        return root.attrib["Author"]
+        return root.attrib["Author"].strip()
 
     def get_version(self) -> str:
         """
         returns the version of the message implementation guide
         """
         root = self._element_tree.getroot()  # might be either <M_FORMAT> or <Uebertragungsdatei>
-        return root.attrib["Versionsnummer"]
+        return root.attrib["Versionsnummer"].strip()
 
     def get_format(self) -> EdifactFormat:
         """returns the format of the message implementation guide, e.g. 'UTILTS'"""
