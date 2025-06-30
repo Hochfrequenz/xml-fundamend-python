@@ -247,6 +247,21 @@ def parallel_iter_segment_group_or_root(
         pass
 
 
+def create_ahb_code_from_mig(mig_code: mig.Code) -> ahb.Code:
+    """
+    Creates an AHB code from a MIG code.
+
+    :param mig_code: The MIG code to convert.
+    :return: An AHB code with the same name, description and value.
+    """
+    return ahb.Code(
+        name=mig_code.name,
+        description=mig_code.description,
+        value=mig_code.value,
+        ahb_status="X [2499]",
+    )
+
+
 def create_ahb_data_element_from_mig(mig_data_element: mig.DataElement) -> ahb.DataElement:
     """
     Creates an AHB data element from a MIG data element.
@@ -263,8 +278,8 @@ def create_ahb_data_element_from_mig(mig_data_element: mig.DataElement) -> ahb.D
     return ahb.DataElement(
         id=mig_data_element.id,
         name=mig_data_element.name,
-        ahb_status="X [2499]",
-        codes=(),
+        ahb_status="X [2499]" if len(mig_data_element.codes) == 0 else None,
+        codes=tuple(create_ahb_code_from_mig(mig_code) for mig_code in mig_data_element.codes),
     )
 
 
@@ -302,7 +317,14 @@ def create_ahb_segment_from_mig(mig_segment: mig.Segment) -> ahb.Segment:
         name=mig_segment.name,
         number=mig_segment.number,
         ahb_status="X [2499]",
-        data_elements=(),
+        data_elements=tuple(
+            (
+                create_ahb_data_element_from_mig(mig_element)
+                if isinstance(mig_element, mig.DataElement)
+                else create_ahb_data_element_group_from_mig(mig_element)
+            )
+            for mig_element in mig_segment.data_elements
+        ),
     )
 
 
@@ -322,7 +344,14 @@ def create_ahb_segment_group_from_mig(mig_segment_group: mig.SegmentGroup) -> ah
         id=mig_segment_group.id,
         name=mig_segment_group.name,
         ahb_status="X [2499]",
-        elements=(create_ahb_segment_from_mig(leading_segment(mig_segment_group)),),
+        elements=tuple(
+            (
+                create_ahb_segment_from_mig(mig_element)
+                if isinstance(mig_element, mig.Segment)
+                else create_ahb_segment_group_from_mig(mig_element)
+            )
+            for mig_element in mig_segment_group.elements
+        ),
     )
 
 
