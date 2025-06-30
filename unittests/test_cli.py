@@ -93,7 +93,7 @@ def test_cli_directory(example_files_lesefassung: Path) -> None:
     ahb_path.with_suffix(".json").unlink()  # Clean up the created JSON file after the test
 
 
-def test_cli_directory_with_sanitize_compressed(example_files_fehlerkorrektur: Path, tmp_path: Path) -> None:
+def test_cli_directory_with_sanitize_compressed_splitted(example_files_fehlerkorrektur: Path, tmp_path: Path) -> None:
     if _SKIP_TESTS:
         pytest.skip("Seems like typer is not installed")
     # mig_path = example_files_lesefassung / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
@@ -103,31 +103,32 @@ def test_cli_directory_with_sanitize_compressed(example_files_fehlerkorrektur: P
 
     result = runner.invoke(
         app,
-        ["-cp", str(example_files_fehlerkorrektur.absolute())],
+        ["-cap", str(example_files_fehlerkorrektur.absolute())],
         catch_exceptions=False,
     )
     assert result.exit_code == 0
-    assert mig_path.with_suffix(".json").exists()
-    assert ahb_path.with_suffix(".json").exists()
+    assert mig_path.with_suffix(".json").is_file()
+    assert ahb_path.with_suffix("").is_dir()
 
     mig_json_copy = tmp_path / mig_path.with_suffix(".json").name
-    ahb_json_copy = tmp_path / ahb_path.with_suffix(".json").name
+    ahb_json_copy = tmp_path / ahb_path.with_suffix("").name
     shutil.copyfile(mig_path.with_suffix(".json"), mig_json_copy)
-    shutil.copyfile(ahb_path.with_suffix(".json"), ahb_json_copy)
+    shutil.copytree(ahb_path.with_suffix(""), ahb_json_copy)
 
     result = runner.invoke(
         app,
-        ["-scp", str(example_files_fehlerkorrektur.absolute())],
+        ["-scap", str(example_files_fehlerkorrektur.absolute())],
         catch_exceptions=False,
     )
     assert result.exit_code == 0
-    assert mig_path.with_suffix(".json").exists()
-    assert ahb_path.with_suffix(".json").exists()
+    assert mig_path.with_suffix(".json").is_file()
+    assert ahb_path.with_suffix("").is_dir()
 
-    assert mig_json_copy.read_text("utf-8") != mig_path.read_text("utf-8")
-    assert ahb_json_copy.read_text("utf-8") != ahb_path.read_text("utf-8")
+    assert sum(len(file.read_text("utf-8")) for file in ahb_json_copy.with_suffix("").glob("*.json")) < sum(
+        len(file.read_text("utf-8")) for file in ahb_path.with_suffix("").glob("*.json")
+    ), "Expected sanitized AHB JSON to be bigger"
 
     mig_path.with_suffix(".json").unlink()  # Clean up the created JSON file after the test
-    ahb_path.with_suffix(".json").unlink()  # Clean up the created JSON file after the test
+    shutil.rmtree(ahb_path.with_suffix(""))  # Clean up the created JSON file after the test
     mig_json_copy.with_suffix(".json").unlink()  # Clean up the copied JSON files after the test
-    ahb_json_copy.with_suffix(".json").unlink()  # Clean up the copied JSON files after the test
+    shutil.rmtree(ahb_json_copy.with_suffix(""))  # Clean up the copied JSON files after the test
