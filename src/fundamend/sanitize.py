@@ -457,7 +457,11 @@ def remove_example_codes_recursive(
         | ahb.DataElement
     ),
 ) -> None:
+    """
+    Recursively removes example codes from MIG and AHB elements.
 
+    :param element: The element to remove example codes from recursively.
+    """
     match element:
         case mig.MessageImplementationGuide() | mig.SegmentGroup() | ahb.Anwendungsfall() | ahb.SegmentGroup():
             for sub_element in element.elements:
