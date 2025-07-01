@@ -443,6 +443,41 @@ def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> 
     )
 
 
+def remove_example_codes_recursive(
+    element: (
+        mig.MessageImplementationGuide
+        | mig.SegmentGroup
+        | ahb.Anwendungsfall
+        | ahb.SegmentGroup
+        | mig.Segment
+        | ahb.Segment
+        | mig.DataElementGroup
+        | ahb.DataElementGroup
+        | mig.DataElement
+        | ahb.DataElement
+    ),
+) -> None:
+    """
+    Recursively removes example codes from MIG and AHB elements.
+
+    :param element: The element to remove example codes from recursively.
+    """
+    match element:
+        case mig.MessageImplementationGuide() | mig.SegmentGroup() | ahb.Anwendungsfall() | ahb.SegmentGroup():
+            for sub_element in element.elements:
+                remove_example_codes_recursive(sub_element)
+        case mig.Segment() | ahb.Segment() | mig.DataElementGroup() | ahb.DataElementGroup():
+            for sub_data_element in element.data_elements:
+                remove_example_codes_recursive(sub_data_element)
+        case mig.DataElement() | ahb.DataElement():
+            # Remove example codes from MIG and AHB data elements
+            object.__setattr__(
+                element, "codes", tuple(code for code in element.codes if "Beispielcode" not in code.name)
+            )
+        case _:
+            raise TypeError(f"Unexpected element type: {type(element)}. Expected MIG or AHB element types.")
+
+
 def sanitize_ahb(mig_root: mig.MessageImplementationGuide, ahb_root: ahb.Anwendungshandbuch) -> None:
     """
     Sanitizes the AHB by adding unused MIG elements to the AHB.
@@ -458,5 +493,7 @@ def sanitize_ahb(mig_root: mig.MessageImplementationGuide, ahb_root: ahb.Anwendu
     :param ahb_root: The AHB root element to add unused elements to.
     """
     add_must_not_pattern_to_ahb_conditions(ahb_root)
+    remove_example_codes_recursive(mig_root)
     for anwendungsfall in ahb_root.anwendungsfaelle:
         add_unused_segment_or_groups_to_ahb(mig_root, anwendungsfall)
+        remove_example_codes_recursive(anwendungsfall)
