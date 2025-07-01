@@ -467,13 +467,15 @@ def remove_example_codes_recursive(
             for sub_element in element.elements:
                 remove_example_codes_recursive(sub_element)
         case mig.Segment() | ahb.Segment() | mig.DataElementGroup() | ahb.DataElementGroup():
-            for sub_element in element.data_elements:
-                remove_example_codes_recursive(sub_element)
+            for sub_data_element in element.data_elements:
+                remove_example_codes_recursive(sub_data_element)
         case mig.DataElement() | ahb.DataElement():
             # Remove example codes from MIG and AHB data elements
             object.__setattr__(
                 element, "codes", tuple(code for code in element.codes if "Beispielcode" not in code.name)
             )
+        case _:
+            raise TypeError(f"Unexpected element type: {type(element)}. Expected MIG or AHB element types.")
 
 
 def sanitize_ahb(mig_root: mig.MessageImplementationGuide, ahb_root: ahb.Anwendungshandbuch) -> None:
