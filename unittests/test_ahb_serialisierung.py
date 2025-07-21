@@ -65,7 +65,7 @@ def test_deserializing_all_migs() -> None:
 def test_uebertragungsdatei_level_flag_is_set_ahb() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
-    reader = AhbReader(data_path / "FV2504" / "MSCONS_AHB_3_1f_Fehlerkorrektur_20250417.xml")
+    reader = AhbReader(data_path / "FV2504" / "MSCONS_AHB_3_1f_Fehlerkorrektur_20250623.xml")
     ahb13012 = [awf for awf in reader.read().anwendungsfaelle if awf.pruefidentifikator == "13012"][0]
     unb_segment = ahb13012.elements[0]
     assert isinstance(unb_segment, AhbSegment) and unb_segment.id == "UNB"
