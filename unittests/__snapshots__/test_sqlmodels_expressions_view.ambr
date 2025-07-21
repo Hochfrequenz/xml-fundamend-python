@@ -596,46 +596,5 @@
 # ---
 # name: test_create_expressions_table_from_submodule_with_validity
   list([
-    dict({
-      'ahbicht_error_message': '''
-        Error trying to process rule "CONDITION_EXPRESSION":
-        
-        
-                    condition expression: ([446] ∧ ([465] ∨ [466]) ∧ [467] ∧ ([468] ⊻ ([469] ∧ [470])) ⊻ [448]
-                    Please make sure that:
-                     * all conditions have the form [INT]
-                     * all packages have the form [INTPn..m]
-                     * no conditions are empty
-                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
-                     * all open brackets are closed again and vice versa
-                     
-      ''',
-      'edifact_format_version': 'FV2410',
-      'expression': '''
-        Muss ([446] ∧ ([465] ∨ [466]) ∧ [467] ∧ ([468] ⊻ ([469] ∧ [470])) ⊻ [448]
-        Soll [165]
-      ''',
-      'format': 'UTILMD',
-      'node_texts': '',
-    }),
-    dict({
-      'ahbicht_error_message': '''
-        Error trying to process rule "CONDITION_EXPRESSION":
-        
-        
-                    condition expression: ([62] ∧ [108]) ⊻ ([148] ∨ ([149] ∧ [150])
-                    Please make sure that:
-                     * all conditions have the form [INT]
-                     * all packages have the form [INTPn..m]
-                     * no conditions are empty
-                     * all compositions are combined by operators 'U'/'O'/'X' or without an operator
-                     * all open brackets are closed again and vice versa
-                     
-      ''',
-      'edifact_format_version': 'FV2504',
-      'expression': 'Muss ([62] ∧ [108]) ⊻ ([148] ∨ ([149] ∧ [150])',
-      'format': 'UTILMD',
-      'node_texts': '',
-    }),
   ])
 # ---
