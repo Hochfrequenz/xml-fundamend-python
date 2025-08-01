@@ -7,6 +7,7 @@ DROP VIEW IF EXISTS v_ahbtabellen;
 
 CREATE VIEW v_ahbtabellen AS
 WITH consolidated_ahm AS (SELECT id,
+                                 anwendungshandbuch_primary_key,
                                  edifact_format_version,
                                  format,
                                  pruefidentifikator,
@@ -30,6 +31,7 @@ WITH consolidated_ahm AS (SELECT id,
                             AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
 
 SELECT c.id                                  as id,
+       c.anwendungshandbuch_primary_key      as anwendungshandbuch_primary_key,
        c.edifact_format_version              as format_version,
        c.format                              as format,
        c.pruefidentifikator                  as pruefidentifikator,
@@ -56,5 +58,3 @@ FROM consolidated_ahm as c
                    ON ahe.edifact_format_version = c.edifact_format_version
                        AND ahe.format = c.format
                        AND ahe.expression = c.line_ahb_status;
-
-
