@@ -222,7 +222,7 @@ def parallel_iter_segment_group_or_root(
             )
             yield cur_mig_element, cur_ahb_element  # type: ignore[misc]
             # mypy is not smart enough to understand the union construction here
-            cur_ahb_element = next(ahb_elements, None)  # type: ignore[arg-type]
+            cur_ahb_element = next(ahb_elements, None)  # type: ignore[assignment]
         else:
             yield cur_mig_element, None  # type: ignore[misc]
             # mypy is not smart enough to understand the union construction here
