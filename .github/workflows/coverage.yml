@@ -12,7 +12,7 @@ jobs:
         python-version: ["3.13"]
         os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ github.actor == 'dependabot[bot]' && secrets.REPO_AND_READ_PACKAGES_PAT || secrets.XML_SUBMODULE_PAT }}
