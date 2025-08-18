@@ -20,7 +20,7 @@ jobs:
         python-version: [ "3.13" ]
         os: [ ubuntu-latest ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ secrets.XML_SUBMODULE_PAT }} # token with repo scope; expires never
@@ -53,7 +53,7 @@ jobs:
       id-token: write
     needs: tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
