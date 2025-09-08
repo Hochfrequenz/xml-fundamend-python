@@ -32,7 +32,7 @@ ahbicht = [
     "ahbicht>=0.16.0"
 ]
 coverage = [
-    "coverage==7.10.5"
+    "coverage==7.10.6"
 ]
 formatting = [
     "black==25.1.0",
