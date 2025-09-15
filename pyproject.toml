@@ -49,7 +49,7 @@ spellcheck = [
 ]
 test_packaging = [
     "build==1.3.0",
-    "twine==6.1.0"
+    "twine==6.2.0"
 ]
 tests = [
     "pytest==8.4.2",
