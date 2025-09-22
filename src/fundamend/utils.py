@@ -2,6 +2,10 @@
 Contains some utility functions that are used in the project.
 """
 
+from typing import Optional
+
+from fundamend.models.anwendungshandbuch import Kommunikationsrichtung
+
 
 def lstrip(prefix: str, text: str) -> str:
     """Strip the given prefix from the given text. If the text does not start with the prefix, return the text as is.
@@ -73,4 +77,53 @@ def remove_linebreaks_and_hyphens(original: str) -> str:
     return " ".join(result.strip().split())
 
 
-__all__ = ["lstrip", "rstrip", "strip", "remove_linebreaks_and_hyphens"]
+_UNIFIED_SEPARATOR = "/"  # how multiple Marktrollen shall be split in the kommunikation_von attribute
+
+
+def _parse_kommunikation_von_line(kommunikation_von_line: str) -> list[Kommunikationsrichtung]:
+    """
+    parses a single line of kommunikation_von into a list of Kommunikationsrichtung objects
+    this is necessary because some AHBs have multiple lines in the kommunikation_von attribute which must not be mixed
+    """
+    if not kommunikation_von_line or not kommunikation_von_line.strip():
+        return []
+    result: list[Kommunikationsrichtung] = []
+    parts = kommunikation_von_line.split(" an ")
+    if len(parts) != 2:
+        raise ValueError(f"Invalid kommunikation_von string: {kommunikation_von_line}. Expected format: 'X an Y[/Z]'")
+    sender_str = parts[0]
+    receiver_str = parts[1]
+    alternative_separators = [","]
+    for alternative_separator in alternative_separators:
+        if alternative_separator in receiver_str:
+            receiver_str = receiver_str.replace(alternative_separator, _UNIFIED_SEPARATOR)
+        if alternative_separator in sender_str:
+            sender_str = sender_str.replace(alternative_separator, _UNIFIED_SEPARATOR)
+    senders = [x.strip() for x in sender_str.split(_UNIFIED_SEPARATOR)]
+    receivers = [x.strip() for x in receiver_str.split(_UNIFIED_SEPARATOR)]
+    for sender in senders:
+        for receiver in receivers:
+            result.append(Kommunikationsrichtung(sender=sender, empfaenger=receiver))
+    return result
+
+
+def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikationsrichtung]:
+    """Splits the kommunikation_von string into something strongly typed
+
+    Args:
+        kommunikation_von: The kommunikation_von string to split, e.g. 'NB an LF/MSB'.
+
+    Returns:
+        Properly typed list of Kommunikationsrichtung objects:
+        [Kommunikationsrichtung(sender='NB', empfaenger='LF'),
+        Kommunikationsrichtung(sender='NB', empfaenger='MSB')]
+    """
+    result: list[Kommunikationsrichtung] = []
+    for line in (kommunikation_von or "").splitlines():
+        line = line.strip()
+        if line:
+            result += _parse_kommunikation_von_line(line)
+    return result
+
+
+__all__ = ["lstrip", "rstrip", "strip", "remove_linebreaks_and_hyphens", "parse_kommunikation_von"]
