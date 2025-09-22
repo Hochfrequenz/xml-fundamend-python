@@ -121,6 +121,15 @@ class SegmentGroup(FundamendBaseModel):
     elements: tuple["Segment | SegmentGroup", ...]
 
 
+class Kommunikationsrichtung(FundamendBaseModel):
+    """
+    a strongly typed representation of the 'Kommunikation_von' attribute of anwendungsfall
+    """
+
+    sender: str  #: e.g. "NB"
+    empfaenger: str  #: e.g. "MSB"
+
+
 class Anwendungsfall(FundamendBaseModel):
     """
     One 'Anwendungsfall', indicated by `<AWF>` tag, corresponds to one Prüfidentifikator or type of Message

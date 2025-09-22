@@ -1,6 +1,7 @@
 import pytest
 
-from fundamend.utils import remove_linebreaks_and_hyphens
+from fundamend.models.anwendungshandbuch import Kommunikationsrichtung
+from fundamend.utils import parse_kommunikation_von, remove_linebreaks_and_hyphens
 
 
 @pytest.mark.parametrize(
@@ -19,4 +20,88 @@ from fundamend.utils import remove_linebreaks_and_hyphens
 )
 def test_anwendungsfall_beschreibung_normalization(original: str, expected: str) -> None:
     actual = remove_linebreaks_and_hyphens(original)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "original, expected",
+    [
+        pytest.param("", [], id="empty string = no directions"),
+        pytest.param("LF an NB", [Kommunikationsrichtung(sender="LF", empfaenger="NB")], id="simple example"),
+        pytest.param(
+            "MSB an NB, LF",
+            [
+                Kommunikationsrichtung(sender="MSB", empfaenger="NB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="LF"),
+            ],
+            id="two receivers, comma separated",
+        ),
+        pytest.param(
+            "MSB an NB / LF",
+            [
+                Kommunikationsrichtung(sender="MSB", empfaenger="NB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="LF"),
+            ],
+            id="two receivers, slash separated",
+        ),
+        pytest.param(
+            "NB, LF an MSB",
+            [
+                Kommunikationsrichtung(sender="NB", empfaenger="MSB"),
+                Kommunikationsrichtung(sender="LF", empfaenger="MSB"),
+            ],
+            id="two senders, comma separated",
+        ),
+        pytest.param(
+            "NB / LF an MSB",
+            [
+                Kommunikationsrichtung(sender="NB", empfaenger="MSB"),
+                Kommunikationsrichtung(sender="LF", empfaenger="MSB"),
+            ],
+            id="two senders, slash separated",
+        ),
+        pytest.param(
+            "BIKO an NB / ÜNB",
+            [
+                Kommunikationsrichtung(sender="BIKO", empfaenger="NB"),
+                Kommunikationsrichtung(sender="BIKO", empfaenger="ÜNB"),
+            ],
+            id="two receivers, slash separated but with Umlaut",
+        ),
+        pytest.param(
+            "NB an LF\nMSB an LF, NB, ESA",
+            [
+                Kommunikationsrichtung(sender="NB", empfaenger="LF"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="LF"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="NB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="ESA"),
+            ],
+            id="two lines",
+        ),
+        pytest.param(
+            "NB an LF / MSB\r\nLF an NB, MSB",
+            [
+                Kommunikationsrichtung(sender="NB", empfaenger="LF"),
+                Kommunikationsrichtung(sender="NB", empfaenger="MSB"),
+                Kommunikationsrichtung(sender="LF", empfaenger="NB"),
+                Kommunikationsrichtung(sender="LF", empfaenger="MSB"),
+            ],
+            id="two lines with mixed separators",
+            # shit is real, I'm not making this up
+        ),
+        pytest.param(
+            "MSB an NB/LF/ÜNB/MSB/ESA",
+            [
+                Kommunikationsrichtung(sender="MSB", empfaenger="NB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="LF"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="ÜNB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="MSB"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="ESA"),
+            ],
+            id="many receivers",
+        ),
+    ],
+)
+def test_parsing_kommunikation_von(original: str, expected: list[Kommunikationsrichtung]) -> None:
+    actual = parse_kommunikation_von(original)
     assert actual == expected
