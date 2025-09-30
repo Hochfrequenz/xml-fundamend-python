@@ -2,6 +2,7 @@
 Contains some utility functions that are used in the project.
 """
 
+import re
 from typing import Optional
 
 from fundamend.models.anwendungshandbuch import Kommunikationsrichtung
@@ -78,6 +79,14 @@ def remove_linebreaks_and_hyphens(original: str) -> str:
 
 
 _UNIFIED_SEPARATOR = "/"  # how multiple Marktrollen shall be split in the kommunikation_von attribute
+_ALTERNATIVE_SEPARATORS = [","]  # other separators that are used in the wild
+
+_an_at_word_boundary = re.compile(r"\ban\b")
+
+
+def _add_whitespace_before_an(original: str) -> str:
+    """adds whitespace before 'an' if it is not already there"""
+    return _an_at_word_boundary.sub(" an", original)
 
 
 def _parse_kommunikation_von_line(kommunikation_von_line: str) -> list[Kommunikationsrichtung]:
@@ -88,13 +97,18 @@ def _parse_kommunikation_von_line(kommunikation_von_line: str) -> list[Kommunika
     if not kommunikation_von_line or not kommunikation_von_line.strip():
         return []
     result: list[Kommunikationsrichtung] = []
-    parts = kommunikation_von_line.split(" an ")
+    parts = _add_whitespace_before_an(kommunikation_von_line).split(" an ")
     if len(parts) != 2:
-        raise ValueError(f"Invalid kommunikation_von string: {kommunikation_von_line}. Expected format: 'X an Y[/Z]'")
+        # maybe this line looks different, more like 'NB an LF, MSB an NB (Gas)'
+        # then we have to split at the comma first and treat each part like it was a single line. wtf
+        if "," in kommunikation_von_line:
+            for subpart in kommunikation_von_line.split(","):
+                result += _parse_kommunikation_von_line(subpart.strip())
+            return result
+        raise ValueError(f"Invalid kommunikation_von string: '{kommunikation_von_line}'. Expected format: 'X an Y[/Z]'")
     sender_str = parts[0]
     receiver_str = parts[1]
-    alternative_separators = [","]
-    for alternative_separator in alternative_separators:
+    for alternative_separator in _ALTERNATIVE_SEPARATORS:
         if alternative_separator in receiver_str:
             receiver_str = receiver_str.replace(alternative_separator, _UNIFIED_SEPARATOR)
         if alternative_separator in sender_str:
@@ -107,7 +121,7 @@ def _parse_kommunikation_von_line(kommunikation_von_line: str) -> list[Kommunika
     return result
 
 
-def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikationsrichtung]:
+def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikationsrichtung] | None:
     """Splits the kommunikation_von string into something strongly typed
 
     Args:
@@ -117,7 +131,10 @@ def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikat
         Properly typed list of Kommunikationsrichtung objects:
         [Kommunikationsrichtung(sender='NB', empfaenger='LF'),
         Kommunikationsrichtung(sender='NB', empfaenger='MSB')]
+        or none in case there are no information given (directly).
     """
+    if kommunikation_von == "Beteiligte aus Ursprungs-nachricht":
+        return None
     result: list[Kommunikationsrichtung] = []
     for line in (kommunikation_von or "").splitlines():
         line = line.strip()

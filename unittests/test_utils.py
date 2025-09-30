@@ -1,7 +1,13 @@
+from pathlib import Path
+from typing import Generator
+
 import pytest
 
-from fundamend.models.anwendungshandbuch import Kommunikationsrichtung
+from fundamend import AhbReader
+from fundamend.models.anwendungshandbuch import Anwendungsfall, Kommunikationsrichtung
 from fundamend.utils import parse_kommunikation_von, remove_linebreaks_and_hyphens
+
+from .conftest import is_private_submodule_checked_out
 
 
 @pytest.mark.parametrize(
@@ -100,8 +106,41 @@ def test_anwendungsfall_beschreibung_normalization(original: str, expected: str)
             ],
             id="many receivers",
         ),
+        pytest.param(
+            "NB an LF, MSB an NB (Gas)",
+            [
+                Kommunikationsrichtung(sender="NB", empfaenger="LF"),
+                Kommunikationsrichtung(sender="MSB", empfaenger="NB (Gas)"),
+            ],
+        ),
+        pytest.param("NB (VNB)an NB (LPB)", [Kommunikationsrichtung(sender="NB (VNB)", empfaenger="NB (LPB)")]),
+        pytest.param("Beteiligte aus Ursprungs-nachricht", None),
     ],
 )
-def test_parsing_kommunikation_von(original: str, expected: list[Kommunikationsrichtung]) -> None:
+def test_parsing_kommunikation_von(original: str, expected: list[Kommunikationsrichtung] | None) -> None:
     actual = parse_kommunikation_von(original)
     assert actual == expected
+
+
+def _all_anwendungsfaelle() -> Generator[Anwendungsfall, None, None]:
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+    assert private_submodule_root.exists() and private_submodule_root.is_dir()
+    for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
+        ahb = AhbReader(ahb_file_path).read()
+        for anwendungsfall in ahb.anwendungsfaelle:
+            if anwendungsfall.is_outdated:
+                continue
+            yield anwendungsfall
+
+
+def test_parsing_all_kommunikation_von_there_is() -> None:
+    """loop over all AHB files and read the 'Kommunikation Von' Attribute of all the Anwendungsfälle"""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    for anwendungsfall in _all_anwendungsfaelle():
+        kommunikation_von = anwendungsfall.kommunikation_von
+        if not isinstance(kommunikation_von, str):
+            pytest.skip("Skipping test because 'Kommunikation Von' is not a string (anymore)")
+        _ = parse_kommunikation_von(kommunikation_von)  # must not crash
