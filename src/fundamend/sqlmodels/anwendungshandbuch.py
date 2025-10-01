@@ -13,7 +13,7 @@ from efoli import EdifactFormat, EdifactFormatVersion
 
 
 try:
-    from sqlalchemy import CheckConstraint, UniqueConstraint
+    from sqlalchemy import JSON, CheckConstraint, Column, UniqueConstraint
     from sqlmodel import Field, Relationship, SQLModel
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels] or did you try to import from fundamend.models instead?"
@@ -341,6 +341,15 @@ class Anwendungsfall(SQLModel, table=True):
     pruefidentifikator: str = Field(index=True)  #: e.g. '25001'
     beschreibung: str = Field(index=True)  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
+    kommunikationsrichtungen: list[dict[str, str]] | None = Field(default_factory=list, sa_column=Column(JSON))
+    """
+    JSON column containing a list of dicts with keys 'sender' and 'empfaenger'.
+    The columns value can be deserialized as list[Kommunikationsrichtung].
+    The column contains no more information than the stringly typed 'kommunikation_von' column alone,
+    but it's parsed already and hence easier to use and query.
+    """
+    # we use a json column because setting up a separate table and FK relationships for this seems overkill
+    # https://stackoverflow.com/a/70659555/10009545
     format: EdifactFormat = Field(index=True)  #: e.g. 'UTILTS'
     segments: list[Segment] = Relationship(back_populates="anwendungsfall")
     segment_groups: list[SegmentGroup] = Relationship(back_populates="anwendungsfall")
@@ -356,6 +365,11 @@ class Anwendungsfall(SQLModel, table=True):
             pruefidentifikator=model.pruefidentifikator,
             beschreibung=model.beschreibung,
             kommunikation_von=model.kommunikation_von,
+            kommunikationsrichtungen=(
+                [kr.model_dump(mode="json") for kr in model.kommunikationsrichtungen]
+                if model.kommunikationsrichtungen is not None
+                else None
+            ),
             format=model.format,
             position=position,
         )
@@ -373,6 +387,7 @@ class Anwendungsfall(SQLModel, table=True):
             pruefidentifikator=self.pruefidentifikator,
             beschreibung=self.beschreibung,
             kommunikation_von=self.kommunikation_von,
+            # the kommunikationsrichtungen are a computed property, so we reconstruct it from the kommunikation_von str
             format=self.format,
             elements=tuple(
                 x.to_model()

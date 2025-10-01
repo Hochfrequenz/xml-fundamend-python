@@ -8,11 +8,13 @@ from typing import Generator
 
 import pytest
 from efoli import EdifactFormatVersion
+from pydantic import RootModel
 from sqlmodel import Session, SQLModel, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
+from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
 from fundamend.sqlmodels import AhbHierarchyMaterialized
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
 from fundamend.sqlmodels import create_ahb_view, create_db_and_populate_with_ahb_view
@@ -89,6 +91,9 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
         assert roundtrip_abb == ahb
 
 
+_Kommunikationsrichtungen = RootModel[list[Kommunikationsrichtung]]
+
+
 def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session) -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
@@ -97,6 +102,14 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
+        for awf, sql_awf in zip(ahb.anwendungsfaelle, sql_ahb.anwendungsfaelle):
+            if awf.is_outdated:
+                continue
+            # this is for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173
+            if awf.kommunikationsrichtungen is not None and any(awf.kommunikationsrichtungen):
+                assert any(_Kommunikationsrichtungen.model_validate(sql_awf.kommunikationsrichtungen).root)
+            else:
+                assert sql_awf.kommunikationsrichtungen is None or not any(sql_awf.kommunikationsrichtungen)
         sqlite_session.add(sql_ahb)
     sqlite_session.commit()
     create_ahb_view(session=sqlite_session)
