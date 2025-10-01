@@ -341,7 +341,7 @@ class Anwendungsfall(SQLModel, table=True):
     pruefidentifikator: str = Field(index=True)  #: e.g. '25001'
     beschreibung: str = Field(index=True)  #: e.g. 'Berechnungsformel'
     kommunikation_von: str  #: e.g. 'NB an MSB / LF'
-    kommunikationsrichtungen: list[dict[str, str]] | None = Field(default_factory=list, sa_column=Column(JSON))
+    kommunikationsrichtungen: list[dict[str, str]] | None = Field(default=None, sa_column=Column(JSON))
     """
     JSON column containing a list of dicts with keys 'sender' and 'empfaenger'.
     The columns value can be deserialized as list[Kommunikationsrichtung].
