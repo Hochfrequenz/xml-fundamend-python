@@ -102,12 +102,18 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
-        for awf, sql_awf in zip(ahb.anwendungsfaelle, sql_ahb.anwendungsfaelle):
-            if awf.is_outdated:
-                continue
+        for awf, sql_awf in zip(
+            (x for x in ahb.anwendungsfaelle if not x.is_outdated),
+            # this is because outdated AWF are not included in the SQL model;
+            # see the SqlAnwendungshandbuch.from_model implementation.
+            sorted(sql_ahb.anwendungsfaelle, key=lambda _awf: _awf.position or 0),
+        ):
             # this is for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173
             if awf.kommunikationsrichtungen is not None and any(awf.kommunikationsrichtungen):
-                assert any(_Kommunikationsrichtungen.model_validate(sql_awf.kommunikationsrichtungen).root)
+                sql_kommunikationsrichtungen = _Kommunikationsrichtungen.model_validate(
+                    sql_awf.kommunikationsrichtungen
+                ).root
+                assert sql_kommunikationsrichtungen == awf.kommunikationsrichtungen
             else:
                 assert sql_awf.kommunikationsrichtungen is None or not any(sql_awf.kommunikationsrichtungen)
         sqlite_session.add(sql_ahb)
