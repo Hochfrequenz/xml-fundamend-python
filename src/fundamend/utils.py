@@ -46,3 +46,31 @@ def strip(prefix: str, text: str, suffix: str) -> str:
         The text with the prefix and suffix stripped.
     """
     return lstrip(prefix, rstrip(text, suffix))
+
+
+_replacements: dict[str, str] = {
+    "-\r\n": "",
+    "\r\n": " ",
+    "\r": "",
+    "\n": "",
+}
+
+
+def remove_linebreaks_and_hyphens(original: str) -> str:
+    """
+    Normalize a multi line string by stripping leading and trailing whitespace and removing line breaks.
+
+    Args:
+        original: The string to normalize.
+
+    Returns:
+        The normalized string.
+    """
+    result = original
+    for old, new in _replacements.items():
+        result = result.replace(old, new)
+    # if you add more replacement rules, please also add a unit test in bltest_utils.py
+    return " ".join(result.strip().split())
+
+
+__all__ = ["lstrip", "rstrip", "strip", "remove_linebreaks_and_hyphens"]
