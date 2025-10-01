@@ -4,7 +4,8 @@ from typing import Generator
 import pytest
 
 from fundamend import AhbReader
-from fundamend.models.anwendungshandbuch import Anwendungsfall, Kommunikationsrichtung
+from fundamend.models.anwendungshandbuch import Anwendungsfall
+from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
 from fundamend.utils import parse_kommunikation_von
 
 from .conftest import is_private_submodule_checked_out

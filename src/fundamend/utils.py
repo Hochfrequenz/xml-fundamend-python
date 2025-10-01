@@ -5,7 +5,7 @@ Contains some utility functions that are used in the project.
 import re
 from typing import Optional
 
-from fundamend.models.anwendungshandbuch import Kommunikationsrichtung
+from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
 
 
 def lstrip(prefix: str, text: str) -> str:
