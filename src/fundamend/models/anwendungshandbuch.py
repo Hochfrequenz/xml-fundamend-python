@@ -8,6 +8,8 @@ from datetime import date
 from efoli import EdifactFormat
 
 from fundamend.models.base import FundamendBaseModel
+from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
+from fundamend.utils import parse_kommunikation_von
 
 
 class Code(FundamendBaseModel):
@@ -121,15 +123,6 @@ class SegmentGroup(FundamendBaseModel):
     elements: tuple["Segment | SegmentGroup", ...]
 
 
-class Kommunikationsrichtung(FundamendBaseModel):
-    """
-    a strongly typed representation of the 'Kommunikation_von' attribute of anwendungsfall
-    """
-
-    sender: str  #: e.g. "NB"
-    empfaenger: str  #: e.g. "MSB"
-
-
 class Anwendungsfall(FundamendBaseModel):
     """
     One 'Anwendungsfall', indicated by `<AWF>` tag, corresponds to one Prüfidentifikator or type of Message
@@ -157,6 +150,15 @@ class Anwendungsfall(FundamendBaseModel):
         It's not like they could've added just another attribute to indicate that.
         """
         return "##alt##" in self.pruefidentifikator.lower()  # table flip moment
+
+    @property
+    def kommunikationsrichtungen(self) -> list[Kommunikationsrichtung] | None:
+        """
+        the parsed 'kommunikation_von' attribute or None if it's unparsable (l)or outdated
+        """
+        if self.is_outdated:
+            return None
+        return parse_kommunikation_von(self.kommunikation_von)
 
 
 class Bedingung(FundamendBaseModel):
