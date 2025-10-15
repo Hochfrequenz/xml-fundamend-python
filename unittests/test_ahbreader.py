@@ -7,6 +7,8 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend.models.anwendungshandbuch import Anwendungsfall, Anwendungshandbuch, Bedingung, Paket, UbBedingung
 from fundamend.reader import AhbReader
 
+from .conftest import is_private_submodule_checked_out
+
 
 @pytest.mark.parametrize(
     "ahb_xml_file_path, expected_date",
@@ -193,3 +195,28 @@ def test_anwendungshandbuch_hashable(ahb_xml_file_path: Path) -> None:
     assert isinstance(hash_code, int)
     hash_collection = set()
     hash_collection.add(ahb)
+
+
+_xml_submodule_root: Path = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+
+
+@pytest.mark.snapshot()
+def test_sanitizing_all_awf_beschreibungen(snapshot: SnapshotAssertion) -> None:
+    """this test makes changes to the sanitation code visible."""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    all_sanitized_awf_beschreibungen: set[str] = set()
+    for ahb_file_path in _xml_submodule_root.rglob("**/*AHB*.xml"):
+        reader = AhbReader(ahb_file_path)
+        ahb = reader.read()
+        for awf in ahb.anwendungsfaelle:
+            if awf.is_outdated:
+                continue
+            all_sanitized_awf_beschreibungen.add(awf.beschreibung)
+    # If you're unhappy with any specific entry in this list, better write a new unit test case in
+    # test_utils.py / test_anwendungsfall_beschreibung_normalization (add more parametrization).
+    # If the snapshot test fails because of updated data, just run
+    # tox -e snapshots
+    # and commit the updated .ambr file.
+    distinct_beschreibungen_as_list = list(sorted(all_sanitized_awf_beschreibungen))
+    snapshot.assert_match(distinct_beschreibungen_as_list)
