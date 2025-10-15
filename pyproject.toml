@@ -37,10 +37,10 @@ coverage = [
 ]
 formatting = [
     "black==25.9.0",
-    "isort==6.1.0"
+    "isort==7.0.0"
 ]
 linting = [
-    "pylint==3.3.9"
+    "pylint==4.0.0"
 ]
 cli = [
     "typer" # if you install fundamend[cli], the cli commands are available via typer
