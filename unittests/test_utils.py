@@ -6,7 +6,7 @@ import pytest
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungsfall
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.utils import parse_kommunikation_von
+from fundamend.utils import parse_kommunikation_von, remove_linebreaks_and_hyphens
 
 from .conftest import is_private_submodule_checked_out
 
@@ -126,3 +126,22 @@ def test_parsing_all_kommunikation_von_there_is() -> None:
         if not isinstance(kommunikation_von, str):
             pytest.skip("Skipping test because 'Kommunikation Von' is not a string (anymore)")
         _ = parse_kommunikation_von(kommunikation_von)  # must not crash
+
+
+@pytest.mark.parametrize(
+    "original, expected",
+    [
+        pytest.param("foo", "foo", id="no change"),
+        pytest.param("foo ", "foo", id="trailing whitespace"),
+        pytest.param(" foo", "foo", id="leading whitespace"),
+        pytest.param(" foo ", "foo", id="trailing and leading whitespaces"),
+        pytest.param(" foo\r\n ", "foo", id="trailing and leading whitespaces and line break"),
+        # hyphen requirements discussed here:
+        # https://github.com/Hochfrequenz/xml-fundamend-python/issues/172#issue-3427724092
+        pytest.param(" Foo-\r\nbar ", "Foobar", id="hyphen with line break"),
+        pytest.param(" Foo\r\n and bar ", "Foo and bar", id="line break w/o hyphen"),
+    ],
+)
+def test_anwendungsfall_beschreibung_normalization(original: str, expected: str) -> None:
+    actual = remove_linebreaks_and_hyphens(original)
+    assert actual == expected
