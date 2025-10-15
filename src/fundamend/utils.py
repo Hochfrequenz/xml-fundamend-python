@@ -69,7 +69,7 @@ def remove_linebreaks_and_hyphens(original: str) -> str:
     result = original
     for old, new in _replacements.items():
         result = result.replace(old, new)
-    # if you add more replacement rules, please also add a unit test in bltest_utils.py
+    # if you add more replacement rules, please also add a unit test in test_utils.py
     return " ".join(result.strip().split())
 
 
