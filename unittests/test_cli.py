@@ -4,19 +4,19 @@ from typing import Iterator
 
 import pytest
 
-_SKIP_TESTS = False
+_should_skip_typer_based_tests = False
 try:
     from typer.testing import CliRunner
 
     runner = CliRunner()
     from fundamend.__main__ import app
 except ImportError:
-    _SKIP_TESTS = True
+    _should_skip_typer_based_tests = True
 
 
 @pytest.fixture(scope="function")
 def example_files_lesefassung(tmp_path: Path) -> Iterator[Path]:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     copied_files_path = tmp_path / "example_files"
     copied_files_path.mkdir(parents=True, exist_ok=True)
@@ -29,7 +29,7 @@ def example_files_lesefassung(tmp_path: Path) -> Iterator[Path]:
 
 @pytest.fixture(scope="function")
 def example_files_konsulationsfassung_without_uebertragungsdatei(tmp_path: Path) -> Iterator[Path]:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     copied_files_path = tmp_path / "example_files"
     copied_files_path.mkdir(parents=True, exist_ok=True)
@@ -43,7 +43,7 @@ def example_files_konsulationsfassung_without_uebertragungsdatei(tmp_path: Path)
 
 @pytest.fixture(scope="function")
 def example_files_fehlerkorrektur(tmp_path: Path) -> Iterator[Path]:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     copied_files_path = tmp_path / "example_files"
     copied_files_path.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ def example_files_fehlerkorrektur(tmp_path: Path) -> Iterator[Path]:
 
 
 def test_cli_single_file_mig(example_files_lesefassung: Path) -> None:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     mig_path = example_files_lesefassung / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
 
@@ -66,7 +66,7 @@ def test_cli_single_file_mig(example_files_lesefassung: Path) -> None:
 
 
 def test_cli_single_file_ahb(example_files_konsulationsfassung_without_uebertragungsdatei: Path) -> None:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     ahb_path = (
         example_files_konsulationsfassung_without_uebertragungsdatei
@@ -80,7 +80,7 @@ def test_cli_single_file_ahb(example_files_konsulationsfassung_without_uebertrag
 
 
 def test_cli_directory(example_files_lesefassung: Path) -> None:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     mig_path = example_files_lesefassung / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
     ahb_path = example_files_lesefassung / "UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"
@@ -94,7 +94,7 @@ def test_cli_directory(example_files_lesefassung: Path) -> None:
 
 
 def test_cli_directory_with_sanitize_compressed_splitted(example_files_fehlerkorrektur: Path, tmp_path: Path) -> None:
-    if _SKIP_TESTS:
+    if _should_skip_typer_based_tests:
         pytest.skip("Seems like typer is not installed")
     # mig_path = example_files_lesefassung / "UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"
     # ahb_path = example_files_lesefassung / "UTILTS_AHB_1.1c_Lesefassung_2023_12_12_ZPbXedn.xml"

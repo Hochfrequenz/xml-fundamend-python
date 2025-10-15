@@ -8,6 +8,8 @@ from datetime import date
 from efoli import EdifactFormat
 
 from fundamend.models.base import FundamendBaseModel
+from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
+from fundamend.utils import parse_kommunikation_von
 
 
 class Code(FundamendBaseModel):
@@ -148,6 +150,15 @@ class Anwendungsfall(FundamendBaseModel):
         It's not like they could've added just another attribute to indicate that.
         """
         return "##alt##" in self.pruefidentifikator.lower()  # table flip moment
+
+    @property
+    def kommunikationsrichtungen(self) -> list[Kommunikationsrichtung] | None:
+        """
+        the parsed 'kommunikation_von' attribute or None if it's unparsable (l)or outdated
+        """
+        if self.is_outdated:
+            return None
+        return parse_kommunikation_von(self.kommunikation_von)
 
 
 class Bedingung(FundamendBaseModel):
