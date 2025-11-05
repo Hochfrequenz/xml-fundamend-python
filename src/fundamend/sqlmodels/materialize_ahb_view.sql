@@ -12,7 +12,7 @@ WITH RECURSIVE
     ordered_roots AS (SELECT sg.primary_key,
                              sg.position,
                              'segment_group' AS type,
-                             sg.id   AS root_id_text,
+                             sg.id           AS root_id_text,
                              sg.name,
                              sg.ahb_status,
                              sg.anwendungsfall_primary_key,
@@ -495,12 +495,15 @@ CREATE INDEX idx_hierarchy_versionsnummer ON ahb_hierarchy_materialized (version
 CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_von);
 CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
 CREATE INDEX idx_hierarchy_beschreibung ON ahb_hierarchy_materialized (beschreibung);
+CREATE INDEX idx_hierarchy_beschreibung_lower ON ahb_hierarchy_materialized (lower(beschreibung));
 CREATE INDEX idx_hierarchy_kommunikation_von ON ahb_hierarchy_materialized (kommunikation_von);
 CREATE INDEX idx_hierarchy_edifact_format_version ON ahb_hierarchy_materialized (edifact_format_version);
 CREATE INDEX idx_hierarchy_segmentgroup_id ON ahb_hierarchy_materialized (segmentgroup_id);
+CREATE INDEX idx_hierarchy_segmentgroup_id_lower ON ahb_hierarchy_materialized (lower(segmentgroup_id));
 CREATE INDEX idx_hierarchy_segmentgroup_name ON ahb_hierarchy_materialized (segmentgroup_name);
 CREATE INDEX idx_hierarchy_segmentgroup_position ON ahb_hierarchy_materialized (segmentgroup_position);
 CREATE INDEX idx_hierarchy_segment_id ON ahb_hierarchy_materialized (segment_id);
+CREATE INDEX idx_hierarchy_segment_id_lower ON ahb_hierarchy_materialized (lower(segment_id));
 CREATE INDEX idx_hierarchy_segment_name ON ahb_hierarchy_materialized (segment_name);
 CREATE INDEX idx_hierarchy_segment_number ON ahb_hierarchy_materialized (segment_number);
 CREATE INDEX idx_hierarchy_segment_position ON ahb_hierarchy_materialized (segment_position);
@@ -508,13 +511,16 @@ CREATE INDEX idx_hierarchy_dataelementgroup_id ON ahb_hierarchy_materialized (da
 CREATE INDEX idx_hierarchy_dataelementgroup_name ON ahb_hierarchy_materialized (dataelementgroup_name);
 CREATE INDEX idx_hierarchy_dataelementgroup_position ON ahb_hierarchy_materialized (dataelementgroup_position);
 CREATE INDEX idx_hierarchy_dataelement_id ON ahb_hierarchy_materialized (dataelement_id);
+CREATE INDEX idx_hierarchy_dataelement_id_lower ON ahb_hierarchy_materialized (lower(dataelement_id));
 CREATE INDEX idx_hierarchy_dataelement_name ON ahb_hierarchy_materialized (dataelement_name);
 CREATE INDEX idx_hierarchy_dataelement_position ON ahb_hierarchy_materialized (dataelement_position);
 CREATE INDEX idx_hierarchy_dataelement_ahb_status ON ahb_hierarchy_materialized (dataelement_ahb_status);
 CREATE INDEX idx_hierarchy_code_id ON ahb_hierarchy_materialized (code_id);
 CREATE INDEX idx_hierarchy_code_name ON ahb_hierarchy_materialized (code_name);
 CREATE INDEX idx_hierarchy_code_description ON ahb_hierarchy_materialized (code_description);
+CREATE INDEX idx_hierarchy_code_description_lower ON ahb_hierarchy_materialized (lower(code_description));
 CREATE INDEX idx_hierarchy_code_value ON ahb_hierarchy_materialized (code_value);
+CREATE INDEX idx_hierarchy_code_value_lower ON ahb_hierarchy_materialized (lower(code_value));
 CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_ahb_status);
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
 CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
@@ -527,7 +533,9 @@ CREATE INDEX idx_ahb_tabellen_filter2 ON ahb_hierarchy_materialized (type) WHERE
 
 -- indexes for computed columns for v_ahbtabellen
 CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized (line_ahb_status);
+CREATE INDEX idx_line_ahb_status_lower ON ahb_hierarchy_materialized (lower(line_ahb_status));
 CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
+CREATE INDEX idx_line_name_lower ON ahb_hierarchy_materialized (lower(line_name));
 
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
