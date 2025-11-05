@@ -37,9 +37,9 @@ SELECT c.id                                  as id,
        c.id_path,
        c.kommunikation_von                   as direction,
        c.beschreibung                        as description,
-       c.segmentgroup_id                     as segmentgroup_key, -- eg 'SG6'
-       c.segment_id                          as segment_code,     -- e.g 'NAD'
-       c.dataelement_id                      as data_element,     -- e.g 'D_3035'
+       c.segmentgroup_id                     as segmentgroup_key,               -- eg 'SG6'
+       c.segment_id                          as segment_code,                   -- e.g 'NAD'
+       c.dataelement_id                      as data_element,                   -- e.g 'D_3035'
        c.is_on_uebertragungsdatei_level      as is_on_uebertragungsdatei_level, -- true for UNA/UNB+UNZ, not for UNH
        --CASE
        --    WHEN dataelement_id IS NOT NULL THEN SUBSTR(dataelement_id, 3)

@@ -525,11 +525,11 @@ ALTER TABLE ahb_hierarchy_materialized
           segment_name,
           segmentgroup_name
         )
-      )
-    ) STORED;
+            )
+            ) STORED;
 
-CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized(line_ahb_status);
-CREATE INDEX idx_line_name ON ahb_hierarchy_materialized(line_name);
+CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized (line_ahb_status);
+CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
