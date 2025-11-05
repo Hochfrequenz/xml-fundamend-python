@@ -499,6 +499,37 @@ CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_a
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
 CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
 CREATE INDEX idx_hierarchy_id_path ON ahb_hierarchy_materialized (id_path);
+
+-- add 2 computed columns to improve performance of v_ahbtabellen
+ALTER TABLE ahb_hierarchy_materialized
+  ADD COLUMN line_ahb_status TEXT
+    GENERATED ALWAYS AS (
+      trim(
+        coalesce(
+          code_ahb_status,
+          dataelement_ahb_status,
+          segment_ahb_status,
+          segmentgroup_ahb_status
+        )
+      )
+    ) STORED;
+
+ALTER TABLE ahb_hierarchy_materialized
+  ADD COLUMN line_name TEXT
+    GENERATED ALWAYS AS (
+      trim(
+        coalesce(
+          code_name,
+          dataelement_name,
+          dataelementgroup_name,
+          segment_name,
+          segmentgroup_name
+        )
+      )
+    ) STORED;
+
+CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized(line_ahb_status);
+CREATE INDEX idx_line_name ON ahb_hierarchy_materialized(line_name);
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
