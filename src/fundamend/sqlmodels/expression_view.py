@@ -241,7 +241,7 @@ class AhbExpression(SQLModel, table=True):
     format: EdifactFormat = Field(index=True)  # the edifact format, e.g. 'UTILMD'
     # expressions and conditions are always interpreted on a per-format basis (no pruefidentifikator required)
     expression: str = Field(index=True)  #: e.g 'Muss [1] U [2]'
-    node_texts: str = Field()
+    node_texts: str = Field(index=True)  # indexed for the search feature in AHB-tabellen
     """
     this contains the typical "[1] Foo Text\n[2] Bar Text" which explains the meaning of the nodes from inside the
     respective Expression (e.g. for expression "Muss [1] U [2]")
