@@ -471,7 +471,7 @@ CREATE INDEX idx_hierarchy_awfpk_sort ON ahb_hierarchy_materialized (anwendungsf
 CREATE INDEX idx_hierarchy_type ON ahb_hierarchy_materialized (type);
 CREATE INDEX idx_hierarchy_pruefidentifikator ON ahb_hierarchy_materialized (pruefidentifikator);
 CREATE INDEX idx_hierarchy_format ON ahb_hierarchy_materialized (format);
-CREATE INDEX idx_hierarchy_format ON ahb_hierarchy_materialized (format, edifact_format_version);
+CREATE INDEX idx_hierarchy_format_format_version ON ahb_hierarchy_materialized (format, edifact_format_version);
 CREATE INDEX idx_hierarchy_versionsnummer ON ahb_hierarchy_materialized (versionsnummer);
 CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_von);
 CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
