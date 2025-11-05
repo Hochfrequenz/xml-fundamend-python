@@ -21,11 +21,9 @@ WITH consolidated_ahm AS (SELECT id,
                                  dataelement_id,
                                  code_value,
                                  sort_path,
-                                 trim(coalesce(code_ahb_status, coalesce(dataelement_ahb_status,
-                                                                         coalesce(segment_ahb_status, segmentgroup_ahb_status))))     AS line_ahb_status,
-                                 coalesce(code_name, coalesce(dataelement_name, coalesce(dataelementgroup_name,
-                                                                                         coalesce(segment_name, segmentgroup_name)))) AS line_name,
-                                 type                                                                                                 as line_type
+                                 line_ahb_status,
+                                 line_name,
+                                 type as line_type
                           FROM ahb_hierarchy_materialized ahm
                           WHERE ahm.TYPE != 'dataelementgroup'
                             AND (ahm.TYPE != 'dataelement' OR ahm.dataelement_ahb_status IS NOT NULL))
