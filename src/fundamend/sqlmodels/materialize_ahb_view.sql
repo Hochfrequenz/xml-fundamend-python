@@ -459,7 +459,26 @@ WITH RECURSIVE
                            JOIN code c ON c.data_element_primary_key = h.current_id
                   WHERE h.type = 'dataelement')
 
-SELECT hex(randomblob(16)) AS id, *
+SELECT hex(randomblob(16)) AS id,
+       *,
+       -- add 2 computed columns which are used in v_ahbtabellen only but not indexable if they were not real columns (but just an expression inside a view definition)
+       trim(
+               coalesce(
+                       code_name,
+                       dataelement_name,
+                       dataelementgroup_name,
+                       segment_name,
+                       segmentgroup_name
+               )
+       )                   as line_name,
+       trim(
+               coalesce(
+                       code_ahb_status,
+                       dataelement_ahb_status,
+                       segment_ahb_status,
+                       segmentgroup_ahb_status
+               )
+       )                   as line_ahb_status
 FROM hierarchy
 ORDER BY anwendungsfall_pk, sort_path;
 
@@ -506,34 +525,7 @@ CREATE INDEX idx_hierarchy_sort ON ahb_hierarchy_materialized (sort_path);
 CREATE INDEX idx_ahb_tabellen_filter1 ON ahb_hierarchy_materialized (dataelement_ahb_status) WHERE type = 'dataelement' AND dataelement_ahb_status IS NOT NULL;
 CREATE INDEX idx_ahb_tabellen_filter2 ON ahb_hierarchy_materialized (type) WHERE type <> 'dataelementgroup';
 
--- add 2 computed columns which are used in v_ahbtabellen only but not indexable if they were not real columns (but just an expression inside a view definition)
-ALTER TABLE ahb_hierarchy_materialized
-  ADD COLUMN line_ahb_status TEXT
-    GENERATED ALWAYS AS (
-      trim(
-        coalesce(
-          code_ahb_status,
-          dataelement_ahb_status,
-          segment_ahb_status,
-          segmentgroup_ahb_status
-        )
-      )
-    ) STORED;
-
-ALTER TABLE ahb_hierarchy_materialized
-  ADD COLUMN line_name TEXT
-    GENERATED ALWAYS AS (
-      trim(
-        coalesce(
-          code_name,
-          dataelement_name,
-          dataelementgroup_name,
-          segment_name,
-          segmentgroup_name
-        )
-            )
-            ) STORED;
-
+-- indexes for computed columns for v_ahbtabellen
 CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized (line_ahb_status);
 CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
 
