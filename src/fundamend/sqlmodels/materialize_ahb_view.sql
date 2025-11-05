@@ -459,7 +459,26 @@ WITH RECURSIVE
                            JOIN code c ON c.data_element_primary_key = h.current_id
                   WHERE h.type = 'dataelement')
 
-SELECT hex(randomblob(16)) AS id, *
+SELECT hex(randomblob(16)) AS id,
+       *,
+       -- add 2 computed columns which are used in v_ahbtabellen only but not indexable if they were not real columns (but just an expression inside a view definition)
+       trim(
+               coalesce(
+                       code_name,
+                       dataelement_name,
+                       dataelementgroup_name,
+                       segment_name,
+                       segmentgroup_name
+               )
+       )                   as line_name,
+       trim(
+               coalesce(
+                       code_ahb_status,
+                       dataelement_ahb_status,
+                       segment_ahb_status,
+                       segmentgroup_ahb_status
+               )
+       )                   as line_ahb_status
 FROM hierarchy
 ORDER BY anwendungsfall_pk, sort_path;
 
@@ -501,9 +520,15 @@ CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_pos
 CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
 CREATE INDEX idx_hierarchy_id_path ON ahb_hierarchy_materialized (id_path);
 CREATE INDEX idx_hierarchy_sort ON ahb_hierarchy_materialized (sort_path);
+
 -- the following 2 indexes are to speed of v_ahbtabellen only
 CREATE INDEX idx_ahb_tabellen_filter1 ON ahb_hierarchy_materialized (dataelement_ahb_status) WHERE type = 'dataelement' AND dataelement_ahb_status IS NOT NULL;
 CREATE INDEX idx_ahb_tabellen_filter2 ON ahb_hierarchy_materialized (type) WHERE type <> 'dataelementgroup';
+
+-- indexes for computed columns for v_ahbtabellen
+CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized (line_ahb_status);
+CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
+
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
