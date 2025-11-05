@@ -467,10 +467,11 @@ ORDER BY anwendungsfall_pk, sort_path;
 
 CREATE UNIQUE INDEX idx_hierarchy_id ON ahb_hierarchy_materialized (id);
 CREATE INDEX idx_hierarchy_afpk ON ahb_hierarchy_materialized (anwendungsfall_pk);
-CREATE INDEX idx_hierarchy_sort ON ahb_hierarchy_materialized (anwendungsfall_pk, sort_path);
+CREATE INDEX idx_hierarchy_awfpk_sort ON ahb_hierarchy_materialized (anwendungsfall_pk, sort_path);
 CREATE INDEX idx_hierarchy_type ON ahb_hierarchy_materialized (type);
 CREATE INDEX idx_hierarchy_pruefidentifikator ON ahb_hierarchy_materialized (pruefidentifikator);
 CREATE INDEX idx_hierarchy_format ON ahb_hierarchy_materialized (format);
+CREATE INDEX idx_hierarchy_format_format_version ON ahb_hierarchy_materialized (format, edifact_format_version);
 CREATE INDEX idx_hierarchy_versionsnummer ON ahb_hierarchy_materialized (versionsnummer);
 CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_von);
 CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
@@ -499,8 +500,13 @@ CREATE INDEX idx_hierarchy_code_ahb_status ON ahb_hierarchy_materialized (code_a
 CREATE INDEX idx_hierarchy_code_position ON ahb_hierarchy_materialized (code_position);
 CREATE INDEX idx_hierarchy_path ON ahb_hierarchy_materialized (path);
 CREATE INDEX idx_hierarchy_id_path ON ahb_hierarchy_materialized (id_path);
+CREATE INDEX idx_hierarchy_sort ON ahb_hierarchy_materialized (sort_path);
 
--- add 2 computed columns to improve performance of v_ahbtabellen
+-- the following 2 indexes are to speed of v_ahbtabellen only
+CREATE INDEX idx_ahb_tabellen_filter1 ON ahb_hierarchy_materialized (dataelement_ahb_status) WHERE type = 'dataelement' AND dataelement_ahb_status IS NOT NULL;
+CREATE INDEX idx_ahb_tabellen_filter2 ON ahb_hierarchy_materialized (type) WHERE type <> 'dataelementgroup';
+
+-- add 2 computed columns which are used in v_ahbtabellen only but not indexable if they were not real columns (but just an expression inside a view definition)
 ALTER TABLE ahb_hierarchy_materialized
   ADD COLUMN line_ahb_status TEXT
     GENERATED ALWAYS AS (
@@ -530,6 +536,7 @@ ALTER TABLE ahb_hierarchy_materialized
 
 CREATE INDEX idx_line_ahb_status ON ahb_hierarchy_materialized (line_ahb_status);
 CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
+
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
