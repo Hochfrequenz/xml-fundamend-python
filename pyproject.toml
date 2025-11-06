@@ -30,7 +30,7 @@ sqlmodels = [
   "sqlalchemy[mypy]>=2.0.37"
 ]
 ahbicht = [
-    "ahbicht>=0.16.0"
+    "ahbicht>=0.16.0,<1"
 ]
 coverage = [
     "coverage==7.11.0"
