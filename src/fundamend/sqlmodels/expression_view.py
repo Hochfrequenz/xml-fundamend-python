@@ -30,7 +30,7 @@ try:
     from ahbicht.content_evaluation.expression_check import is_valid_expression
     from ahbicht.content_evaluation.token_logic_provider import SingletonTokenLogicProvider, TokenLogicProvider
     from ahbicht.expressions.condition_expression_parser import extract_categorized_keys
-    from ahbicht.models.content_evaluation_result import ContentEvaluationResult, ContentEvaluationResultSchema
+    from ahbicht.models.content_evaluation_result import ContentEvaluationResult
     from lark.exceptions import VisitError
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels,ahbicht]?"
@@ -53,7 +53,7 @@ def _get_evaluatable_data() -> EvaluatableData[ContentEvaluationResult]:
     """
     cer = _content_evaluation_result.get()
     return EvaluatableData(
-        body=ContentEvaluationResultSchema().dump(cer),
+        body=cer.model_dump(mode="json"),
         edifact_format=EdifactFormat.UTILMD,  # not important, something has to be here
         edifact_format_version=EdifactFormatVersion.FV2504,  # not important, something has to be here
     )
