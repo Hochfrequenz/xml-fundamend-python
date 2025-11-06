@@ -52,8 +52,9 @@ def _get_evaluatable_data() -> EvaluatableData[ContentEvaluationResult]:
     :return:
     """
     cer = _content_evaluation_result.get()
+    assert cer is not None
     return EvaluatableData(
-        body=cer.model_dump(mode="json"),
+        body=cer,
         edifact_format=EdifactFormat.UTILMD,  # not important, something has to be here
         edifact_format_version=EdifactFormatVersion.FV2504,  # not important, something has to be here
     )
