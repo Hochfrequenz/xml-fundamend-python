@@ -14,6 +14,7 @@ from uuid import UUID
 import sqlalchemy
 from efoli import EdifactFormatVersion, get_edifact_format_version
 from pydantic import BaseModel
+from sqlalchemy import JSON, Column
 
 try:
     from sqlalchemy.sql.functions import func
@@ -195,7 +196,9 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     versionsnummer: str = Field(index=True)
     gueltig_von: Optional[date] = Field(default=None, index=True)
     gueltig_bis: Optional[date] = Field(default=None, index=True)
-    kommunikation_von: Optional[str] = Field(default=None, index=True)
+    kommunikationsrichtungen: Optional[list[dict[Literal["empfaenger", "sender"], str]]] = Field(
+        default=None, sa_column=Column(JSON)
+    )
     beschreibung: Optional[str] = Field(default=None, index=True)
     edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
 

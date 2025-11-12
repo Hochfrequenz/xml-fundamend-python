@@ -23,7 +23,7 @@ WITH RECURSIVE
                              ah.gueltig_von,
                              ah.gueltig_bis,
                              af.beschreibung,
-                             af.kommunikation_von,
+                             af.kommunikationsrichtungen,
                              ah.edifact_format_version,
                              af.anwendungshandbuch_primary_key,
                              null            as is_on_uebertragungsdatei_level
@@ -47,7 +47,7 @@ WITH RECURSIVE
                              ah.gueltig_von,
                              ah.gueltig_bis,
                              af.beschreibung,
-                             af.kommunikation_von,
+                             af.kommunikationsrichtungen,
                              ah.edifact_format_version,
                              af.anwendungshandbuch_primary_key,
                              s.is_on_uebertragungsdatei_level as is_on_uebertragungsdatei_level
@@ -82,7 +82,7 @@ WITH RECURSIVE
                               o.gueltig_von,
                               o.gueltig_bis,
                               o.beschreibung,
-                              o.kommunikation_von,
+                              o.kommunikationsrichtungen,
                               o.edifact_format_version,
                               o.anwendungshandbuch_primary_key,
                               o.is_on_uebertragungsdatei_level,
@@ -141,7 +141,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
@@ -199,7 +199,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          s.is_on_uebertragungsdatei_level,
@@ -255,7 +255,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
@@ -311,7 +311,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
@@ -368,7 +368,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
@@ -424,7 +424,7 @@ WITH RECURSIVE
                          h.gueltig_von,
                          h.gueltig_bis,
                          h.beschreibung,
-                         h.kommunikation_von,
+                         h.kommunikationsrichtungen,
                          h.edifact_format_version,
                          h.anwendungshandbuch_primary_key,
                          h.is_on_uebertragungsdatei_level,
@@ -496,7 +496,7 @@ CREATE INDEX idx_hierarchy_gueltig_von ON ahb_hierarchy_materialized (gueltig_vo
 CREATE INDEX idx_hierarchy_gueltig_bis ON ahb_hierarchy_materialized (gueltig_bis);
 CREATE INDEX idx_hierarchy_beschreibung ON ahb_hierarchy_materialized (beschreibung);
 CREATE INDEX idx_hierarchy_beschreibung_lower ON ahb_hierarchy_materialized (lower(beschreibung));
-CREATE INDEX idx_hierarchy_kommunikation_von ON ahb_hierarchy_materialized (kommunikation_von);
+CREATE INDEX idx_hierarchy_kommunikationsrichtungen ON ahb_hierarchy_materialized (kommunikationsrichtungen);
 CREATE INDEX idx_hierarchy_edifact_format_version ON ahb_hierarchy_materialized (edifact_format_version);
 CREATE INDEX idx_hierarchy_segmentgroup_id ON ahb_hierarchy_materialized (segmentgroup_id);
 CREATE INDEX idx_hierarchy_segmentgroup_id_lower ON ahb_hierarchy_materialized (lower(segmentgroup_id));
