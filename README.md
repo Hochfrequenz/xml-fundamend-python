@@ -123,7 +123,7 @@ Das Ergebnis sieht dann so aus:
 
 ### SQL Models
 Die Daten aus den XML-Dateien (Stand 2025-02-10 nur AHBs) lassen sich auch in Datenbanken persistieren.
-Die dazu verwendeten [SQLModel](https://sqlmodel.tiangolo.com/)-Klassen lassen sich mit `fundamend[sqlmodel]` installieren.
+Die dazu verwendeten [SQLModel](https://sqlmodel.tiangolo.com/)-Klassen lassen sich mit `fundamend[sqlmodels]` installieren.
 Instanzen der Pydantic-Klassen lassen sich in SQL-Models überführen und umgekehrt:
 ```python
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
@@ -144,7 +144,7 @@ Was wenn man die Datenbank als Grundlage nähme, um eine Frontend für AHBs zu b
 Was wenn man die Datenbank als Grundlage nähme, um ein Frontend zu bauen, das AHBs in verschiedenen Versionen vergleicht und einen lesbaren Diff erzeugt der anders als die Änderungshistorie der PDFs sogar vollständig ist? Das gibt es: [ahlbatross](https://github.com/Hochfrequenz/ahlbatross).
 
 ```python
-# pip install fundamend[sqlmodel]
+# pip install fundamend[sqlmodelsl]
 from pathlib import Path
 from fundamend.sqlmodels.ahbview import create_db_and_populate_with_ahb_view, AhbHierarchyMaterialized
 from sqlmodel import Session, create_engine, select
