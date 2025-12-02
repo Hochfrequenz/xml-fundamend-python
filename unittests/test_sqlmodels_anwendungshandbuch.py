@@ -212,16 +212,8 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
     assert all(x.beschreibung is not None for x in results)
 
 
-def test_id_path_uniqueness_per_pruefidentifikator() -> None:
-    """
-    Verify that id_path is unique per combination of Prüfidentifikator AND EDIFACT format version.
-    This test checks if the id_path construction properly distinguishes between elements
-    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version) tuple.
-    """
-
-    ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
-    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+def _check_uniqueness_of_id_paths(sqlite_path: Path) -> None:
+    engine = create_engine(f"sqlite:///{sqlite_path}")
     with Session(bind=engine) as session:
         stmt = (
             select(
@@ -241,3 +233,30 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
         duplicates = session.exec(stmt).all()
 
     assert not any(duplicates), f"Found duplicate id_paths per pruefidentifikator: {duplicates}"
+
+
+def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
+    """
+    Verify that id_path is unique per combination of Prüfidentifikator AND EDIFACT format version.
+    This test checks if the id_path construction properly distinguishes between elements
+    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version) tuple.
+    """
+
+    ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
+
+
+def test_sqlmodels_all_id_path_uniqueness(sqlite_session: Session) -> None:
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+    assert private_submodule_root.exists() and private_submodule_root.is_dir()
+    relevant_files = (
+        [(p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")]
+        + [(p, date(2025, 6, 6), date(2025, 10, 1)) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
+        + [(p, date(2025, 10, 1), None) for p in (private_submodule_root / "FV2510").rglob("**/*AHB*.xml")]
+        + [(p, date(2026, 4, 1), None) for p in (private_submodule_root / "FV2604").rglob("**/*AHB*.xml")]
+    )
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
