@@ -233,7 +233,7 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
             .group_by(
                 AhbHierarchyMaterialized.id_path,
                 AhbHierarchyMaterialized.pruefidentifikator,
-                AhbHierarchyMaterialized.edifact_format_version,
+                AhbHierarchyMaterialized.edifact_format_version or "",
             )
             .having(func.count() > 1)
             .order_by(func.count().desc())
