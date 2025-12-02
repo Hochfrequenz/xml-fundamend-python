@@ -54,6 +54,10 @@ class AhbDiffLine(SQLModel, table=True):
     __tablename__ = "v_ahb_diff"
 
     # Use a composite key since this is a view joining two tables
+    # Note that the triple: (id_path, format_version, prüfidentifikator) is unique, so you can use it to find the
+    # matching lines e.g. in v_ahbtabellen by using an inner joins and still use ORDER BY sort_path ASC.
+    # When building a frontend that compares 2 AWFs in different versions, just make sure that the left and right
+    # side of the comparison share the same id_path.
     id_path: str = Field(primary_key=True)
     format_version_a: Optional[EdifactFormatVersion] = Field(primary_key=True)
     format_version_b: Optional[EdifactFormatVersion] = Field(primary_key=True)
