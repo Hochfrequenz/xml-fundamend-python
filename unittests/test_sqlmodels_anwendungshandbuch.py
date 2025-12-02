@@ -9,6 +9,7 @@ from typing import Generator
 import pytest
 from efoli import EdifactFormatVersion
 from pydantic import RootModel
+from sqlalchemy import func
 from sqlmodel import Session, SQLModel, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
@@ -217,7 +218,6 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
     This test checks if the id_path construction properly distinguishes between elements
     that appear multiple times in the same AHB.
     """
-    from sqlalchemy import func
 
     ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
     actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
@@ -228,15 +228,15 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
                 AhbHierarchyMaterialized.id_path,
                 AhbHierarchyMaterialized.pruefidentifikator,
                 AhbHierarchyMaterialized.edifact_format_version,
-                func.count().label("cnt"),
+                func.count().label("cnt"),  # pylint:disable=not-callable
             )
             .group_by(
                 AhbHierarchyMaterialized.id_path,
                 AhbHierarchyMaterialized.pruefidentifikator,
                 AhbHierarchyMaterialized.edifact_format_version or "",
             )
-            .having(func.count() > 1)
-            .order_by(func.count().desc())
+            .having(func.count() > 1)  # pylint:disable=not-callable
+            .order_by(func.count().desc())  # pylint:disable=not-callable
         )
         duplicates = session.exec(stmt).all()
 
