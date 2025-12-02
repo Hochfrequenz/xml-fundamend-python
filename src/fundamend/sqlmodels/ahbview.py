@@ -142,7 +142,7 @@ def create_db_and_populate_with_ahb_view(
                         )
                     }
                 )
-                _logger.warning("Removed some AWFs from %s before adding to DB", item[0].absolute())
+                _logger.warning("Removed some AWFs from AHB with version %s before adding to DB", ahb.versionsnummer)
             sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
             sql_ahb.gueltig_von = gueltig_von
             sql_ahb.gueltig_bis = gueltig_bis
