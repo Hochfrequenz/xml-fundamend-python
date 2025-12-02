@@ -206,25 +206,36 @@ ORDER BY sort_path;
 </details>
 
 <details>
-<summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen</summary>
+<summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen, gelöscht oder geändert wurden</summary>
 <br>
 
+Dafür gibt es die View `v_ahb_diff`, die mit `create_ahb_diff_view(session)` erstellt werden kann:
+```python
+from fundamend.sqlmodels import create_ahb_diff_view
+create_ahb_diff_view(session)
+```
+
+Die View erwartet 4 Filter-Parameter beim Abfragen und liefert einen `diff_status`:
+- `added`: Zeile existiert in Version A, aber nicht in Version B
+- `deleted`: Zeile existiert in Version B, aber nicht in Version A
+- `modified`: Zeile existiert in beiden Versionen, aber mit unterschiedlichen Werten
+- `unchanged`: Zeile ist in beiden Versionen identisch
+
+Alle Wert-Spalten existieren doppelt (`_a` und `_b`), um die Werte aus beiden Versionen nebeneinander anzuzeigen.
+
 ```sql
-    with fv2504 as (SELECT *
-                FROM ahb_hierarchy_materialized
-                WHERE pruefidentifikator = '55014'
-                  and edifact_format_version = 'FV2504'
-                ORDER BY sort_path ASC),
-     fv2410 as (SELECT *
-                FROM ahb_hierarchy_materialized
-                WHERE pruefidentifikator = '55014'
-                  and edifact_format_version = 'FV2410'
-                ORDER BY sort_path ASC)
-SELECT fv2504.path
-FROM fv2504
-         LEFT JOIN fv2410 on fv2504.id_path = fv2410.id_path
-WHERE fv2410.id is null -- alle zeilen, die so im fv2410 ahb nicht vorhanden waren
-ORDER BY fv2504.sort_path;
+-- Alle Änderungen zwischen zwei Versionen anzeigen
+SELECT path, diff_status,
+       segment_ahb_status_a, segment_ahb_status_b,
+       dataelement_ahb_status_a, dataelement_ahb_status_b,
+       code_value_a, code_value_b
+FROM v_ahb_diff
+WHERE format_version_a = 'FV2504'
+  AND format_version_b = 'FV2410'
+  AND pruefidentifikator_a = '55014'
+  AND pruefidentifikator_b = '55014'
+  AND diff_status != 'unchanged'
+ORDER BY sort_path;
 ```
 
 </details>
