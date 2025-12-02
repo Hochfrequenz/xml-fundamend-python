@@ -29,25 +29,21 @@ def test_ahb_diff_view_55001(snapshot: SnapshotAssertion) -> None:
     actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    results: list[AhbDiffLine] = []
     with Session(bind=engine) as session:
         create_ahb_diff_view(session)
-        # Query the diff view for changes between FV2410 and FV2504
-        stmt = (
-            select(AhbDiffLine)
-            .where(AhbDiffLine.format_version_a == EdifactFormatVersion.FV2504)
-            .where(AhbDiffLine.format_version_b == EdifactFormatVersion.FV2410)
-            .where(AhbDiffLine.pruefidentifikator_a == "55001")
-            .where(AhbDiffLine.pruefidentifikator_b == "55001")
-            .where(AhbDiffLine.diff_status != "unchanged")
-            .order_by(AhbDiffLine.sort_path)
-        )
-        results = session.exec(stmt).all()
-
+        for pruefidentifikator in ["55001", "55002", "44042", "44043", "27001", "13002", "19011", "15003"]:
+            # the pruefis chosen are arbitrary. they should just cover some common EdifactFormats.
+            stmt = (
+                select(AhbDiffLine)
+                .where(AhbDiffLine.format_version_a == EdifactFormatVersion.FV2504)
+                .where(AhbDiffLine.format_version_b == EdifactFormatVersion.FV2410)
+                .where(AhbDiffLine.pruefidentifikator_a == pruefidentifikator)
+                .where(AhbDiffLine.pruefidentifikator_b == pruefidentifikator)
+                .where(AhbDiffLine.diff_status != "unchanged")
+                .order_by(AhbDiffLine.sort_path)
+            )
+            sub_results = session.exec(stmt).all()
+            results.extend(sub_results)
     raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
-    # Remove columns that are not relevant for comparison
-    for raw_result in raw_results:
-        for column in ["format_version_a", "format_version_b", "pruefidentifikator_a", "pruefidentifikator_b"]:
-            if column in raw_result:
-                del raw_result[column]
-
     snapshot.assert_match(raw_results)
