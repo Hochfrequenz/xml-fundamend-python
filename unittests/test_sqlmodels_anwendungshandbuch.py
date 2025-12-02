@@ -209,3 +209,35 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
     assert all(x.gueltig_von is not None for x in results)
     assert all(x.kommunikationsrichtungen is not None for x in results)
     assert all(x.beschreibung is not None for x in results)
+
+
+def test_id_path_uniqueness_per_pruefidentifikator() -> None:
+    """
+    Verify that id_path is unique per Prüfidentifikator within the same EDIFACT format version.
+    This test checks if the id_path construction properly distinguishes between elements
+    that appear multiple times in the same AHB.
+    """
+    from sqlalchemy import func
+
+    ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    with Session(bind=engine) as session:
+        stmt = (
+            select(
+                AhbHierarchyMaterialized.id_path,
+                AhbHierarchyMaterialized.pruefidentifikator,
+                AhbHierarchyMaterialized.edifact_format_version,
+                func.count().label("cnt"),
+            )
+            .group_by(
+                AhbHierarchyMaterialized.id_path,
+                AhbHierarchyMaterialized.pruefidentifikator,
+                AhbHierarchyMaterialized.edifact_format_version,
+            )
+            .having(func.count() > 1)
+            .order_by(func.count().desc())
+        )
+        duplicates = session.exec(stmt).all()
+
+    assert not any(duplicates), f"Found duplicate id_paths per pruefidentifikator: {duplicates}"

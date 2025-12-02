@@ -537,7 +537,22 @@ CREATE INDEX idx_line_ahb_status_lower ON ahb_hierarchy_materialized (lower(line
 CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
 CREATE INDEX idx_line_name_lower ON ahb_hierarchy_materialized (lower(line_name));
 
+-- Append position to id_path only where duplicates exist (to ensure uniqueness while keeping paths clean)
+-- This updates id_paths that are not unique per (pruefidentifikator, edifact_format_version) by appending the sort_path
+UPDATE ahb_hierarchy_materialized
+SET id_path = id_path || '@' || sort_path
+WHERE id IN (SELECT h1.id
+             FROM ahb_hierarchy_materialized h1
+             WHERE EXISTS (SELECT 1
+                           FROM ahb_hierarchy_materialized h2
+                           WHERE h2.id_path = h1.id_path
+                             AND h2.pruefidentifikator = h1.pruefidentifikator
+                             AND (h2.edifact_format_version = h1.edifact_format_version OR
+                                  (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
+                             AND h2.id != h1.id));
+
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
-CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version);
+CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (path, pruefidentifikator, edifact_format_version);
+
 
