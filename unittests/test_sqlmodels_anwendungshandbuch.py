@@ -214,9 +214,9 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
 
 def test_id_path_uniqueness_per_pruefidentifikator() -> None:
     """
-    Verify that id_path is unique per Prüfidentifikator within the same EDIFACT format version.
+    Verify that id_path is unique per combination of Prüfidentifikator AND EDIFACT format version.
     This test checks if the id_path construction properly distinguishes between elements
-    that appear multiple times in the same AHB.
+    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version) tuple.
     """
 
     ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
