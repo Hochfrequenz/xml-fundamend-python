@@ -72,7 +72,7 @@ SELECT a.edifact_format_version           as format_version_a,
 FROM ahb_hierarchy_materialized a
          LEFT JOIN ahb_hierarchy_materialized b
                    ON a.id_path = b.id_path
-                   AND COALESCE(a.segmentgroup_name, '') = COALESCE(b.segmentgroup_name, '')
+                       AND COALESCE(a.segmentgroup_name, '') = COALESCE(b.segmentgroup_name, '')
 
 UNION ALL
 
@@ -121,5 +121,5 @@ SELECT a.edifact_format_version  as format_version_a,
 FROM ahb_hierarchy_materialized b
          LEFT JOIN ahb_hierarchy_materialized a
                    ON b.id_path = a.id_path
-                   AND COALESCE(b.segmentgroup_name, '') = COALESCE(a.segmentgroup_name, '')
+                       AND COALESCE(b.segmentgroup_name, '') = COALESCE(a.segmentgroup_name, '')
 WHERE a.id IS NULL;
