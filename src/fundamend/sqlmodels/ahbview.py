@@ -195,7 +195,7 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     depth: int
     position: Optional[int] = Field(default=None)
     path: str
-    id_path: str
+    id_path: str = Field(index=True)
     parent_path: str
     root_order: int
     type: str = Field(index=True)

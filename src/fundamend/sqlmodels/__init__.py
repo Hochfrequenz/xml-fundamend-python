@@ -15,6 +15,7 @@ you need to install fundamend[sqlmodels] to use this sub-package
 # E   ValueError: <class 'fundamend.models.anwendungshandbuch.Anwendungshandbuch'> has no matching SQLAlchemy type
 # => you need to keep the models in sync manually by now
 
+from .ahb_diff_view import AhbDiffLine, DiffStatus, create_ahb_diff_view
 from .ahbtabellen_view import AhbTabellenLine, create_ahbtabellen_view
 from .ahbview import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
 from .anwendungshandbuch import (
@@ -32,6 +33,9 @@ __all__ = [
     "create_ahb_view",
     "AhbHierarchyMaterialized",
     "create_db_and_populate_with_ahb_view",
+    "create_ahb_diff_view",
+    "AhbDiffLine",
+    "DiffStatus",
     "create_ahbtabellen_view",
     "AhbTabellenLine",
     "Code",
