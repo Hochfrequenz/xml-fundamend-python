@@ -131,6 +131,18 @@ def create_db_and_populate_with_ahb_view(
                 gueltig_bis = item[2]
             else:
                 raise ValueError(f"Invalid item type in ahb_files: {type(item)}")
+            ahb_contains_bad_awfs = any(
+                awf for awf in ahb.anwendungsfaelle if awf.is_outdated or not awf.pruefidentifikator
+            )
+            if ahb_contains_bad_awfs:
+                ahb = ahb.model_copy(
+                    update={
+                        "anwendungsfaelle": tuple(
+                            awf for awf in ahb.anwendungsfaelle if awf.pruefidentifikator and not awf.is_outdated
+                        )
+                    }
+                )
+                _logger.warning("Removed some AWFs from AHB with version %s before adding to DB", ahb.versionsnummer)
             sql_ahb = SqlAnwendungshandbuch.from_model(ahb)
             sql_ahb.gueltig_von = gueltig_von
             sql_ahb.gueltig_bis = gueltig_bis
