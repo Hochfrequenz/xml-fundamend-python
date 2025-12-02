@@ -58,14 +58,14 @@ SELECT a.edifact_format_version           as format_version_a,
        -- Diff status (only compare AHB status fields, not names)
        CASE
            WHEN b.id IS NULL THEN 'added'
-           WHEN a.segmentgroup_ahb_status != b.segmentgroup_ahb_status
+           WHEN (a.segmentgroup_ahb_status != b.segmentgroup_ahb_status
                OR a.segment_ahb_status != b.segment_ahb_status
                OR a.dataelement_ahb_status != b.dataelement_ahb_status
                OR a.code_ahb_status != b.code_ahb_status
                OR (a.segmentgroup_ahb_status IS NULL) != (b.segmentgroup_ahb_status IS NULL)
                OR (a.segment_ahb_status IS NULL) != (b.segment_ahb_status IS NULL)
                OR (a.dataelement_ahb_status IS NULL) != (b.dataelement_ahb_status IS NULL)
-               OR (a.code_ahb_status IS NULL) != (b.code_ahb_status IS NULL)
+               OR (a.code_ahb_status IS NULL) != (b.code_ahb_status IS NULL)) AND (a.segment_name = b.segment_name)
                THEN 'modified'
            ELSE 'unchanged'
            END                            as diff_status
