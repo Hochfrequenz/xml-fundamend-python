@@ -239,7 +239,8 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
     """
     Verify that id_path is unique per combination of Prüfidentifikator AND EDIFACT format version.
     This test checks if the id_path construction properly distinguishes between elements
-    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version) tuple.
+    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version)
+    tuple.
     """
 
     ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
@@ -247,7 +248,7 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
     _check_uniqueness_of_id_paths(actual_sqlite_path)
 
 
-def test_sqlmodels_all_id_path_uniqueness(sqlite_session: Session) -> None:
+def test_sqlmodels_all_id_path_uniqueness() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
