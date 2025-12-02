@@ -241,6 +241,7 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
     This test checks if the id_path construction properly distinguishes between elements
     that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version)
     tuple.
+    This test is pretty fast because it uses just a single AHB.
     """
 
     ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
@@ -248,16 +249,27 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
     _check_uniqueness_of_id_paths(actual_sqlite_path)
 
 
-def test_sqlmodels_all_id_path_uniqueness() -> None:
+@pytest.mark.parametrize(
+    "format_version,gueltig_von,gueltig_bis",
+    [
+        # parametrizing doesn't affect the result as the different ABHs/AWFs won't share the same format version anyway.
+        pytest.param("FV2410", date(2024, 10, 1), date(2025, 6, 6), id="FV2410"),
+        pytest.param("FV2504", date(2025, 6, 6), date(2025, 10, 1), id="FV2504"),
+        pytest.param("FV2510", date(2025, 10, 1), date(2026,4,1), id="FV2510"),
+        pytest.param("FV2604", date(2026, 4, 1), None, id="FV2604"),
+    ],
+)
+def test_sqlmodels_all_id_path_uniqueness(
+    format_version: str, gueltig_von: date, gueltig_bis: date | None
+) -> None:
+    """this test is pretty slow because it checks against all AHBs"""
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     assert private_submodule_root.exists() and private_submodule_root.is_dir()
-    relevant_files = (
-        [(p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")]
-        + [(p, date(2025, 6, 6), date(2025, 10, 1)) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
-        + [(p, date(2025, 10, 1), None) for p in (private_submodule_root / "FV2510").rglob("**/*AHB*.xml")]
-        + [(p, date(2026, 4, 1), None) for p in (private_submodule_root / "FV2604").rglob("**/*AHB*.xml")]
-    )
+    format_version_path = private_submodule_root / format_version
+    if not format_version_path.exists():
+        pytest.skip(f"Format version {format_version} not found in submodule")
+    relevant_files = [(p, gueltig_von, gueltig_bis) for p in format_version_path.rglob("**/*AHB*.xml")]
     actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
     _check_uniqueness_of_id_paths(actual_sqlite_path)
