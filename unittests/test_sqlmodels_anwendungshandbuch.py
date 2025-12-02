@@ -212,16 +212,8 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
     assert all(x.beschreibung is not None for x in results)
 
 
-def test_id_path_uniqueness_per_pruefidentifikator() -> None:
-    """
-    Verify that id_path is unique per Prüfidentifikator within the same EDIFACT format version.
-    This test checks if the id_path construction properly distinguishes between elements
-    that appear multiple times in the same AHB.
-    """
-
-    ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
-    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+def _check_uniqueness_of_id_paths(sqlite_path: Path) -> None:
+    engine = create_engine(f"sqlite:///{sqlite_path}")
     with Session(bind=engine) as session:
         stmt = (
             select(
@@ -233,7 +225,7 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
             .group_by(
                 AhbHierarchyMaterialized.id_path,
                 AhbHierarchyMaterialized.pruefidentifikator,
-                AhbHierarchyMaterialized.edifact_format_version or "",
+                func.coalesce(AhbHierarchyMaterialized.edifact_format_version, ""),
             )
             .having(func.count() > 1)  # pylint:disable=not-callable
             .order_by(func.count().desc())  # pylint:disable=not-callable
@@ -241,3 +233,41 @@ def test_id_path_uniqueness_per_pruefidentifikator() -> None:
         duplicates = session.exec(stmt).all()
 
     assert not any(duplicates), f"Found duplicate id_paths per pruefidentifikator: {duplicates}"
+
+
+def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
+    """
+    Verify that id_path is unique per combination of Prüfidentifikator AND EDIFACT format version.
+    This test checks if the id_path construction properly distinguishes between elements
+    that appear multiple times in the same AHB, ensuring uniqueness per (pruefidentifikator, edifact_format_version)
+    tuple.
+    This test is pretty fast because it uses just a single AHB.
+    """
+
+    ahb_paths = [Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"]
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
+
+
+@pytest.mark.parametrize(
+    "format_version,gueltig_von,gueltig_bis",
+    [
+        # parametrizing doesn't affect the result as the different ABHs/AWFs won't share the same format version anyway.
+        pytest.param("FV2410", date(2024, 10, 1), date(2025, 6, 6), id="FV2410"),
+        pytest.param("FV2504", date(2025, 6, 6), date(2025, 10, 1), id="FV2504"),
+        pytest.param("FV2510", date(2025, 10, 1), date(2026, 4, 1), id="FV2510"),
+        pytest.param("FV2604", date(2026, 4, 1), None, id="FV2604"),
+    ],
+)
+def test_sqlmodels_all_id_path_uniqueness(format_version: str, gueltig_von: date, gueltig_bis: date | None) -> None:
+    """this test is pretty slow because it checks against all AHBs"""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+    assert private_submodule_root.exists() and private_submodule_root.is_dir()
+    format_version_path = private_submodule_root / format_version
+    if not format_version_path.exists():
+        pytest.skip(f"Format version {format_version} not found in submodule")
+    relevant_files = [(p, gueltig_von, gueltig_bis) for p in format_version_path.rglob("**/*AHB*.xml")]
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
