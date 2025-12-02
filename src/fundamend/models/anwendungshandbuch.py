@@ -189,7 +189,7 @@ class Paket(FundamendBaseModel):
 class Anwendungshandbuch(FundamendBaseModel):
     """
     Ein Anwendungshandbuch, indicated by the `<AHB` tag, bündelt verschiedene Nachrichtentypen/Anwendungsfälle im
-    selben Format oder mit der selben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
+    selben Format oder mit derselben regulatorischen Grundlage und stellt gemeinsame Pakete & Bedingungen bereit.
     """
 
     # Example:
