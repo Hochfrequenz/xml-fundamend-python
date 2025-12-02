@@ -255,13 +255,11 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
         # parametrizing doesn't affect the result as the different ABHs/AWFs won't share the same format version anyway.
         pytest.param("FV2410", date(2024, 10, 1), date(2025, 6, 6), id="FV2410"),
         pytest.param("FV2504", date(2025, 6, 6), date(2025, 10, 1), id="FV2504"),
-        pytest.param("FV2510", date(2025, 10, 1), date(2026,4,1), id="FV2510"),
+        pytest.param("FV2510", date(2025, 10, 1), date(2026, 4, 1), id="FV2510"),
         pytest.param("FV2604", date(2026, 4, 1), None, id="FV2604"),
     ],
 )
-def test_sqlmodels_all_id_path_uniqueness(
-    format_version: str, gueltig_von: date, gueltig_bis: date | None
-) -> None:
+def test_sqlmodels_all_id_path_uniqueness(format_version: str, gueltig_von: date, gueltig_bis: date | None) -> None:
     """this test is pretty slow because it checks against all AHBs"""
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
