@@ -111,6 +111,7 @@ _after_bulk_insert_ops: list[TextClause] = [
     sqlalchemy.text("PRAGMA locking_mode = NORMAL"),
 ]
 
+
 # pylint:disable= too-many-locals
 def create_db_and_populate_with_ahb_view(
     ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
