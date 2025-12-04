@@ -107,8 +107,8 @@ _before_bulk_insert_ops: list[TextClause] = [
     sqlalchemy.text("PRAGMA locking_mode = EXCLUSIVE"),
 ]
 _after_bulk_insert_ops: list[TextClause] = [
-    sqlalchemy.text("PRAGMA synchronous = FULL"),
     sqlalchemy.text("PRAGMA locking_mode = NORMAL"),
+    sqlalchemy.text("PRAGMA synchronous = FULL"),
 ]
 
 
@@ -176,6 +176,8 @@ def create_db_and_populate_with_ahb_view(
             ]
         session.add_all(sql_ahbs)
         session.commit()
+        for _op in _after_bulk_insert_ops:
+            session.execute(_op)
         create_ahb_view(session)
         if drop_raw_tables:
             _check_for_no_overlaps(pruefis_added)
@@ -192,8 +194,6 @@ def create_db_and_populate_with_ahb_view(
                 session.execute(sqlalchemy.text(f"DROP TABLE IF EXISTS {model_class.__tablename__};"))
                 _logger.debug("Dropped %s", model_class.__tablename__)
         session.commit()
-        for _op in _after_bulk_insert_ops:
-            session.execute(_op)
     return sqlite_path
 
 
