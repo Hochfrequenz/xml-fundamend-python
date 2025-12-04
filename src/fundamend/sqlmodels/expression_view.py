@@ -14,7 +14,6 @@ from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
-    from sqlalchemy.sql.functions import func
     from sqlmodel import Field, Session, SQLModel, UniqueConstraint, col, select
 
 except ImportError as import_error:
@@ -186,6 +185,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         if (key := (row[0], row[1], row[2].strip())) not in seen
         and not seen.add(key)  # type:ignore[ func-returns-value]
     ]
+    ahb_expression_rows: list[AhbExpression] = []
     for row in unique_rows:  # there are ~3600 unique rows for FV2410+FV2504 as of 2025-04-15
         expression = row[2].strip()
         if use_cpu_intensive_validity_check:
@@ -195,30 +195,23 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
             )
         else:
             _, node_texts, error_message = _get_validity_node_texts_and_error_message_fast(expression, session, row[3])
-        ahb_expression_row = AhbExpression(
-            edifact_format_version=row[0],
-            format=row[1],
-            expression=expression,
-            node_texts=node_texts,
-            anwendungshandbuch_primary_key=row[3],
-            ahbicht_error_message=error_message,
+        ahb_expression_rows.append(
+            AhbExpression(
+                edifact_format_version=row[0],
+                format=row[1],
+                expression=expression,
+                node_texts=node_texts,
+                anwendungshandbuch_primary_key=row[3],
+                ahbicht_error_message=error_message,
+            )
         )
-        session.add(ahb_expression_row)
-        _logger.debug(
-            "Added row (%s, %s, %s) to the ahb_expressions_table",
-            ahb_expression_row.edifact_format_version,
-            ahb_expression_row.format,
-            ahb_expression_row.expression,
-        )
-    number_of_inserted_rows = session.scalar(
-        select(func.count(AhbExpression.id))  # type:ignore[arg-type]# pylint:disable=not-callable
-    )
+    session.add_all(ahb_expression_rows)
+    session.commit()
     _logger.info(
         "Inserted %d rows into the table %s",
-        number_of_inserted_rows,
+        len(ahb_expression_rows),
         AhbExpression.__tablename__,
     )
-    session.commit()
 
 
 class AhbExpression(SQLModel, table=True):
