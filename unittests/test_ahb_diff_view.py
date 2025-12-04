@@ -6,8 +6,9 @@ from efoli import EdifactFormatVersion
 from sqlmodel import Session, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.sqlmodels import create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
+from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
 from .conftest import is_private_submodule_checked_out
 
@@ -15,9 +16,9 @@ private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
 
 
 @pytest.mark.snapshot
-def test_ahb_diff_view_55001(snapshot: SnapshotAssertion) -> None:
+def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     """
-    Test the diff view by comparing Prüfidentifikator 55001 between FV2410 and FV2504.
+    Test the diff view by comparing between FV2410 and FV2504.
     """
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
@@ -31,15 +32,16 @@ def test_ahb_diff_view_55001(snapshot: SnapshotAssertion) -> None:
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     results: list[AhbDiffLine] = []
     with Session(bind=engine) as session:
+        create_ahbtabellen_view(session)
         create_ahb_diff_view(session)
-        for pruefidentifikator in ["55001", "55002", "44042", "44043", "27001", "13002", "19011", "15003"]:
+        for pruefidentifikator in ["55109", "29002", "44042", "31005", "27001", "13002", "19011", "15003"]:
             # the pruefis chosen are arbitrary. they should just cover some common EdifactFormats.
             stmt = (
                 select(AhbDiffLine)
-                .where(AhbDiffLine.format_version_a == EdifactFormatVersion.FV2504)
-                .where(AhbDiffLine.format_version_b == EdifactFormatVersion.FV2410)
-                .where(AhbDiffLine.pruefidentifikator_a == pruefidentifikator)
-                .where(AhbDiffLine.pruefidentifikator_b == pruefidentifikator)
+                .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2504)
+                .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2410)
+                .where(AhbDiffLine.new_pruefidentifikator == pruefidentifikator)
+                .where(AhbDiffLine.old_pruefidentifikator == pruefidentifikator)
                 .where(AhbDiffLine.diff_status != "unchanged")
                 .order_by(AhbDiffLine.sort_path)
             )
