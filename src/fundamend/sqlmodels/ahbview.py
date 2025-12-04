@@ -168,7 +168,6 @@ def create_db_and_populate_with_ahb_view(
             if sql_ahb.gueltig_von is not None:
                 sql_ahb.edifact_format_version = get_edifact_format_version(sql_ahb.gueltig_von)
             sql_ahbs.append(sql_ahb)
-            # session.add(sql_ahb)
             pruefis_added += [
                 _PruefiValidity(
                     pruefidentifikator=af.pruefidentifikator, gueltig_bis=gueltig_bis, gueltig_von=gueltig_von
