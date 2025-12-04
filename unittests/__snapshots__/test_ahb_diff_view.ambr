@@ -1,8 +1,4 @@
 # serializer version: 1
-# name: test_ahb_diff_view_55001
-  list([
-  ])
-# ---
 # name: test_ahb_diff_view_various_pruefis
   list([
     dict({
