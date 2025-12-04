@@ -537,6 +537,9 @@ CREATE INDEX idx_line_ahb_status_lower ON ahb_hierarchy_materialized (lower(line
 CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
 CREATE INDEX idx_line_name_lower ON ahb_hierarchy_materialized (lower(line_name));
 CREATE INDEX idx_hierarchy_sort_path_per_ahb ON ahb_hierarchy_materialized (sort_path, pruefidentifikator, edifact_format_version);
+
+-- index for v_ahb_diff view queries (filter by version+pruefi, join on id_path)
+CREATE INDEX idx_ahb_diff_lookup ON ahb_hierarchy_materialized (edifact_format_version, pruefidentifikator, id_path);
 -- Append position to id_path only where duplicates exist (to ensure uniqueness while keeping paths clean)
 -- This updates id_paths that are not unique per (pruefidentifikator, edifact_format_version) by appending the sort_path
 UPDATE ahb_hierarchy_materialized

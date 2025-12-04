@@ -9,7 +9,6 @@
       'diff_status': 'modified',
       'id_path': 'UNH>',
       'line_type': 'segment',
-      'new_bedingung': '[555] Die Anwendungsfälle für die Durchführung der BDEW-Anwendungshilfe „Marktprozesse Netzbetreiberwechsel Sparte Strom“ sind ab dem 01.08.2025 für Netzbetreiberwechsel ab dem 01.01.2026 zu verwenden',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [555]',
       'new_line_name': 'Nachrichten-Kopfsegment',
@@ -49,7 +48,6 @@
       'new_pruefidentifikator': '55109',
       'new_segment_code': 'STS',
       'new_segmentgroup_key': 'SG4',
-      'old_bedingung': '[2061] Segment bzw. Segmentgruppe ist genau einmal je SG4 IDE (Vorgang) anzugeben',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Muss [2061]',
       'old_line_name': 'Transaktionsgrund',
@@ -97,7 +95,6 @@
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])',
       'old_data_element': 'D_2380',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [UB1]',
@@ -163,7 +160,6 @@
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[UB1] ([931] ∧ [932] [490]) ⊻ ([931] ∧ [933] [491])',
       'old_data_element': 'D_2380',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [UB1]',
@@ -264,16 +260,11 @@
       'diff_status': 'modified',
       'id_path': 'SG4>SG8>@00005-00006-',
       'line_type': 'segment_group',
-      'new_bedingung': '''
-        [2004] Segmentgruppe ist genau einmal für jede Zeitraum-ID aus dem DE1156 der SG6 RFF+Z49 (Verwendungszeitraum der Daten: "Gültige Daten") anzugeben
-        [480] Wenn SG4 STS+7++xxx+ZW4 (Transaktionsgrundergänzung Verbrauchende Marktlokation) vorhanden
-      ''',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [480] ∧ [2004]',
       'new_line_name': 'Daten des Kunden des Lieferanten',
       'new_pruefidentifikator': '55109',
       'new_segmentgroup_key': 'SG8',
-      'old_bedingung': '[2061] Segment bzw. Segmentgruppe ist genau einmal je SG4 IDE (Vorgang) anzugeben',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Muss [2061]',
       'old_line_name': 'Daten der Marktlokation',
@@ -339,7 +330,6 @@
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[950] Format: Marktlokations-ID',
       'old_data_element': 'D_1154',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [950]',
@@ -436,7 +426,6 @@
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[92] Wenn Wert innerhalb SG bzw. Segment geändert wird',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Soll [92]',
       'old_line_name': 'Gruppenzuordnung (nach EnWG)',
@@ -466,7 +455,6 @@
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[92] Wenn Wert innerhalb SG bzw. Segment geändert wird',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Soll [92]',
       'old_line_name': 'Daten des Kunden des Lieferanten',
@@ -523,16 +511,11 @@
       'diff_status': 'modified',
       'id_path': 'SG4>SG12>@00005-00008-',
       'line_type': 'segment_group',
-      'new_bedingung': '''
-        [2004] Segmentgruppe ist genau einmal für jede Zeitraum-ID aus dem DE1156 der SG6 RFF+Z49 (Verwendungszeitraum der Daten: "Gültige Daten") anzugeben
-        [480] Wenn SG4 STS+7++xxx+ZW4 (Transaktionsgrundergänzung Verbrauchende Marktlokation) vorhanden
-      ''',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [480] ∧ [2004]',
       'new_line_name': 'Korrespondenzanschrift des Kunden des Lieferanten',
       'new_pruefidentifikator': '55109',
       'new_segmentgroup_key': 'SG12',
-      'old_bedingung': '[92] Wenn Wert innerhalb SG bzw. Segment geändert wird',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Soll [92]',
       'old_line_name': 'Kunde des Lieferanten',
@@ -583,11 +566,6 @@
       'diff_status': 'modified',
       'id_path': 'SG4>SG12>RFF>C_C506>D_1154>@00005-00008-00001-00000-00001-',
       'line_type': 'dataelement',
-      'new_bedingung': '''
-        [22] Es ist die Zeitraum-ID vom DE1156 aus einem passenden SG6 RFF+Z47/ Z48/ Z49 (Verwendungszeitraum der Daten) einzutragen
-        [914] Format: Möglicher Wert: > 0
-        [937] Format: keine Nachkommastelle
-      ''',
       'new_data_element': 'D_1154',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'X [914] ∧ [937] [22]',
@@ -643,7 +621,6 @@
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[950] Format: Marktlokations-ID',
       'old_data_element': 'D_1154',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [950]',
@@ -660,7 +637,6 @@
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[92] Wenn Wert innerhalb SG bzw. Segment geändert wird',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'Soll [92]',
       'old_line_name': 'Korrespondenzanschrift des Kunden des Lieferanten',
@@ -772,7 +748,6 @@
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
-      'old_bedingung': '[950] Format: Marktlokations-ID',
       'old_data_element': 'D_1154',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [950]',
@@ -835,7 +810,6 @@
       'diff_status': 'modified',
       'id_path': 'SG17>SG36>SG40>',
       'line_type': 'segment_group',
-      'new_bedingung': '[53] Diese SG40 darf genau einmal in der SG36 angegeben werden',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [53]',
       'new_line_name': 'Preisangabe',
@@ -853,7 +827,6 @@
       'diff_status': 'modified',
       'id_path': 'SG1>RFF>C_C506>D_1154>@00004-00000-00000-00001-',
       'line_type': 'dataelement',
-      'new_bedingung': '[529] Hinweis: Wert aus BGM+7 DE1004 der ORDERS mit der die Anforderung von Messwerten erfolgt ist.',
       'new_data_element': 'D_1154',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'X [529]',
@@ -861,7 +834,6 @@
       'new_pruefidentifikator': '13002',
       'new_segment_code': 'RFF',
       'new_segmentgroup_key': 'SG1',
-      'old_bedingung': '[529] Hinweis: Wert aus BGM+7 DE1004 der ORDERS mit der die Anforderung von Messwerten erfolgt ist.',
       'old_data_element': 'D_1154',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': 'X [529]',
@@ -871,41 +843,6 @@
       'old_segmentgroup_key': 'SG1',
       'path': 'Referenz > Referenzangaben > Referenz > Referenznummer',
       'sort_path': '00004-00000-00000-00001-',
-    }),
-    dict({
-      'diff_status': 'modified',
-      'id_path': 'SG2>SG4>COM>C_C076>D_3148>',
-      'line_type': 'dataelement',
-      'new_bedingung': '''
-        [142] wenn im DE3155 in demselben COM der Code EM vorhanden ist
-        [143] wenn im DE3155 in demselben COM der Code TE / FX / AJ / AL vorhanden ist
-        [576] Hinweis: Es darf nur eine Information im DE3148 übermittelt werden
-        [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
-        [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
-      ''',
-      'new_data_element': 'D_3148',
-      'new_format_version': 'FV2504',
-      'new_line_ahb_status': 'X (([939] [142]) ∨ ([940] [143])) ∧ [576]',
-      'new_line_name': 'Kommunikationsadresse, Identifikation',
-      'new_pruefidentifikator': '13002',
-      'new_segment_code': 'COM',
-      'new_segmentgroup_key': 'SG4',
-      'old_bedingung': '''
-        [142] wenn im DE3155 im demselben COM der Code EM vorhanden ist
-        [143] wenn im DE3155 im demselben COM der Code TE / FX / AJ / AL vorhanden ist
-        [576] Hinweis: Es darf nur eine Information im DE3148 übermittelt werden
-        [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
-        [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
-      ''',
-      'old_data_element': 'D_3148',
-      'old_format_version': 'FV2410',
-      'old_line_ahb_status': 'X (([939] [142]) ∨ ([940] [143])) ∧ [576]',
-      'old_line_name': 'Kommunikationsadresse, Identifikation',
-      'old_pruefidentifikator': '13002',
-      'old_segment_code': 'COM',
-      'old_segmentgroup_key': 'SG4',
-      'path': 'MP-ID Absender > Kontaktinformation > Kommunikationsverbindung > Kommunikationsverbindung > Kommunikationsadresse, Identifikation',
-      'sort_path': '00007-00001-00001-00000-00000-',
     }),
     dict({
       'diff_status': 'deleted',
@@ -927,13 +864,6 @@
       'diff_status': 'modified',
       'id_path': 'SG3>SG6>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
-      'new_bedingung': '''
-        [50] wenn im DE3155 in demselben COM der Code EM vorhanden ist
-        [51] wenn im DE3155 in demselben COM der Code TE / FX / AJ / AL vorhanden ist
-        [540] Hinweis: Es darf nur eine Information im DE3148 übermittelt werden
-        [939] Format: Die Zeichenkette muss die Zeichen @ und . enthalten
-        [940] Format: Die Zeichenkette muss mit dem Zeichen + beginnen und danach dürfen nur noch Ziffern folgen
-      ''',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'X (([939] [50]) ∨ ([940] [51])) ∧ [540]',
