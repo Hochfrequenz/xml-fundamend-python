@@ -21,21 +21,31 @@ DROP TABLE IF EXISTS v_ahb_diff;
 DROP VIEW IF EXISTS v_ahb_diff;
 
 CREATE VIEW v_ahb_diff AS
--- All comparison pairs: new x old (full join simulated via LEFT JOINs + UNION)
--- This includes: added (new only), deleted (old only), modified, unchanged
+-- Generate all version pairs first, then do proper matching within each pair
+-- This approach creates the cross-product of version pairs, then finds added/deleted/modified/unchanged
+WITH version_pairs AS (
+    -- All possible pairs of (old_version, old_pruefi) x (new_version, new_pruefi)
+    SELECT DISTINCT
+        old_v.format_version AS old_format_version,
+        old_v.pruefidentifikator AS old_pruefidentifikator,
+        new_v.format_version AS new_format_version,
+        new_v.pruefidentifikator AS new_pruefidentifikator
+    FROM (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) old_v
+    CROSS JOIN (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) new_v
+)
+-- Modified and unchanged rows (exist in both old and new for the same id_path within the pair)
 SELECT
     CASE
-        WHEN old_tbl.id_path IS NULL THEN 'added'
         WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
           OR COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
           OR COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
         THEN 'modified'
         ELSE 'unchanged'
     END AS diff_status,
-    COALESCE(new_tbl.id_path, old_tbl.id_path) AS id_path,
-    COALESCE(new_tbl.sort_path, old_tbl.sort_path) AS sort_path,
-    COALESCE(new_tbl.path, old_tbl.path) AS path,
-    COALESCE(new_tbl.line_type, old_tbl.line_type) AS line_type,
+    new_tbl.id_path AS id_path,
+    new_tbl.sort_path AS sort_path,
+    new_tbl.path AS path,
+    new_tbl.line_type AS line_type,
     -- Old version columns
     old_tbl.format_version AS old_format_version,
     old_tbl.pruefidentifikator AS old_pruefidentifikator,
@@ -58,12 +68,60 @@ SELECT
     new_tbl.line_name AS new_line_name,
     new_tbl.bedingung AS new_bedingung,
     new_tbl.bedingungsfehler AS new_bedingungsfehler
-FROM v_ahbtabellen new_tbl
-LEFT JOIN v_ahbtabellen old_tbl ON new_tbl.id_path = old_tbl.id_path
+FROM version_pairs vp
+JOIN v_ahbtabellen new_tbl
+    ON new_tbl.format_version = vp.new_format_version
+    AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+JOIN v_ahbtabellen old_tbl
+    ON old_tbl.format_version = vp.old_format_version
+    AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
+    AND old_tbl.id_path = new_tbl.id_path
 
 UNION ALL
 
--- Deleted rows (in old but not in new) - only rows where id_path doesn't match ANY new row
+-- Added rows (exist in new but not in old for the specific version pair)
+SELECT
+    'added' AS diff_status,
+    new_tbl.id_path,
+    new_tbl.sort_path,
+    new_tbl.path,
+    new_tbl.line_type,
+    -- Old version columns (NULL for added rows)
+    vp.old_format_version AS old_format_version,
+    vp.old_pruefidentifikator AS old_pruefidentifikator,
+    NULL AS old_segmentgroup_key,
+    NULL AS old_segment_code,
+    NULL AS old_data_element,
+    NULL AS old_qualifier,
+    NULL AS old_line_ahb_status,
+    NULL AS old_line_name,
+    NULL AS old_bedingung,
+    NULL AS old_bedingungsfehler,
+    -- New version columns
+    new_tbl.format_version AS new_format_version,
+    new_tbl.pruefidentifikator AS new_pruefidentifikator,
+    new_tbl.segmentgroup_key AS new_segmentgroup_key,
+    new_tbl.segment_code AS new_segment_code,
+    new_tbl.data_element AS new_data_element,
+    new_tbl.qualifier AS new_qualifier,
+    new_tbl.line_ahb_status AS new_line_ahb_status,
+    new_tbl.line_name AS new_line_name,
+    new_tbl.bedingung AS new_bedingung,
+    new_tbl.bedingungsfehler AS new_bedingungsfehler
+FROM version_pairs vp
+JOIN v_ahbtabellen new_tbl
+    ON new_tbl.format_version = vp.new_format_version
+    AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+WHERE NOT EXISTS (
+    SELECT 1 FROM v_ahbtabellen old_tbl
+    WHERE old_tbl.format_version = vp.old_format_version
+      AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
+      AND old_tbl.id_path = new_tbl.id_path
+)
+
+UNION ALL
+
+-- Deleted rows (exist in old but not in new for the specific version pair)
 SELECT
     'deleted' AS diff_status,
     old_tbl.id_path,
@@ -81,9 +139,9 @@ SELECT
     old_tbl.line_name AS old_line_name,
     old_tbl.bedingung AS old_bedingung,
     old_tbl.bedingungsfehler AS old_bedingungsfehler,
-    -- New version columns populated from the attempted join target for filtering
-    new_tbl.format_version AS new_format_version,
-    new_tbl.pruefidentifikator AS new_pruefidentifikator,
+    -- New version columns (NULL for deleted rows, except version/pruefi for filtering)
+    vp.new_format_version AS new_format_version,
+    vp.new_pruefidentifikator AS new_pruefidentifikator,
     NULL AS new_segmentgroup_key,
     NULL AS new_segment_code,
     NULL AS new_data_element,
@@ -92,11 +150,13 @@ SELECT
     NULL AS new_line_name,
     NULL AS new_bedingung,
     NULL AS new_bedingungsfehler
-FROM v_ahbtabellen old_tbl
-CROSS JOIN (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) new_tbl
+FROM version_pairs vp
+JOIN v_ahbtabellen old_tbl
+    ON old_tbl.format_version = vp.old_format_version
+    AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
 WHERE NOT EXISTS (
-    SELECT 1 FROM v_ahbtabellen existing_new
-    WHERE existing_new.id_path = old_tbl.id_path
-      AND existing_new.format_version = new_tbl.format_version
-      AND existing_new.pruefidentifikator = new_tbl.pruefidentifikator
+    SELECT 1 FROM v_ahbtabellen new_tbl
+    WHERE new_tbl.format_version = vp.new_format_version
+      AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+      AND new_tbl.id_path = old_tbl.id_path
 );
