@@ -248,4 +248,4 @@ class AhbExpression(SQLModel, table=True):
     respective Expression (e.g. for expression "Muss [1] U [2]")
     """
     ahbicht_error_message: str | None = Field(default=None)
-    anwendungshandbuch_primary_key: uuid.UUID = Field()
+    anwendungshandbuch_primary_key: uuid.UUID = Field(foreign_key="anwendungshandbuch.primary_key")
