@@ -107,6 +107,8 @@ _before_bulk_insert_ops: list[TextClause] = [
     sqlalchemy.text("PRAGMA locking_mode = EXCLUSIVE"),
 ]
 _after_bulk_insert_ops: list[TextClause] = [
+    sqlalchemy.text("PRAGMA wal_checkpoint(FULL)"),
+    sqlalchemy.text("PRAGMA journal_mode = DELETE"),
     sqlalchemy.text("PRAGMA locking_mode = NORMAL"),
     sqlalchemy.text("PRAGMA synchronous = FULL"),
 ]
