@@ -35,7 +35,14 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
         create_ahb_diff_view(session)
         for pruefidentifikator in [
             # Existing prüfis
-            "55109", "29002", "44042", "31005", "27001", "13002", "19011", "15003",
+            "55109",
+            "29002",
+            "44042",
+            "31005",
+            "27001",
+            "13002",
+            "19011",
+            "15003",
             # New prüfis to test structural changes (added/deleted elements)
             "21000",  # IFTSTA - status messages
             "21001",  # IFTSTA - another status message prüfi
