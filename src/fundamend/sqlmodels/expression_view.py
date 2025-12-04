@@ -14,7 +14,6 @@ from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
 
 try:
-    from sqlalchemy.sql.functions import func
     from sqlmodel import Field, Session, SQLModel, UniqueConstraint, col, select
 
 except ImportError as import_error:
