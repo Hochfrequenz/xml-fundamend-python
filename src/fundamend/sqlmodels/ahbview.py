@@ -15,6 +15,7 @@ import sqlalchemy
 from efoli import EdifactFormatVersion, get_edifact_format_version
 from pydantic import BaseModel
 from sqlalchemy import JSON, Column
+from sqlalchemy.sql.elements import TextClause
 
 try:
     from sqlalchemy.sql.functions import func
@@ -98,6 +99,22 @@ def _check_for_no_overlaps(pruefi_validities: list[_PruefiValidity]) -> None:
         )
 
 
+_before_bulk_insert_ops: list[TextClause] = [
+    sqlalchemy.text("PRAGMA synchronous = OFF"),
+    sqlalchemy.text("PRAGMA journal_mode = WAL"),
+    sqlalchemy.text("PRAGMA cache_size = -64000"),
+    sqlalchemy.text("PRAGMA temp_store = MEMORY"),
+    sqlalchemy.text("PRAGMA locking_mode = EXCLUSIVE"),
+]
+_after_bulk_insert_ops: list[TextClause] = [
+    sqlalchemy.text("PRAGMA wal_checkpoint(FULL)"),
+    sqlalchemy.text("PRAGMA journal_mode = DELETE"),
+    sqlalchemy.text("PRAGMA locking_mode = NORMAL"),
+    sqlalchemy.text("PRAGMA synchronous = FULL"),
+]
+
+
+# pylint:disable= too-many-locals
 def create_db_and_populate_with_ahb_view(
     ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
     drop_raw_tables: bool = False,
@@ -116,7 +133,13 @@ def create_db_and_populate_with_ahb_view(
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     pruefis_added: list[_PruefiValidity] = []
+    with engine.connect() as conn:
+        # SQLite performance optimizations for bulk insert operations
+        for _op in _before_bulk_insert_ops:
+            conn.execute(_op)
+        conn.commit()
     with Session(bind=engine) as session:
+        sql_ahbs: list[SqlAnwendungshandbuch] = []
         for item in ahb_files:
             ahb: PydanticAnwendungshandbuch
             gueltig_von: Optional[date]
@@ -148,15 +171,21 @@ def create_db_and_populate_with_ahb_view(
             sql_ahb.gueltig_bis = gueltig_bis
             if sql_ahb.gueltig_von is not None:
                 sql_ahb.edifact_format_version = get_edifact_format_version(sql_ahb.gueltig_von)
-            session.add(sql_ahb)
+            sql_ahbs.append(sql_ahb)
             pruefis_added += [
                 _PruefiValidity(
                     pruefidentifikator=af.pruefidentifikator, gueltig_bis=gueltig_bis, gueltig_von=gueltig_von
                 )
                 for af in sql_ahb.anwendungsfaelle
             ]
+        session.add_all(sql_ahbs)
         session.commit()
-        session.flush()
+    with engine.connect() as conn:
+        for _op in _after_bulk_insert_ops:
+            conn.execute(_op)
+        conn.commit()
+    # reopen a new connection/session after aggressive bulk insert to avoid side effects of PRAGMA (re)settings
+    with Session(bind=engine) as session:
         create_ahb_view(session)
         if drop_raw_tables:
             _check_for_no_overlaps(pruefis_added)
@@ -173,7 +202,6 @@ def create_db_and_populate_with_ahb_view(
                 session.execute(sqlalchemy.text(f"DROP TABLE IF EXISTS {model_class.__tablename__};"))
                 _logger.debug("Dropped %s", model_class.__tablename__)
         session.commit()
-        session.flush()
     return sqlite_path
 
 
