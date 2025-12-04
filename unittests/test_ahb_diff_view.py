@@ -33,7 +33,21 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     with Session(bind=engine) as session:
         create_ahbtabellen_view(session)
         create_ahb_diff_view(session)
-        for pruefidentifikator in ["55109", "29002", "44042", "31005", "27001", "13002", "19011", "15003"]:
+        for pruefidentifikator in [
+            # Existing prüfis
+            "55109", "29002", "44042", "31005", "27001", "13002", "19011", "15003",
+            # New prüfis to test structural changes (added/deleted elements)
+            "21000",  # IFTSTA - status messages
+            "21001",  # IFTSTA - another status message prüfi
+            "33001",  # REMADV - remittance advice
+            "37001",  # PARTIN - party information
+            "25001",  # UTILTS - utility time series
+            "39000",  # ORDCHG - order change (major version difference)
+            "13007",  # MSCONS - metered services consumption
+            "17001",  # ORDERS - orders
+            "31001",  # INVOIC - invoice
+            "17101",  # ORDERS - another orders prüfi
+        ]:
             # the pruefis chosen are arbitrary. they should just cover some common EdifactFormats.
             stmt = (
                 select(AhbDiffLine)
