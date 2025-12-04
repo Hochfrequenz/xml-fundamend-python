@@ -8,6 +8,7 @@ from syrupy.assertion import SnapshotAssertion
 
 from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
+
 from .conftest import is_private_submodule_checked_out
 
 private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
