@@ -133,10 +133,12 @@ def create_db_and_populate_with_ahb_view(
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     pruefis_added: list[_PruefiValidity] = []
-    with Session(bind=engine) as session:
+    with engine.connect() as conn:
         # SQLite performance optimizations for bulk insert operations
         for _op in _before_bulk_insert_ops:
-            session.execute(_op)
+            conn.execute(_op)
+        conn.commit()
+    with Session(bind=engine) as session:
         sql_ahbs: list[SqlAnwendungshandbuch] = []
         for item in ahb_files:
             ahb: PydanticAnwendungshandbuch
@@ -178,8 +180,12 @@ def create_db_and_populate_with_ahb_view(
             ]
         session.add_all(sql_ahbs)
         session.commit()
+    with engine.connect() as conn:
         for _op in _after_bulk_insert_ops:
-            session.execute(_op)
+            conn.execute(_op)
+        conn.commit()
+    # reopen a new connection/session after aggressive bulk insert to avoid side effects of PRAGMA (re)settings
+    with Session(bind=engine) as session:
         create_ahb_view(session)
         if drop_raw_tables:
             _check_for_no_overlaps(pruefis_added)
