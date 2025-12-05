@@ -1,6 +1,4 @@
 from datetime import date
-from pathlib import Path
-from typing import Generator
 
 import pytest
 from efoli import EdifactFormatVersion
@@ -9,33 +7,8 @@ from syrupy.assertion import SnapshotAssertion
 
 from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
-from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
-from .conftest import is_private_submodule_checked_out
-
-private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
-
-
-@pytest.fixture(scope="module")
-def diff_view_session() -> Generator[Session, None, None]:
-    """
-    Module-scoped fixture that creates a database with the diff view.
-    This is expensive to create, so we reuse it across tests in this module.
-    """
-    if not is_private_submodule_checked_out():
-        pytest.skip("Skipping test because of missing private submodule")
-
-    ahb_paths = [
-        (p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")
-    ] + [(p, date(2025, 6, 6), None) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
-
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
-    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
-    with Session(bind=engine) as session:
-        create_and_fill_ahb_expression_table(session)
-        create_ahbtabellen_view(session)
-        create_ahb_diff_view(session)
-        yield session
+from .conftest import is_private_submodule_checked_out, private_submodule_root
 
 
 @pytest.mark.snapshot
@@ -95,12 +68,12 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     snapshot.assert_match(raw_results)
 
 
-def test_diff_view_self_comparison_returns_only_unchanged(diff_view_session: Session) -> None:
+def test_diff_view_self_comparison_returns_only_unchanged(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that comparing a version to itself returns only 'unchanged' entries.
     This verifies the diff logic is correct - nothing should be added/deleted/modified.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT diff_status, COUNT(*) as cnt
@@ -120,13 +93,13 @@ def test_diff_view_self_comparison_returns_only_unchanged(diff_view_session: Ses
     assert status_counts["unchanged"] > 0, "Self-comparison should have at least one unchanged entry"
 
 
-def test_diff_view_symmetry_added_deleted(diff_view_session: Session) -> None:
+def test_diff_view_symmetry_added_deleted(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that diff is symmetric: added in forward direction = deleted in reverse direction.
     This is a fundamental property that must hold for the diff to be correct.
     """
     # Forward direction: FV2410 -> FV2504
-    result_fwd = diff_view_session.execute(
+    result_fwd = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT diff_status, COUNT(*) as cnt
@@ -140,7 +113,7 @@ def test_diff_view_symmetry_added_deleted(diff_view_session: Session) -> None:
     fwd = {row[0]: row[1] for row in result_fwd}
 
     # Reverse direction: FV2504 -> FV2410
-    result_rev = diff_view_session.execute(
+    result_rev = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT diff_status, COUNT(*) as cnt
@@ -162,12 +135,12 @@ def test_diff_view_symmetry_added_deleted(diff_view_session: Session) -> None:
     assert fwd.get("unchanged", 0) == rev.get("unchanged", 0), "Unchanged count should be symmetric"
 
 
-def test_diff_view_no_duplicate_id_paths(diff_view_session: Session) -> None:
+def test_diff_view_no_duplicate_id_paths(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that there are no duplicate id_paths for the same version pair comparison.
     Each id_path should appear exactly once in the diff results.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT id_path, COUNT(*) as cnt
@@ -183,12 +156,12 @@ def test_diff_view_no_duplicate_id_paths(diff_view_session: Session) -> None:
     assert len(duplicates) == 0, f"Found duplicate id_paths in diff results: {duplicates[:5]}"
 
 
-def test_diff_view_added_rows_have_null_old_columns(diff_view_session: Session) -> None:
+def test_diff_view_added_rows_have_null_old_columns(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that 'added' rows have NULL values for old_* columns and populated new_* columns.
     This verifies the SQL is correctly setting NULL for the old version.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT
@@ -208,12 +181,12 @@ def test_diff_view_added_rows_have_null_old_columns(diff_view_session: Session) 
     assert row[2] > 0, "Added rows should have non-NULL new_line_ahb_status"
 
 
-def test_diff_view_deleted_rows_have_null_new_columns(diff_view_session: Session) -> None:
+def test_diff_view_deleted_rows_have_null_new_columns(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that 'deleted' rows have NULL values for new_* columns and populated old_* columns.
     This verifies the SQL is correctly setting NULL for the new version.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT
@@ -233,12 +206,12 @@ def test_diff_view_deleted_rows_have_null_new_columns(diff_view_session: Session
     assert row[2] > 0, "Deleted rows should have non-NULL old_line_ahb_status"
 
 
-def test_diff_view_modified_rows_have_actual_differences(diff_view_session: Session) -> None:
+def test_diff_view_modified_rows_have_actual_differences(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that 'modified' rows actually have differences in at least one compared field.
     This verifies the CASE statement logic is correct.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT id_path, old_line_ahb_status, new_line_ahb_status,
@@ -259,11 +232,11 @@ def test_diff_view_modified_rows_have_actual_differences(diff_view_session: Sess
         assert status_diff or name_diff or bed_diff, f"Modified row {id_path} has no actual differences"
 
 
-def test_diff_view_nonexistent_pruefi_returns_empty(diff_view_session: Session) -> None:
+def test_diff_view_nonexistent_pruefi_returns_empty(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
     Test that querying a non-existent prüfidentifikator returns empty results.
     """
-    result = diff_view_session.execute(
+    result = session_fv2410_fv2504_with_diff_view.execute(
         text(
             """
         SELECT COUNT(*) FROM v_ahb_diff
