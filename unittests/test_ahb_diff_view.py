@@ -3,13 +3,12 @@ from pathlib import Path
 from typing import Generator
 
 import pytest
-import sqlalchemy
 from efoli import EdifactFormatVersion
 from sqlmodel import Session, create_engine, select, text
 from syrupy.assertion import SnapshotAssertion
 
 from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
-from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, DiffStatus, create_ahb_diff_view
+from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
 from .conftest import is_private_submodule_checked_out
