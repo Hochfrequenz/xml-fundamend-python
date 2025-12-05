@@ -1,125 +1,162 @@
--- Assume that materialize_ahb_view.sql has been executed already.
--- This view allows comparing two AHB versions to find added, deleted, and modified rows.
--- Usage:
+-- Assume that materialize_ahb_view.sql and create_ahbtabellen_view.sql have been executed already.
+-- This view allows comparing two AHB versions (using v_ahbtabellen) to find added, deleted, and modified rows.
+--
+-- IMPORTANT: This view produces a cross-product of all version pairs. You MUST filter by version and pruefidentifikator.
+--
+-- Usage for comparing FV2410 -> FV2504 for pruefidentifikator 55014:
 --   SELECT * FROM v_ahb_diff
---   WHERE format_version_a = 'FV2504'
---     AND format_version_b = 'FV2410'
---     AND pruefidentifikator_a = '55014'
---     AND pruefidentifikator_b = '55014'
---     AND diff_status = 'added'
+--   WHERE old_format_version = 'FV2410'
+--     AND old_pruefidentifikator = '55014'
+--     AND new_format_version = 'FV2504'
+--     AND new_pruefidentifikator = '55014'
 --   ORDER BY sort_path;
 --
 -- diff_status can be: 'added', 'deleted', 'modified', 'unchanged'
+-- The view compares line_ahb_status, bedingung, and line_name to determine modifications.
+--
+-- For deleted rows, old_ columns are populated and new_ columns are NULL.
+-- For added rows, new_ columns are populated and old_ columns are NULL.
 
 DROP TABLE IF EXISTS v_ahb_diff;
 DROP VIEW IF EXISTS v_ahb_diff;
 
 CREATE VIEW v_ahb_diff AS
--- Rows in A (added, modified, unchanged)
-SELECT a.edifact_format_version           as format_version_a,
-       b.edifact_format_version           as format_version_b,
-       a.pruefidentifikator               as pruefidentifikator_a,
-       b.pruefidentifikator               as pruefidentifikator_b,
-       COALESCE(a.path, b.path)           as path,
-       COALESCE(a.id_path, b.id_path)     as id_path,
-       COALESCE(a.sort_path, b.sort_path) as sort_path,
-       COALESCE(a.type, b.type)           as type,
-       -- Segment Group
-       a.segmentgroup_name                as segmentgroup_name_a,
-       b.segmentgroup_name                as segmentgroup_name_b,
-       a.segmentgroup_ahb_status          as segmentgroup_ahb_status_a,
-       b.segmentgroup_ahb_status          as segmentgroup_ahb_status_b,
-       -- Segment
-       a.segment_id                       as segment_id_a,
-       b.segment_id                       as segment_id_b,
-       a.segment_name                     as segment_name_a,
-       b.segment_name                     as segment_name_b,
-       a.segment_ahb_status               as segment_ahb_status_a,
-       b.segment_ahb_status               as segment_ahb_status_b,
-       -- Data Element Group
-       a.dataelementgroup_id              as dataelementgroup_id_a,
-       b.dataelementgroup_id              as dataelementgroup_id_b,
-       a.dataelementgroup_name            as dataelementgroup_name_a,
-       b.dataelementgroup_name            as dataelementgroup_name_b,
-       -- Data Element
-       a.dataelement_id                   as dataelement_id_a,
-       b.dataelement_id                   as dataelement_id_b,
-       a.dataelement_name                 as dataelement_name_a,
-       b.dataelement_name                 as dataelement_name_b,
-       a.dataelement_ahb_status           as dataelement_ahb_status_a,
-       b.dataelement_ahb_status           as dataelement_ahb_status_b,
-       -- Code
-       a.code_value                       as code_value_a,
-       b.code_value                       as code_value_b,
-       a.code_name                        as code_name_a,
-       b.code_name                        as code_name_b,
-       a.code_ahb_status                  as code_ahb_status_a,
-       b.code_ahb_status                  as code_ahb_status_b,
-       -- Diff status (only compare AHB status fields, not names)
-       CASE
-           WHEN b.id IS NULL THEN 'added'
-           WHEN (a.segmentgroup_ahb_status != b.segmentgroup_ahb_status
-               OR a.segment_ahb_status != b.segment_ahb_status
-               OR a.dataelement_ahb_status != b.dataelement_ahb_status
-               OR a.code_ahb_status != b.code_ahb_status
-               OR (a.segmentgroup_ahb_status IS NULL) != (b.segmentgroup_ahb_status IS NULL)
-               OR (a.segment_ahb_status IS NULL) != (b.segment_ahb_status IS NULL)
-               OR (a.dataelement_ahb_status IS NULL) != (b.dataelement_ahb_status IS NULL)
-               OR (a.code_ahb_status IS NULL) != (b.code_ahb_status IS NULL)) AND (a.segment_name = b.segment_name)
-               THEN 'modified'
-           ELSE 'unchanged'
-           END                            as diff_status
-FROM ahb_hierarchy_materialized a
-         LEFT JOIN ahb_hierarchy_materialized b
-                   ON a.id_path = b.id_path
-                       AND COALESCE(a.segmentgroup_name, '') = COALESCE(b.segmentgroup_name, '')
+-- Generate all version pairs first, then do proper matching within each pair
+-- This approach creates the cross-product of version pairs, then finds added/deleted/modified/unchanged
+WITH version_pairs AS (
+    -- All possible pairs of (old_version, old_pruefi) x (new_version, new_pruefi)
+    SELECT DISTINCT
+        old_v.format_version AS old_format_version,
+        old_v.pruefidentifikator AS old_pruefidentifikator,
+        new_v.format_version AS new_format_version,
+        new_v.pruefidentifikator AS new_pruefidentifikator
+    FROM (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) old_v
+    CROSS JOIN (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) new_v
+)
+-- Modified and unchanged rows (exist in both old and new for the same id_path within the pair)
+SELECT
+    CASE
+        WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
+          OR COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
+          OR COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+        THEN 'modified'
+        ELSE 'unchanged'
+    END AS diff_status,
+    new_tbl.id_path AS id_path,
+    new_tbl.sort_path AS sort_path,
+    new_tbl.path AS path,
+    new_tbl.line_type AS line_type,
+    -- Old version columns
+    old_tbl.format_version AS old_format_version,
+    old_tbl.pruefidentifikator AS old_pruefidentifikator,
+    old_tbl.segmentgroup_key AS old_segmentgroup_key,
+    old_tbl.segment_code AS old_segment_code,
+    old_tbl.data_element AS old_data_element,
+    old_tbl.qualifier AS old_qualifier,
+    old_tbl.line_ahb_status AS old_line_ahb_status,
+    old_tbl.line_name AS old_line_name,
+    old_tbl.bedingung AS old_bedingung,
+    old_tbl.bedingungsfehler AS old_bedingungsfehler,
+    -- New version columns
+    new_tbl.format_version AS new_format_version,
+    new_tbl.pruefidentifikator AS new_pruefidentifikator,
+    new_tbl.segmentgroup_key AS new_segmentgroup_key,
+    new_tbl.segment_code AS new_segment_code,
+    new_tbl.data_element AS new_data_element,
+    new_tbl.qualifier AS new_qualifier,
+    new_tbl.line_ahb_status AS new_line_ahb_status,
+    new_tbl.line_name AS new_line_name,
+    new_tbl.bedingung AS new_bedingung,
+    new_tbl.bedingungsfehler AS new_bedingungsfehler
+FROM version_pairs vp
+JOIN v_ahbtabellen new_tbl
+    ON new_tbl.format_version = vp.new_format_version
+    AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+JOIN v_ahbtabellen old_tbl
+    ON old_tbl.format_version = vp.old_format_version
+    AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
+    AND old_tbl.id_path = new_tbl.id_path
 
 UNION ALL
 
--- Rows only in B (deleted)
-SELECT a.edifact_format_version  as format_version_a,
-       b.edifact_format_version  as format_version_b,
-       a.pruefidentifikator      as pruefidentifikator_a,
-       b.pruefidentifikator      as pruefidentifikator_b,
-       b.path                    as path,
-       b.id_path                 as id_path,
-       b.sort_path               as sort_path,
-       b.type                    as type,
-       -- Segment Group
-       NULL                      as segmentgroup_name_a,
-       b.segmentgroup_name       as segmentgroup_name_b,
-       NULL                      as segmentgroup_ahb_status_a,
-       b.segmentgroup_ahb_status as segmentgroup_ahb_status_b,
-       -- Segment
-       NULL                      as segment_id_a,
-       b.segment_id              as segment_id_b,
-       NULL                      as segment_name_a,
-       b.segment_name            as segment_name_b,
-       NULL                      as segment_ahb_status_a,
-       b.segment_ahb_status      as segment_ahb_status_b,
-       -- Data Element Group
-       NULL                      as dataelementgroup_id_a,
-       b.dataelementgroup_id     as dataelementgroup_id_b,
-       NULL                      as dataelementgroup_name_a,
-       b.dataelementgroup_name   as dataelementgroup_name_b,
-       -- Data Element
-       NULL                      as dataelement_id_a,
-       b.dataelement_id          as dataelement_id_b,
-       NULL                      as dataelement_name_a,
-       b.dataelement_name        as dataelement_name_b,
-       NULL                      as dataelement_ahb_status_a,
-       b.dataelement_ahb_status  as dataelement_ahb_status_b,
-       -- Code
-       NULL                      as code_value_a,
-       b.code_value              as code_value_b,
-       NULL                      as code_name_a,
-       b.code_name               as code_name_b,
-       NULL                      as code_ahb_status_a,
-       b.code_ahb_status         as code_ahb_status_b,
-       -- Diff status
-       'deleted'                 as diff_status
-FROM ahb_hierarchy_materialized b
-         LEFT JOIN ahb_hierarchy_materialized a
-                   ON b.id_path = a.id_path
-                       AND COALESCE(b.segmentgroup_name, '') = COALESCE(a.segmentgroup_name, '')
-WHERE a.id IS NULL;
+-- Added rows (exist in new but not in old for the specific version pair)
+SELECT
+    'added' AS diff_status,
+    new_tbl.id_path,
+    new_tbl.sort_path,
+    new_tbl.path,
+    new_tbl.line_type,
+    -- Old version columns (NULL for added rows)
+    vp.old_format_version AS old_format_version,
+    vp.old_pruefidentifikator AS old_pruefidentifikator,
+    NULL AS old_segmentgroup_key,
+    NULL AS old_segment_code,
+    NULL AS old_data_element,
+    NULL AS old_qualifier,
+    NULL AS old_line_ahb_status,
+    NULL AS old_line_name,
+    NULL AS old_bedingung,
+    NULL AS old_bedingungsfehler,
+    -- New version columns
+    new_tbl.format_version AS new_format_version,
+    new_tbl.pruefidentifikator AS new_pruefidentifikator,
+    new_tbl.segmentgroup_key AS new_segmentgroup_key,
+    new_tbl.segment_code AS new_segment_code,
+    new_tbl.data_element AS new_data_element,
+    new_tbl.qualifier AS new_qualifier,
+    new_tbl.line_ahb_status AS new_line_ahb_status,
+    new_tbl.line_name AS new_line_name,
+    new_tbl.bedingung AS new_bedingung,
+    new_tbl.bedingungsfehler AS new_bedingungsfehler
+FROM version_pairs vp
+JOIN v_ahbtabellen new_tbl
+    ON new_tbl.format_version = vp.new_format_version
+    AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+WHERE NOT EXISTS (
+    SELECT 1 FROM v_ahbtabellen old_tbl
+    WHERE old_tbl.format_version = vp.old_format_version
+      AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
+      AND old_tbl.id_path = new_tbl.id_path
+)
+
+UNION ALL
+
+-- Deleted rows (exist in old but not in new for the specific version pair)
+SELECT
+    'deleted' AS diff_status,
+    old_tbl.id_path,
+    old_tbl.sort_path,
+    old_tbl.path,
+    old_tbl.line_type,
+    -- Old version columns
+    old_tbl.format_version AS old_format_version,
+    old_tbl.pruefidentifikator AS old_pruefidentifikator,
+    old_tbl.segmentgroup_key AS old_segmentgroup_key,
+    old_tbl.segment_code AS old_segment_code,
+    old_tbl.data_element AS old_data_element,
+    old_tbl.qualifier AS old_qualifier,
+    old_tbl.line_ahb_status AS old_line_ahb_status,
+    old_tbl.line_name AS old_line_name,
+    old_tbl.bedingung AS old_bedingung,
+    old_tbl.bedingungsfehler AS old_bedingungsfehler,
+    -- New version columns (NULL for deleted rows, except version/pruefi for filtering)
+    vp.new_format_version AS new_format_version,
+    vp.new_pruefidentifikator AS new_pruefidentifikator,
+    NULL AS new_segmentgroup_key,
+    NULL AS new_segment_code,
+    NULL AS new_data_element,
+    NULL AS new_qualifier,
+    NULL AS new_line_ahb_status,
+    NULL AS new_line_name,
+    NULL AS new_bedingung,
+    NULL AS new_bedingungsfehler
+FROM version_pairs vp
+JOIN v_ahbtabellen old_tbl
+    ON old_tbl.format_version = vp.old_format_version
+    AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
+WHERE NOT EXISTS (
+    SELECT 1 FROM v_ahbtabellen new_tbl
+    WHERE new_tbl.format_version = vp.new_format_version
+      AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
+      AND new_tbl.id_path = old_tbl.id_path
+);
