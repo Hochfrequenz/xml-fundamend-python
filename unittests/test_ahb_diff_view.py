@@ -247,3 +247,24 @@ def test_diff_view_nonexistent_pruefi_returns_empty(session_fv2410_fv2504_with_d
     )
     count = list(result)[0][0]
     assert count == 0, "Non-existent prüfi should return no results"
+
+
+@pytest.mark.snapshot
+def test_ahb_diff_view_mscons_13009(
+    session_fv2510_fv2604_mscons_with_diff_view: Session, snapshot: SnapshotAssertion
+) -> None:
+    """
+    Test the diff view by comparing MSCONS between versions
+    """
+    stmt = (
+        select(AhbDiffLine)
+        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2510)
+        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbDiffLine.new_pruefidentifikator == "13009")
+        .where(AhbDiffLine.old_pruefidentifikator == "13009")
+        .where(AhbDiffLine.diff_status != "unchanged")
+        .order_by(AhbDiffLine.sort_path)
+    )
+    results = session_fv2510_fv2604_mscons_with_diff_view.exec(stmt).all()
+    raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
+    snapshot.assert_match(raw_results)
