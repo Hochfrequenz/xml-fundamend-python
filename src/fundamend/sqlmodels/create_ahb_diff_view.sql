@@ -42,6 +42,21 @@ SELECT
         THEN 'modified'
         ELSE 'unchanged'
     END AS diff_status,
+    CASE
+        WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
+          OR COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
+          OR COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+        THEN
+            TRIM(
+                CASE WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
+                     THEN 'line_ahb_status, ' ELSE '' END ||
+                CASE WHEN COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
+                     THEN 'bedingung, ' ELSE '' END ||
+                CASE WHEN COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+                     THEN 'line_name' ELSE '' END
+            , ', ')
+        ELSE NULL
+    END AS changed_columns,
     new_tbl.id_path AS id_path,
     new_tbl.sort_path AS sort_path,
     new_tbl.path AS path,
@@ -82,6 +97,7 @@ UNION ALL
 -- Added rows (exist in new but not in old for the specific version pair)
 SELECT
     'added' AS diff_status,
+    NULL AS changed_columns,
     new_tbl.id_path,
     new_tbl.sort_path,
     new_tbl.path,
@@ -124,6 +140,7 @@ UNION ALL
 -- Deleted rows (exist in old but not in new for the specific version pair)
 SELECT
     'deleted' AS diff_status,
+    NULL AS changed_columns,
     old_tbl.id_path,
     old_tbl.sort_path,
     old_tbl.path,

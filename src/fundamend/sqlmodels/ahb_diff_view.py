@@ -95,6 +95,10 @@ class AhbDiffLine(SQLModel, table=True):
     # Diff status: 'added', 'deleted', 'modified', 'unchanged'
     diff_status: str = Field()
 
+    # Which columns changed (for modified rows only, NULL otherwise)
+    # Comma-separated list, e.g. 'line_ahb_status, bedingung'
+    changed_columns: Optional[str] = Field(default=None)
+
     # Old version columns (from v_ahbtabellen)
     old_segmentgroup_key: Optional[str] = Field(default=None)
     old_segment_code: Optional[str] = Field(default=None)

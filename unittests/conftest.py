@@ -48,3 +48,27 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
         create_ahbtabellen_view(session)
         create_ahb_diff_view(session)
         yield session
+
+
+@pytest.fixture(scope="module")
+def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, None]:
+    """
+    Module-scoped fixture providing a database session with FV510 and FV2604 MSCONS (only) data.
+    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen, v_ahb_diff.
+
+    """
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+
+    ahb_paths = [
+        (p, date(2025, 10, 1), date(2026, 4, 1))
+        for p in (private_submodule_root / "FV2510").rglob("**/MSCONS_AHB*.xml")
+    ] + [(p, date(2026, 4, 1), None) for p in (private_submodule_root / "FV2604").rglob("**/MSCONS_AHB*.xml")]
+
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    with Session(bind=engine) as session:
+        create_and_fill_ahb_expression_table(session)
+        create_ahbtabellen_view(session)
+        create_ahb_diff_view(session)
+        yield session
