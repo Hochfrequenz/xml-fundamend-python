@@ -216,24 +216,24 @@ create_ahb_diff_view(session)
 ```
 
 Die View erwartet 4 Filter-Parameter beim Abfragen und liefert einen `diff_status`:
-- `added`: Zeile existiert in Version A, aber nicht in Version B
-- `deleted`: Zeile existiert in Version B, aber nicht in Version A
-- `modified`: Zeile existiert in beiden Versionen, aber mit unterschiedlichen Werten
+- `added`: Zeile existiert in der neuen Version, aber nicht in der alten
+- `deleted`: Zeile existiert in der alten Version, aber nicht in der neuen
+- `modified`: Zeile existiert in beiden Versionen, aber mit unterschiedlichen Werten (bei `modified` enthält `changed_columns` die Liste der geänderten Spalten)
 - `unchanged`: Zeile ist in beiden Versionen identisch
 
-Alle Wert-Spalten existieren doppelt (`_a` und `_b`), um die Werte aus beiden Versionen nebeneinander anzuzeigen.
+Alle Wert-Spalten existieren doppelt (`old_*` und `new_*`), um die Werte aus beiden Versionen nebeneinander anzuzeigen.
 
 ```sql
 -- Alle Änderungen zwischen zwei Versionen anzeigen
-SELECT path, diff_status,
-       segment_ahb_status_a, segment_ahb_status_b,
-       dataelement_ahb_status_a, dataelement_ahb_status_b,
-       code_value_a, code_value_b
+SELECT path, diff_status, changed_columns,
+       old_line_ahb_status, new_line_ahb_status,
+       old_bedingung, new_bedingung,
+       old_line_name, new_line_name
 FROM v_ahb_diff
-WHERE format_version_a = 'FV2504'
-  AND format_version_b = 'FV2410'
-  AND pruefidentifikator_a = '55014'
-  AND pruefidentifikator_b = '55014'
+WHERE old_format_version = 'FV2410'
+  AND new_format_version = 'FV2504'
+  AND old_pruefidentifikator = '55014'
+  AND new_pruefidentifikator = '55014'
   AND diff_status != 'unchanged'
 ORDER BY sort_path;
 ```
