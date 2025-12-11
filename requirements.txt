@@ -8,7 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 efoli==2.1.1
     # via fundamend (pyproject.toml)
-pydantic==2.12.0
+pydantic==2.12.5
     # via fundamend (pyproject.toml)
 pydantic-core==2.41.1
     # via pydantic
