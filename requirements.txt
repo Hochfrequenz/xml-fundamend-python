@@ -10,7 +10,7 @@ efoli==2.1.1
     # via fundamend (pyproject.toml)
 pydantic==2.12.5
     # via fundamend (pyproject.toml)
-pydantic-core==2.41.1
+pydantic-core==2.41.5
     # via pydantic
 pytz==2025.2
     # via efoli
