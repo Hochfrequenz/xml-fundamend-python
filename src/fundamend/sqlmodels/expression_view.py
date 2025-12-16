@@ -232,12 +232,12 @@ class AhbExpression(SQLModel, table=True):
         ),
         Index(
             # this is to speed up the v_ahb_diff joins
+            "idx_ahb_expressions_covering_v_ahb_diff",
             "edifact_format_version",
             "format",
             "expression",
             "node_texts",
             "ahbicht_error_message",
-            name="idx_ahb_expressions_covering_v_ahb_diff",
         ),
     )
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
