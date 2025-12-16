@@ -10,6 +10,7 @@
 --     AND new_format_version = 'FV2504'
 --     AND new_pruefidentifikator = '55014'
 --   ORDER BY sort_path;
+-- ⚠️ from fundamend >=v0.32 on, there's a limitation to use old prüfi = new prüfi and old FV < new FV
 --
 -- diff_status can be: 'added', 'deleted', 'modified', 'unchanged'
 -- The view compares line_ahb_status, bedingung, and line_name to determine modifications.
@@ -32,6 +33,9 @@ WITH version_pairs AS (
         new_v.pruefidentifikator AS new_pruefidentifikator
     FROM (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) old_v
     CROSS JOIN (SELECT DISTINCT format_version, pruefidentifikator FROM v_ahbtabellen) new_v
+-- ⚠️ from fundamend >=v0.32 on, there's a limitation to use old prüfi = new prüfi and old FV < new FV
+    ON old_v.pruefidentifikator = new_v.pruefidentifikator
+    WHERE old_v.format_version < new_v.format_version
 )
 -- Modified and unchanged rows (exist in both old and new for the same id_path within the pair)
 SELECT
