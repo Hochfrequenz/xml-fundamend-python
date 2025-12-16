@@ -32,6 +32,7 @@ WITH version_pairs AS (SELECT DISTINCT old_v.format_version     AS old_format_ve
                        WHERE old_v.format_version < new_v.format_version),
 
 -- Pre-compute changed_columns once, derive diff_status from it
+-- Note: SQLite's "IS NOT" is a NULL-safe inequality operator (equivalent to SQL standard "IS DISTINCT FROM")
      modified_check AS (SELECT TRIM(
                                        CASE
                                            WHEN old_tbl.line_ahb_status IS NOT new_tbl.line_ahb_status
