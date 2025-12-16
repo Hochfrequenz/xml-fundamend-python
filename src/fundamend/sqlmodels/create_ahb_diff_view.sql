@@ -40,23 +40,23 @@ WITH version_pairs AS (
 -- Modified and unchanged rows (exist in both old and new for the same id_path within the pair)
 SELECT
     CASE
-        WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
-          OR COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
-          OR COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+        WHEN IFNULL(old_tbl.line_ahb_status, '') != IFNULL(new_tbl.line_ahb_status, '')
+          OR IFNULL(old_tbl.bedingung, '') != IFNULL(new_tbl.bedingung, '')
+          OR IFNULL(old_tbl.line_name, '') != IFNULL(new_tbl.line_name, '')
         THEN 'modified'
         ELSE 'unchanged'
     END AS diff_status,
     CASE
-        WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
-          OR COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
-          OR COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+        WHEN IFNULL(old_tbl.line_ahb_status, '') != IFNULL(new_tbl.line_ahb_status, '')
+          OR IFNULL(old_tbl.bedingung, '') != IFNULL(new_tbl.bedingung, '')
+          OR IFNULL(old_tbl.line_name, '') != IFNULL(new_tbl.line_name, '')
         THEN
             TRIM(
-                CASE WHEN COALESCE(old_tbl.line_ahb_status, '') != COALESCE(new_tbl.line_ahb_status, '')
+                CASE WHEN IFNULL(old_tbl.line_ahb_status, '') != IFNULL(new_tbl.line_ahb_status, '')
                      THEN 'line_ahb_status, ' ELSE '' END ||
-                CASE WHEN COALESCE(old_tbl.bedingung, '') != COALESCE(new_tbl.bedingung, '')
+                CASE WHEN IFNULL(old_tbl.bedingung, '') != IFNULL(new_tbl.bedingung, '')
                      THEN 'bedingung, ' ELSE '' END ||
-                CASE WHEN COALESCE(old_tbl.line_name, '') != COALESCE(new_tbl.line_name, '')
+                CASE WHEN IFNULL(old_tbl.line_name, '') != IFNULL(new_tbl.line_name, '')
                      THEN 'line_name' ELSE '' END
             , ', ')
         ELSE NULL
