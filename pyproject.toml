@@ -56,6 +56,10 @@ tests = [
     "pytest==9.0.2",
     "syrupy==5.0.0"
 ]
+benchmark = [
+    "pytest==9.0.2",
+    "pytest-benchmark==5.1.0"
+]
 type_check = [
     "mypy==1.19.1"
 ]
