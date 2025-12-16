@@ -68,7 +68,7 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     snapshot.assert_match(raw_results)
 
 
-# Comparing inside the same format version (or old>=new) is no longer possible with the v_ahb_diff in version >=v0.32.0.
+# Comparing inside the same format version (or old>=new) is no longer possible with the v_ahb_diff in version >=v0.31.0.
 # We restricted a CTE such that only same prüfi old < new format version comparisons are possible.
 # This makes the view less general purpose but way faster, because somehow the WHERE claudes by the client in the end
 # haven't been pushed down to the CTE level to reduce the number of entries there.
@@ -197,8 +197,8 @@ def test_ahb_diff_view_mscons_13009(
     """
     stmt = (
         select(AhbDiffLine)
-        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2510)
-        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2510)
         .where(AhbDiffLine.new_pruefidentifikator == "13009")
         .where(AhbDiffLine.old_pruefidentifikator == "13009")
         .where(AhbDiffLine.diff_status != "unchanged")
