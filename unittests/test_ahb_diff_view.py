@@ -68,29 +68,10 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     snapshot.assert_match(raw_results)
 
 
-def test_diff_view_self_comparison_returns_only_unchanged(session_fv2410_fv2504_with_diff_view: Session) -> None:
-    """
-    Test that comparing a version to itself returns only 'unchanged' entries.
-    This verifies the diff logic is correct - nothing should be added/deleted/modified.
-    """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
-        SELECT diff_status, COUNT(*) as cnt
-        FROM v_ahb_diff
-        WHERE old_format_version = 'FV2504' AND new_format_version = 'FV2504'
-          AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
-        GROUP BY diff_status
-    """
-        )
-    )
-    status_counts = {row[0]: row[1] for row in result}
-
-    assert "added" not in status_counts, "Self-comparison should not have 'added' entries"
-    assert "deleted" not in status_counts, "Self-comparison should not have 'deleted' entries"
-    assert "modified" not in status_counts, "Self-comparison should not have 'modified' entries"
-    assert "unchanged" in status_counts, "Self-comparison should have 'unchanged' entries"
-    assert status_counts["unchanged"] > 0, "Self-comparison should have at least one unchanged entry"
+# Comparing inside the same format version is no longer possible with the v_ahb_diff from fundamend>=v0.32.0
+# We restricted a CTE such that only same prüfi old < new format version comparisons are possible.
+# This makes the view less general purpose but way faster, because somehow the WHERE claudes by the client in the end
+# haven't been pushed down to the CTE level to reduce the number of entries there.
 
 
 def test_diff_view_symmetry_added_deleted(session_fv2410_fv2504_with_diff_view: Session) -> None:
