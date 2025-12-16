@@ -128,12 +128,11 @@ FROM version_pairs vp
 JOIN v_ahbtabellen new_tbl
     ON new_tbl.format_version = vp.new_format_version
     AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
-WHERE NOT EXISTS (
-    SELECT 1 FROM v_ahbtabellen old_tbl
-    WHERE old_tbl.format_version = vp.old_format_version
-      AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
-      AND old_tbl.id_path = new_tbl.id_path
-)
+LEFT JOIN v_ahbtabellen old_check
+    ON old_check.format_version = vp.old_format_version
+    AND old_check.pruefidentifikator = vp.old_pruefidentifikator
+    AND old_check.id_path = new_tbl.id_path
+WHERE old_check.id_path IS NULL
 
 UNION ALL
 
@@ -171,9 +170,8 @@ FROM version_pairs vp
 JOIN v_ahbtabellen old_tbl
     ON old_tbl.format_version = vp.old_format_version
     AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
-WHERE NOT EXISTS (
-    SELECT 1 FROM v_ahbtabellen new_tbl
-    WHERE new_tbl.format_version = vp.new_format_version
-      AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
-      AND new_tbl.id_path = old_tbl.id_path
-);
+LEFT JOIN v_ahbtabellen new_check
+    ON new_check.format_version = vp.new_format_version
+    AND new_check.pruefidentifikator = vp.new_pruefidentifikator
+    AND new_check.id_path = old_tbl.id_path
+WHERE new_check.id_path IS NULL;
