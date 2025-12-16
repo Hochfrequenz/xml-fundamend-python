@@ -68,71 +68,10 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     snapshot.assert_match(raw_results)
 
 
-def test_diff_view_self_comparison_returns_only_unchanged(session_fv2410_fv2504_with_diff_view: Session) -> None:
-    """
-    Test that comparing a version to itself returns only 'unchanged' entries.
-    This verifies the diff logic is correct - nothing should be added/deleted/modified.
-    """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
-        SELECT diff_status, COUNT(*) as cnt
-        FROM v_ahb_diff
-        WHERE old_format_version = 'FV2504' AND new_format_version = 'FV2504'
-          AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
-        GROUP BY diff_status
-    """
-        )
-    )
-    status_counts = {row[0]: row[1] for row in result}
-
-    assert "added" not in status_counts, "Self-comparison should not have 'added' entries"
-    assert "deleted" not in status_counts, "Self-comparison should not have 'deleted' entries"
-    assert "modified" not in status_counts, "Self-comparison should not have 'modified' entries"
-    assert "unchanged" in status_counts, "Self-comparison should have 'unchanged' entries"
-    assert status_counts["unchanged"] > 0, "Self-comparison should have at least one unchanged entry"
-
-
-def test_diff_view_symmetry_added_deleted(session_fv2410_fv2504_with_diff_view: Session) -> None:
-    """
-    Test that diff is symmetric: added in forward direction = deleted in reverse direction.
-    This is a fundamental property that must hold for the diff to be correct.
-    """
-    # Forward direction: FV2410 -> FV2504
-    result_fwd = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
-        SELECT diff_status, COUNT(*) as cnt
-        FROM v_ahb_diff
-        WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
-          AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
-        GROUP BY diff_status
-    """
-        )
-    )
-    fwd = {row[0]: row[1] for row in result_fwd}
-
-    # Reverse direction: FV2504 -> FV2410
-    result_rev = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
-        SELECT diff_status, COUNT(*) as cnt
-        FROM v_ahb_diff
-        WHERE old_format_version = 'FV2504' AND new_format_version = 'FV2410'
-          AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
-        GROUP BY diff_status
-    """
-        )
-    )
-    rev = {row[0]: row[1] for row in result_rev}
-
-    # Added in forward should equal deleted in reverse
-    assert fwd.get("added", 0) == rev.get("deleted", 0), "Forward 'added' should equal reverse 'deleted'"
-    assert fwd.get("deleted", 0) == rev.get("added", 0), "Forward 'deleted' should equal reverse 'added'"
-
-    # Modified and unchanged should be the same in both directions
-    assert fwd.get("modified", 0) == rev.get("modified", 0), "Modified count should be symmetric"
-    assert fwd.get("unchanged", 0) == rev.get("unchanged", 0), "Unchanged count should be symmetric"
+# Comparing inside the same format version (or old>=new) is no longer possible with the v_ahb_diff in version >=v0.31.0.
+# We restricted a CTE such that only same prüfi old < new format version comparisons are possible.
+# This makes the view less general purpose but way faster, because somehow the WHERE claudes by the client in the end
+# haven't been pushed down to the CTE level to reduce the number of entries there.
 
 
 def test_diff_view_no_duplicate_id_paths(session_fv2410_fv2504_with_diff_view: Session) -> None:
@@ -258,8 +197,8 @@ def test_ahb_diff_view_mscons_13009(
     """
     stmt = (
         select(AhbDiffLine)
-        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2510)
-        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2510)
         .where(AhbDiffLine.new_pruefidentifikator == "13009")
         .where(AhbDiffLine.old_pruefidentifikator == "13009")
         .where(AhbDiffLine.diff_status != "unchanged")
