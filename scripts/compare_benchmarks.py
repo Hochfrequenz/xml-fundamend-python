@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Compare benchmark results and report regressions."""
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -15,12 +16,13 @@ def load_benchmarks(path: Path) -> dict[str, float]:
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
-        print("Usage: compare_benchmarks.py <baseline.json> <current.json>")
-        return 1
+    parser = argparse.ArgumentParser(description="Compare benchmark results and report regressions.")
+    parser.add_argument("baseline", type=Path, help="Path to baseline benchmark JSON file")
+    parser.add_argument("current", type=Path, help="Path to current benchmark JSON file")
+    args = parser.parse_args()
 
-    baseline_path = Path(sys.argv[1])
-    current_path = Path(sys.argv[2])
+    baseline_path: Path = args.baseline
+    current_path: Path = args.current
 
     if not baseline_path.exists():
         print("No baseline found, skipping comparison.")
