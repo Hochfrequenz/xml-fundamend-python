@@ -9,6 +9,7 @@ from contextvars import ContextVar
 from typing import Optional
 
 from efoli import EdifactFormat, EdifactFormatVersion
+from sqlalchemy import Index
 
 from fundamend.sqlmodels import AhbHierarchyMaterialized, Bedingung
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
@@ -228,6 +229,15 @@ class AhbExpression(SQLModel, table=True):
             "format",
             "expression",
             name="idx_ahb_expressions_metadata_expression",
+        ),
+        Index(
+            # this is to speed up the v_ahb_diff joins
+            "idx_ahb_expressions_covering_v_ahb_diff",
+            "edifact_format_version",
+            "format",
+            "expression",
+            "node_texts",
+            "ahbicht_error_message",
         ),
     )
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
