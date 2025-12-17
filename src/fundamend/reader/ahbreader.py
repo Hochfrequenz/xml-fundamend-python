@@ -31,7 +31,7 @@ from fundamend.reader.element_distinction import (
     _is_segment_group,
     _is_uebertragungsdatei,
 )
-from fundamend.utils import lstrip, remove_linebreaks_and_hyphens, strip
+from fundamend.utils import lstrip, remove_linebreaks_and_hyphens, remove_unnecessary_hyphens, strip
 
 # pylint:disable=duplicate-code
 # yes, it's very similar to the MigReader
@@ -252,7 +252,9 @@ class AhbReader:
             format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
         return Anwendungsfall(
             pruefidentifikator=original_element.attrib["Pruefidentifikator"],
-            beschreibung=remove_linebreaks_and_hyphens(original_element.attrib["Beschreibung"]),
+            beschreibung=remove_unnecessary_hyphens(
+                remove_linebreaks_and_hyphens(original_element.attrib["Beschreibung"])
+            ),
             kommunikation_von=original_element.attrib["Kommunikation_von"].strip(),
             format=EdifactFormat(lstrip("M_", format_element.tag)),
             elements=tuple(segments_and_groups),

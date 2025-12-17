@@ -3,9 +3,12 @@ Contains some utility functions that are used in the project.
 """
 
 import re
-from typing import Optional
+from typing import Optional, overload
 
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
+
+_unnecessary_hyphen_pattern = re.compile(r"(?<=[a-zäüöß])-(?=[a-zäüöß])")
+"""if before AND after a hyphen there are only lower case letters, then we can probably remove it"""
 
 
 def lstrip(prefix: str, text: str) -> str:
@@ -143,4 +146,27 @@ def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikat
     return result
 
 
-__all__ = ["lstrip", "rstrip", "strip", "parse_kommunikation_von", "remove_linebreaks_and_hyphens"]
+@overload
+def remove_unnecessary_hyphens(candidate: str) -> str: ...
+@overload
+def remove_unnecessary_hyphens(candidate: None) -> None: ...
+def remove_unnecessary_hyphens(candidate: Optional[str]) -> Optional[str]:
+    """
+    removes hyphens from the middle of words that are likely unnecessary
+    Example: "Ausfallarbeits-summenzeitreihe" returns "Ausfallarbeitssummenzeitreihe"
+    or "Bestäti-gung" returns "Bestätigung". But "Sperr-/Entsperrauftrag" stays untouched.
+    Handles multiple occurrences: "Bestäti-gung der Stornier-ung" returns "Bestätigung der Stornierung".
+    """
+    if candidate is None:
+        return None
+    return _unnecessary_hyphen_pattern.sub("", candidate)
+
+
+__all__ = [
+    "lstrip",
+    "rstrip",
+    "strip",
+    "parse_kommunikation_von",
+    "remove_linebreaks_and_hyphens",
+    "remove_unnecessary_hyphens",
+]
