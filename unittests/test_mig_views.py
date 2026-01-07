@@ -255,3 +255,41 @@ def test_mig_diff_snapshot_comdis(snapshot: SnapshotAssertion) -> None:
 
     raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
     snapshot.assert_match(raw_results)
+
+
+@pytest.mark.snapshot
+def test_mig_diff_snapshot_pricat(snapshot: SnapshotAssertion) -> None:
+    """Snapshot test for MIG diff view comparing PRICAT between FV2410 and FV2504 (larger diff)"""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+
+    fv2410_pricat = private_submodule_root / "FV2410" / "PRICAT_MIG_2_0c_Fehlerkorrektur_20240617.xml"
+    fv2504_pricat = private_submodule_root / "FV2504" / "PRICAT_MIG_2_0d_20240619.xml"
+
+    if not fv2410_pricat.exists() or not fv2504_pricat.exists():
+        pytest.skip("PRICAT MIG files not found in both FV2410 and FV2504")
+
+    mig_paths = [
+        (fv2410_pricat, date(2024, 10, 1), date(2025, 6, 6)),
+        (fv2504_pricat, date(2025, 6, 6), None),
+    ]
+
+    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+
+    with Session(bind=engine) as session:
+        create_mig_diff_view(session)
+
+        stmt = (
+            select(MigDiffLine)
+            .where(MigDiffLine.old_format_version == EdifactFormatVersion.FV2410)
+            .where(MigDiffLine.new_format_version == EdifactFormatVersion.FV2504)
+            .where(MigDiffLine.old_format == "PRICAT")
+            .where(MigDiffLine.new_format == "PRICAT")
+            .where(MigDiffLine.diff_status != "unchanged")
+            .order_by(MigDiffLine.sort_path)
+        )
+        results = session.exec(stmt).all()
+
+    raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
+    snapshot.assert_match(raw_results)
