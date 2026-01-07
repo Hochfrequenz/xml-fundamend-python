@@ -293,3 +293,41 @@ def test_mig_diff_snapshot_pricat(snapshot: SnapshotAssertion) -> None:
 
     raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
     snapshot.assert_match(raw_results)
+
+
+@pytest.mark.snapshot
+def test_mig_diff_snapshot_iftsta(snapshot: SnapshotAssertion) -> None:
+    """Snapshot test for MIG diff view comparing IFTSTA between FV2504 and FV2510 (version 2.0f vs 2.0g)"""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+
+    fv2504_iftsta = private_submodule_root / "FV2504" / "IFTSTA_MIG_2_0f_Fehlerkorrektur_20250225.xml"
+    fv2510_iftsta = private_submodule_root / "FV2510" / "IFTSTA_MIG_2_0g_20250401.xml"
+
+    if not fv2504_iftsta.exists() or not fv2510_iftsta.exists():
+        pytest.skip("IFTSTA MIG files not found in both FV2504 and FV2510")
+
+    mig_paths = [
+        (fv2504_iftsta, date(2025, 6, 6), date(2025, 10, 1)),
+        (fv2510_iftsta, date(2025, 10, 1), None),
+    ]
+
+    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+
+    with Session(bind=engine) as session:
+        create_mig_diff_view(session)
+
+        stmt = (
+            select(MigDiffLine)
+            .where(MigDiffLine.old_format_version == EdifactFormatVersion.FV2504)
+            .where(MigDiffLine.new_format_version == EdifactFormatVersion.FV2510)
+            .where(MigDiffLine.old_format == "IFTSTA")
+            .where(MigDiffLine.new_format == "IFTSTA")
+            .where(MigDiffLine.diff_status != "unchanged")
+            .order_by(MigDiffLine.sort_path)
+        )
+        results = session.exec(stmt).all()
+
+    raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
+    snapshot.assert_match(raw_results)
