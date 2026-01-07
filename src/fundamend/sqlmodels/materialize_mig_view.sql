@@ -673,6 +673,19 @@ WHERE id IN (SELECT h1.id
                                   (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
                              AND h2.id != h1.id));
 
+-- Append position to path only where duplicates exist (to ensure uniqueness for diff view matching)
+UPDATE mig_hierarchy_materialized
+SET path = path || ' @' || sort_path
+WHERE id IN (SELECT h1.id
+             FROM mig_hierarchy_materialized h1
+             WHERE EXISTS (SELECT 1
+                           FROM mig_hierarchy_materialized h2
+                           WHERE h2.path = h1.path
+                             AND h2.format = h1.format
+                             AND (h2.edifact_format_version = h1.edifact_format_version OR
+                                  (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
+                             AND h2.id != h1.id));
+
 -- Unique indexes for diff view support
 CREATE UNIQUE INDEX idx_mig_hierarchy_id_path_per_mig ON mig_hierarchy_materialized (edifact_format_version, format, id_path);
 CREATE UNIQUE INDEX idx_mig_hierarchy_path_per_mig ON mig_hierarchy_materialized (edifact_format_version, format, path);

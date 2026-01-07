@@ -65,6 +65,16 @@ class MigDiffLine(SQLModel, table=True):
 
     diff_status can be: 'added', 'deleted', 'modified', 'unchanged'
     All value columns exist twice (old_ and new_) to show the values from both versions.
+
+    MATCHING STRATEGY:
+    Unlike AHBs (which have Prüfidentifikatoren as stable semantic anchors), MIGs represent
+    the complete message structure without such anchors. This view matches rows by their
+    human-readable 'path' column (e.g., "Nachrichten-Kopfsegment > Nachrichten-Kennung > ...")
+    rather than structural id_path. This provides more semantically meaningful comparisons
+    but has limitations:
+    - If an element is renamed between versions, it appears as added+deleted rather than modified
+    - Elements with identical names at different structural positions may be incorrectly matched
+    For structural comparisons, use id_path directly from mig_hierarchy_materialized.
     """
 
     __tablename__ = "v_mig_diff"
