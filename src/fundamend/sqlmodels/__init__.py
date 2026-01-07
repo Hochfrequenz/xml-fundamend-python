@@ -28,6 +28,15 @@ from .anwendungshandbuch import (
     Segment,
     SegmentGroup,
 )
+from .messageimplementationguide import (
+    MessageImplementationGuide,
+    MigCode,
+    MigDataElement,
+    MigDataElementGroup,
+    MigSegment,
+    MigSegmentGroup,
+    MigSegmentGroupLink,
+)
 
 __all__ = [
     "create_ahb_view",
@@ -46,4 +55,11 @@ __all__ = [
     "Anwendungsfall",
     "Bedingung",
     "Anwendungshandbuch",
+    "MessageImplementationGuide",
+    "MigCode",
+    "MigDataElement",
+    "MigDataElementGroup",
+    "MigSegment",
+    "MigSegmentGroup",
+    "MigSegmentGroupLink",
 ]
