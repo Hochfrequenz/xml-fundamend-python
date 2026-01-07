@@ -8,7 +8,9 @@ from typing import Generator
 
 import pytest
 import sqlalchemy.exc
+from efoli import EdifactFormatVersion
 from sqlmodel import Session, SQLModel, create_engine, select
+from syrupy.assertion import SnapshotAssertion
 
 from fundamend import MigReader
 from fundamend.sqlmodels import MessageImplementationGuide as SqlMessageImplementationGuide
@@ -20,7 +22,7 @@ from fundamend.sqlmodels import (
     create_mig_view,
 )
 
-from .conftest import is_private_submodule_checked_out
+from .conftest import is_private_submodule_checked_out, private_submodule_root
 
 
 @pytest.fixture()
@@ -215,3 +217,41 @@ def test_mig_hierarchy_all_from_submodule() -> None:
         results = session.exec(stmt).all()
 
     assert len(results) > 0
+
+
+@pytest.mark.snapshot
+def test_mig_diff_snapshot_comdis(snapshot: SnapshotAssertion) -> None:
+    """Snapshot test for MIG diff view comparing COMDIS between FV2410 and FV2504"""
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+
+    fv2410_comdis = private_submodule_root / "FV2410" / "COMDIS_MIG_1_0d__außerordentliche_20240726.xml"
+    fv2504_comdis = private_submodule_root / "FV2504" / "COMDIS_MIG_1_0e__20240619.xml"
+
+    if not fv2410_comdis.exists() or not fv2504_comdis.exists():
+        pytest.skip("COMDIS MIG files not found in both FV2410 and FV2504")
+
+    mig_paths = [
+        (fv2410_comdis, date(2024, 10, 1), date(2025, 6, 6)),
+        (fv2504_comdis, date(2025, 6, 6), None),
+    ]
+
+    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+
+    with Session(bind=engine) as session:
+        create_mig_diff_view(session)
+
+        stmt = (
+            select(MigDiffLine)
+            .where(MigDiffLine.old_format_version == EdifactFormatVersion.FV2410)
+            .where(MigDiffLine.new_format_version == EdifactFormatVersion.FV2504)
+            .where(MigDiffLine.old_format == "COMDIS")
+            .where(MigDiffLine.new_format == "COMDIS")
+            .where(MigDiffLine.diff_status != "unchanged")
+            .order_by(MigDiffLine.sort_path)
+        )
+        results = session.exec(stmt).all()
+
+    raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]
+    snapshot.assert_match(raw_results)
