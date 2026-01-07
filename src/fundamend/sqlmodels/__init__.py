@@ -37,6 +37,8 @@ from .messageimplementationguide import (
     MigSegmentGroup,
     MigSegmentGroupLink,
 )
+from .mig_diff_view import MigDiffLine, create_mig_diff_view
+from .migview import MigHierarchyMaterialized, create_db_and_populate_with_mig_view, create_mig_view
 
 __all__ = [
     "create_ahb_view",
@@ -62,4 +64,9 @@ __all__ = [
     "MigSegment",
     "MigSegmentGroup",
     "MigSegmentGroupLink",
+    "create_mig_view",
+    "MigHierarchyMaterialized",
+    "create_db_and_populate_with_mig_view",
+    "create_mig_diff_view",
+    "MigDiffLine",
 ]
