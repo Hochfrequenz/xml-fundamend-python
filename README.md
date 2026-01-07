@@ -122,7 +122,7 @@ Das Ergebnis sieht dann so aus:
 ```
 
 ### SQL Models
-Die Daten aus den XML-Dateien (Stand 2025-02-10 nur AHBs) lassen sich auch in Datenbanken persistieren.
+Die Daten aus den XML-Dateien lassen sich auch in Datenbanken persistieren.
 Die dazu verwendeten [SQLModel](https://sqlmodel.tiangolo.com/)-Klassen lassen sich mit `fundamend[sqlmodels]` installieren.
 Instanzen der Pydantic-Klassen lassen sich in SQL-Models überführen und umgekehrt:
 ```python
@@ -131,6 +131,15 @@ from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwe
 
 my_sql_model = SqlAnwendungshandbuch.from_model(pydantic_ahb)
 pydantic_ahb = my_sql_model.to_model()
+```
+
+Analog dazu funktioniert es auch für MIGs:
+```python
+from fundamend.models.messageimplementationguide import MessageImplementationGuide as PydanticMig
+from fundamend.sqlmodels import MessageImplementationGuide as SqlMig
+
+my_sql_model = SqlMig.from_model(pydantic_mig)
+pydantic_mig = my_sql_model.to_model()
 ```
 
 #### Befüllen einer Datenbank mit AHB-Informationen
