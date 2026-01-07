@@ -24,7 +24,6 @@ def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
     with Session(bind=engine) as session:
         yield session
         session.commit()
-        session.flush()
     print(f"Wrote all data to {database_path.absolute()}")
 
 
