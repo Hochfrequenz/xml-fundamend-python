@@ -38,8 +38,8 @@ WITH RECURSIVE
 
                       SELECT s.primary_key,
                              s.position,
-                             'segment'       AS type,
-                             s.id            AS root_id_text,
+                             'segment' AS type,
+                             s.id      AS root_id_text,
                              s.name,
                              s.status_std,
                              s.status_specification,
@@ -69,19 +69,19 @@ WITH RECURSIVE
                                             ) AS root_order
                                  FROM ordered_roots),
 
-    root_hierarchy AS (SELECT o.mig_primary_key                                                      AS mig_pk,
-                              o.primary_key                                                          AS current_id,
-                              o.primary_key                                                          AS root_id,
-                              NULL                                                                   AS parent_id,
-                              0                                                                      AS depth,
+    root_hierarchy AS (SELECT o.mig_primary_key                                                    AS mig_pk,
+                              o.primary_key                                                        AS current_id,
+                              o.primary_key                                                        AS root_id,
+                              NULL                                                                 AS parent_id,
+                              0                                                                    AS depth,
                               o.position,
-                              o.name                                                                 AS path,
-                              o.name                                                                 AS parent_path,
+                              o.name                                                               AS path,
+                              o.name                                                               AS parent_path,
                               o.root_order,
                               o.type,
-                              o.primary_key                                                          AS source_id,
-                              substr('00000' || o.position, -5) || '-'                               AS sort_path,
-                              o.root_id_text || '>'                                                  AS id_path,
+                              o.primary_key                                                        AS source_id,
+                              substr('00000' || o.position, -5) || '-'                             AS sort_path,
+                              o.root_id_text || '>'                                                AS id_path,
                               o.format,
                               o.versionsnummer,
                               o.gueltig_von,
@@ -90,62 +90,62 @@ WITH RECURSIVE
                               o.is_on_uebertragungsdatei_level,
 
                               -- Segment Group fields
-                              CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END   AS segmentgroup_id,
-                              CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END           AS segmentgroup_name,
-                              CASE WHEN o.type = 'segment_group' THEN o.status_std ELSE NULL END     AS segmentgroup_status_std,
+                              CASE WHEN o.type = 'segment_group' THEN o.root_id_text ELSE NULL END AS segmentgroup_id,
+                              CASE WHEN o.type = 'segment_group' THEN o.name ELSE NULL END         AS segmentgroup_name,
+                              CASE WHEN o.type = 'segment_group' THEN o.status_std ELSE NULL END   AS segmentgroup_status_std,
                               CASE
                                   WHEN o.type = 'segment_group' THEN o.status_specification
-                                  ELSE NULL END                                                      AS segmentgroup_status_specification,
-                              CASE WHEN o.type = 'segment_group' THEN o.counter ELSE NULL END        AS segmentgroup_counter,
-                              CASE WHEN o.type = 'segment_group' THEN o.level ELSE NULL END          AS segmentgroup_level,
-                              CASE WHEN o.type = 'segment_group' THEN o.max_rep_std ELSE NULL END    AS segmentgroup_max_rep_std,
+                                  ELSE NULL END                                                    AS segmentgroup_status_specification,
+                              CASE WHEN o.type = 'segment_group' THEN o.counter ELSE NULL END      AS segmentgroup_counter,
+                              CASE WHEN o.type = 'segment_group' THEN o.level ELSE NULL END        AS segmentgroup_level,
+                              CASE WHEN o.type = 'segment_group' THEN o.max_rep_std ELSE NULL END  AS segmentgroup_max_rep_std,
                               CASE
                                   WHEN o.type = 'segment_group' THEN o.max_rep_specification
-                                  ELSE NULL END                                                      AS segmentgroup_max_rep_specification,
-                              CASE WHEN o.type = 'segment_group' THEN o.position ELSE NULL END       AS segmentgroup_position,
+                                  ELSE NULL END                                                    AS segmentgroup_max_rep_specification,
+                              CASE WHEN o.type = 'segment_group' THEN o.position ELSE NULL END     AS segmentgroup_position,
 
                               -- Segment fields
-                              CASE WHEN o.type = 'segment' THEN o.root_id_text ELSE NULL END         AS segment_id,
-                              CASE WHEN o.type = 'segment' THEN o.name ELSE NULL END                 AS segment_name,
-                              CASE WHEN o.type = 'segment' THEN o.status_std ELSE NULL END           AS segment_status_std,
+                              CASE WHEN o.type = 'segment' THEN o.root_id_text ELSE NULL END       AS segment_id,
+                              CASE WHEN o.type = 'segment' THEN o.name ELSE NULL END               AS segment_name,
+                              CASE WHEN o.type = 'segment' THEN o.status_std ELSE NULL END         AS segment_status_std,
                               CASE
                                   WHEN o.type = 'segment' THEN o.status_specification
-                                  ELSE NULL END                                                      AS segment_status_specification,
-                              CASE WHEN o.type = 'segment' THEN o.counter ELSE NULL END              AS segment_counter,
-                              CASE WHEN o.type = 'segment' THEN o.level ELSE NULL END                AS segment_level,
-                              CASE WHEN o.type = 'segment' THEN o.number ELSE NULL END               AS segment_number,
-                              CASE WHEN o.type = 'segment' THEN o.max_rep_std ELSE NULL END          AS segment_max_rep_std,
+                                  ELSE NULL END                                                    AS segment_status_specification,
+                              CASE WHEN o.type = 'segment' THEN o.counter ELSE NULL END            AS segment_counter,
+                              CASE WHEN o.type = 'segment' THEN o.level ELSE NULL END              AS segment_level,
+                              CASE WHEN o.type = 'segment' THEN o.number ELSE NULL END             AS segment_number,
+                              CASE WHEN o.type = 'segment' THEN o.max_rep_std ELSE NULL END        AS segment_max_rep_std,
                               CASE
                                   WHEN o.type = 'segment' THEN o.max_rep_specification
-                                  ELSE NULL END                                                      AS segment_max_rep_specification,
-                              CASE WHEN o.type = 'segment' THEN o.example ELSE NULL END              AS segment_example,
-                              CASE WHEN o.type = 'segment' THEN o.description ELSE NULL END          AS segment_description,
-                              CASE WHEN o.type = 'segment' THEN o.position ELSE NULL END             AS segment_position,
+                                  ELSE NULL END                                                    AS segment_max_rep_specification,
+                              CASE WHEN o.type = 'segment' THEN o.example ELSE NULL END            AS segment_example,
+                              CASE WHEN o.type = 'segment' THEN o.description ELSE NULL END        AS segment_description,
+                              CASE WHEN o.type = 'segment' THEN o.position ELSE NULL END           AS segment_position,
 
                               -- Data Element Group fields (NULL at root level)
-                              NULL                                                                   AS dataelementgroup_id,
-                              NULL                                                                   AS dataelementgroup_name,
-                              NULL                                                                   AS dataelementgroup_description,
-                              NULL                                                                   AS dataelementgroup_status_std,
-                              NULL                                                                   AS dataelementgroup_status_specification,
-                              NULL                                                                   AS dataelementgroup_position,
+                              NULL                                                                 AS dataelementgroup_id,
+                              NULL                                                                 AS dataelementgroup_name,
+                              NULL                                                                 AS dataelementgroup_description,
+                              NULL                                                                 AS dataelementgroup_status_std,
+                              NULL                                                                 AS dataelementgroup_status_specification,
+                              NULL                                                                 AS dataelementgroup_position,
 
                               -- Data Element fields (NULL at root level)
-                              NULL                                                                   AS dataelement_id,
-                              NULL                                                                   AS dataelement_name,
-                              NULL                                                                   AS dataelement_description,
-                              NULL                                                                   AS dataelement_status_std,
-                              NULL                                                                   AS dataelement_status_specification,
-                              NULL                                                                   AS dataelement_format_std,
-                              NULL                                                                   AS dataelement_format_specification,
-                              NULL                                                                   AS dataelement_position,
+                              NULL                                                                 AS dataelement_id,
+                              NULL                                                                 AS dataelement_name,
+                              NULL                                                                 AS dataelement_description,
+                              NULL                                                                 AS dataelement_status_std,
+                              NULL                                                                 AS dataelement_status_specification,
+                              NULL                                                                 AS dataelement_format_std,
+                              NULL                                                                 AS dataelement_format_specification,
+                              NULL                                                                 AS dataelement_position,
 
                               -- Code fields (NULL at root level)
-                              NULL                                                                   AS code_id,
-                              NULL                                                                   AS code_name,
-                              NULL                                                                   AS code_description,
-                              NULL                                                                   AS code_value,
-                              NULL                                                                   AS code_position
+                              NULL                                                                 AS code_id,
+                              NULL                                                                 AS code_name,
+                              NULL                                                                 AS code_description,
+                              NULL                                                                 AS code_value,
+                              NULL                                                                 AS code_position
                        FROM ordered_roots_with_order o),
 
     hierarchy AS (SELECT *

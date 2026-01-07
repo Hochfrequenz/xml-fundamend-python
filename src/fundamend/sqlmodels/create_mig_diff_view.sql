@@ -35,7 +35,8 @@ WITH version_pairs AS (SELECT DISTINCT old_v.edifact_format_version AS old_forma
                                        new_v.edifact_format_version AS new_format_version,
                                        new_v.format                 AS new_format
                        FROM (SELECT DISTINCT edifact_format_version, format FROM mig_hierarchy_materialized) old_v
-                                JOIN (SELECT DISTINCT edifact_format_version, format FROM mig_hierarchy_materialized) new_v
+                                JOIN (SELECT DISTINCT edifact_format_version, format
+                                      FROM mig_hierarchy_materialized) new_v
                                      ON old_v.format = new_v.format
                        WHERE old_v.edifact_format_version < new_v.edifact_format_version),
 
@@ -53,29 +54,29 @@ WITH version_pairs AS (SELECT DISTINCT old_v.edifact_format_version AS old_forma
                                            WHEN old_tbl.line_name IS NOT new_tbl.line_name
                                                THEN 'line_name'
                                            ELSE '' END
-                                   , ', ')                            AS changed_columns,
-                               new_tbl.id_path                        AS id_path,
-                               new_tbl.sort_path                      AS sort_path,
-                               new_tbl.path                           AS path,
-                               new_tbl.type                           AS line_type,
-                               old_tbl.edifact_format_version         AS old_format_version,
-                               old_tbl.format                         AS old_format,
-                               old_tbl.segmentgroup_id                AS old_segmentgroup_id,
-                               old_tbl.segment_id                     AS old_segment_id,
-                               old_tbl.dataelement_id                 AS old_dataelement_id,
-                               old_tbl.code_value                     AS old_code_value,
-                               old_tbl.line_status_std                AS old_line_status_std,
-                               old_tbl.line_status_specification      AS old_line_status_specification,
-                               old_tbl.line_name                      AS old_line_name,
-                               new_tbl.edifact_format_version         AS new_format_version,
-                               new_tbl.format                         AS new_format,
-                               new_tbl.segmentgroup_id                AS new_segmentgroup_id,
-                               new_tbl.segment_id                     AS new_segment_id,
-                               new_tbl.dataelement_id                 AS new_dataelement_id,
-                               new_tbl.code_value                     AS new_code_value,
-                               new_tbl.line_status_std                AS new_line_status_std,
-                               new_tbl.line_status_specification      AS new_line_status_specification,
-                               new_tbl.line_name                      AS new_line_name
+                                   , ', ')                       AS changed_columns,
+                               new_tbl.id_path                   AS id_path,
+                               new_tbl.sort_path                 AS sort_path,
+                               new_tbl.path                      AS path,
+                               new_tbl.type                      AS line_type,
+                               old_tbl.edifact_format_version    AS old_format_version,
+                               old_tbl.format                    AS old_format,
+                               old_tbl.segmentgroup_id           AS old_segmentgroup_id,
+                               old_tbl.segment_id                AS old_segment_id,
+                               old_tbl.dataelement_id            AS old_dataelement_id,
+                               old_tbl.code_value                AS old_code_value,
+                               old_tbl.line_status_std           AS old_line_status_std,
+                               old_tbl.line_status_specification AS old_line_status_specification,
+                               old_tbl.line_name                 AS old_line_name,
+                               new_tbl.edifact_format_version    AS new_format_version,
+                               new_tbl.format                    AS new_format,
+                               new_tbl.segmentgroup_id           AS new_segmentgroup_id,
+                               new_tbl.segment_id                AS new_segment_id,
+                               new_tbl.dataelement_id            AS new_dataelement_id,
+                               new_tbl.code_value                AS new_code_value,
+                               new_tbl.line_status_std           AS new_line_status_std,
+                               new_tbl.line_status_specification AS new_line_status_specification,
+                               new_tbl.line_name                 AS new_line_name
                         FROM version_pairs vp
                                  JOIN mig_hierarchy_materialized new_tbl
                                       ON new_tbl.edifact_format_version = vp.new_format_version
@@ -115,30 +116,30 @@ FROM modified_check
 UNION ALL
 
 -- Added rows (exist in new but not in old for the specific version pair)
-SELECT 'added'                            AS diff_status,
-       NULL                               AS changed_columns,
+SELECT 'added'                           AS diff_status,
+       NULL                              AS changed_columns,
        new_tbl.id_path,
        new_tbl.sort_path,
        new_tbl.path,
-       new_tbl.type                       AS line_type,
-       vp.old_format_version              AS old_format_version,
-       vp.old_format                      AS old_format,
-       NULL                               AS old_segmentgroup_id,
-       NULL                               AS old_segment_id,
-       NULL                               AS old_dataelement_id,
-       NULL                               AS old_code_value,
-       NULL                               AS old_line_status_std,
-       NULL                               AS old_line_status_specification,
-       NULL                               AS old_line_name,
-       new_tbl.edifact_format_version     AS new_format_version,
-       new_tbl.format                     AS new_format,
-       new_tbl.segmentgroup_id            AS new_segmentgroup_id,
-       new_tbl.segment_id                 AS new_segment_id,
-       new_tbl.dataelement_id             AS new_dataelement_id,
-       new_tbl.code_value                 AS new_code_value,
-       new_tbl.line_status_std            AS new_line_status_std,
-       new_tbl.line_status_specification  AS new_line_status_specification,
-       new_tbl.line_name                  AS new_line_name
+       new_tbl.type                      AS line_type,
+       vp.old_format_version             AS old_format_version,
+       vp.old_format                     AS old_format,
+       NULL                              AS old_segmentgroup_id,
+       NULL                              AS old_segment_id,
+       NULL                              AS old_dataelement_id,
+       NULL                              AS old_code_value,
+       NULL                              AS old_line_status_std,
+       NULL                              AS old_line_status_specification,
+       NULL                              AS old_line_name,
+       new_tbl.edifact_format_version    AS new_format_version,
+       new_tbl.format                    AS new_format,
+       new_tbl.segmentgroup_id           AS new_segmentgroup_id,
+       new_tbl.segment_id                AS new_segment_id,
+       new_tbl.dataelement_id            AS new_dataelement_id,
+       new_tbl.code_value                AS new_code_value,
+       new_tbl.line_status_std           AS new_line_status_std,
+       new_tbl.line_status_specification AS new_line_status_specification,
+       new_tbl.line_name                 AS new_line_name
 FROM version_pairs vp
          JOIN mig_hierarchy_materialized new_tbl
               ON new_tbl.edifact_format_version = vp.new_format_version
@@ -152,30 +153,30 @@ WHERE NOT EXISTS (SELECT 1
 UNION ALL
 
 -- Deleted rows (exist in old but not in new for the specific version pair)
-SELECT 'deleted'                          AS diff_status,
-       NULL                               AS changed_columns,
+SELECT 'deleted'                         AS diff_status,
+       NULL                              AS changed_columns,
        old_tbl.id_path,
        old_tbl.sort_path,
        old_tbl.path,
-       old_tbl.type                       AS line_type,
-       old_tbl.edifact_format_version     AS old_format_version,
-       old_tbl.format                     AS old_format,
-       old_tbl.segmentgroup_id            AS old_segmentgroup_id,
-       old_tbl.segment_id                 AS old_segment_id,
-       old_tbl.dataelement_id             AS old_dataelement_id,
-       old_tbl.code_value                 AS old_code_value,
-       old_tbl.line_status_std            AS old_line_status_std,
-       old_tbl.line_status_specification  AS old_line_status_specification,
-       old_tbl.line_name                  AS old_line_name,
-       vp.new_format_version              AS new_format_version,
-       vp.new_format                      AS new_format,
-       NULL                               AS new_segmentgroup_id,
-       NULL                               AS new_segment_id,
-       NULL                               AS new_dataelement_id,
-       NULL                               AS new_code_value,
-       NULL                               AS new_line_status_std,
-       NULL                               AS new_line_status_specification,
-       NULL                               AS new_line_name
+       old_tbl.type                      AS line_type,
+       old_tbl.edifact_format_version    AS old_format_version,
+       old_tbl.format                    AS old_format,
+       old_tbl.segmentgroup_id           AS old_segmentgroup_id,
+       old_tbl.segment_id                AS old_segment_id,
+       old_tbl.dataelement_id            AS old_dataelement_id,
+       old_tbl.code_value                AS old_code_value,
+       old_tbl.line_status_std           AS old_line_status_std,
+       old_tbl.line_status_specification AS old_line_status_specification,
+       old_tbl.line_name                 AS old_line_name,
+       vp.new_format_version             AS new_format_version,
+       vp.new_format                     AS new_format,
+       NULL                              AS new_segmentgroup_id,
+       NULL                              AS new_segment_id,
+       NULL                              AS new_dataelement_id,
+       NULL                              AS new_code_value,
+       NULL                              AS new_line_status_std,
+       NULL                              AS new_line_status_specification,
+       NULL                              AS new_line_name
 FROM version_pairs vp
          JOIN mig_hierarchy_materialized old_tbl
               ON old_tbl.edifact_format_version = vp.old_format_version
