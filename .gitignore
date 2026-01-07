@@ -136,3 +136,6 @@ dmypy.json
 src/_your_package_version.py
 
 src/_fundamend_version.py
+
+# Claude Code
+.claude/

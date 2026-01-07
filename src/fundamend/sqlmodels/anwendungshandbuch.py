@@ -7,7 +7,7 @@ from uuid import UUID
 
 from efoli import EdifactFormat, EdifactFormatVersion
 
-# pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
+# pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring, no-member
 
 # the structures are similar, still we decided against inheritance, so there's naturally a little bit of duplication
 
