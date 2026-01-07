@@ -9,7 +9,8 @@ from efoli import EdifactFormat, EdifactFormatVersion
 
 # pylint: disable=too-few-public-methods, duplicate-code, missing-function-docstring
 
-# the structures are similar to AHB, still we decided against inheritance, so there's naturally a little bit of duplication
+# the structures are similar to AHB, still we decided against inheritance,
+# so there's naturally a little bit of duplication
 
 
 try:
@@ -103,7 +104,10 @@ class MigDataElement(SQLModel, table=True):
             status_specification=model.status_specification.value,
             format_std=model.format_std,
             format_specification=model.format_specification,
-            codes=[MigCode.from_model(pydantic_code, position=position_index) for position_index, pydantic_code in enumerate(model.codes)],
+            codes=[
+                MigCode.from_model(pydantic_code, position=position_index)
+                for position_index, pydantic_code in enumerate(model.codes)
+            ],
             position=position,
         )
         return result
@@ -127,9 +131,7 @@ class MigDataElementGroup(SQLModel, table=True):
     Can contain a single or multiple data elements.
     """
 
-    __table_args__ = (
-        UniqueConstraint("segment_primary_key", "position", name="IX_mig_deg_position_once_per_segment"),
-    )
+    __table_args__ = (UniqueConstraint("segment_primary_key", "position", name="IX_mig_deg_position_once_per_segment"),)
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str = Field(index=True)  # e.g. 'C_C082'
     name: str = Field(index=True)  # e.g. 'Identifikation des Beteiligten'
@@ -264,9 +266,7 @@ class MigSegmentGroup(SQLModel, table=True):
     Contains segments and segment groups.
     """
 
-    __table_args__ = (
-        UniqueConstraint("mig_primary_key", "position", name="IX_mig_sg_position_once_per_mig"),
-    )
+    __table_args__ = (UniqueConstraint("mig_primary_key", "position", name="IX_mig_sg_position_once_per_mig"),)
     primary_key: UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     id: str = Field(index=True)  # e.g. 'SG2'
     name: str = Field(index=True)  # e.g. 'MP-ID Empfänger'

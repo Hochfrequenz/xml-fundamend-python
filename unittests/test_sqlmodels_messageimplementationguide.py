@@ -52,7 +52,9 @@ def test_sqlmodels_single_mig(sqlite_session: Session) -> None:
 
 def test_sqlmodels_mig_with_uebertragungsdatei(sqlite_session: Session) -> None:
     mig = MigReader(
-        Path(__file__).parent / "example_files" / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml"
+        Path(__file__).parent
+        / "example_files"
+        / "UTILTS_MIG_1.1d_Konsultationsfassung_2024_04_02_with_Uebertragungsdatei.xml"
     ).read()
     roundtrip_mig = _load_mig_to_and_from_db(sqlite_session, mig)
     mig_json = mig.model_dump(mode="json")
