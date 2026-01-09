@@ -199,7 +199,6 @@ def test_mig_hierarchy_all_from_submodule() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     mig_paths = list(private_submodule_root.rglob("**/*MIG*.xml"))
 
     if not mig_paths:
