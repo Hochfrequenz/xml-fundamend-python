@@ -249,6 +249,86 @@ ORDER BY sort_path;
 
 </details>
 
+#### Befüllen einer Datenbank mit MIG-Informationen
+Analog zu den AHBs lassen sich auch MIGs in eine Datenbank überführen und "flach" ziehen.
+Da MIGs die vollständige Nachrichtenstruktur beschreiben (Segmentgruppen, Segmente, Datenelementgruppen, Datenelemente und Codes), ist die Hierarchie oft tiefer als bei AHBs.
+
+```python
+# pip install fundamend[sqlmodels]
+from pathlib import Path
+from fundamend.sqlmodels import create_db_and_populate_with_mig_view, MigHierarchyMaterialized
+from sqlmodel import Session, create_engine, select
+
+mig_paths = [
+    Path("UTILTS_MIG_1.1c_Lesefassung_2023_12_12.xml"),
+    # weitere MIG XML-Dateien hier hinzufügen
+]
+sqlite_file = create_db_and_populate_with_mig_view(mig_paths)
+engine = create_engine(f"sqlite:///{sqlite_file}")
+with Session(bind=engine) as session:
+    stmt = select(MigHierarchyMaterialized).where(MigHierarchyMaterialized.format == "UTILTS").order_by(
+        MigHierarchyMaterialized.sort_path
+    )
+    results = session.exec(stmt).all()
+```
+oder in plain SQL:
+```sql
+-- sqlite dialect
+SELECT path,
+       type,
+       segmentgroup_id,
+       segment_id,
+       segment_name,
+       dataelement_id,
+       dataelement_name,
+       code_value,
+       code_name,
+       line_status_std,
+       line_status_specification
+FROM mig_hierarchy_materialized
+WHERE format = 'UTILTS'
+ORDER BY sort_path;
+```
+
+<details>
+<summary>Finde heraus, welche Zeilen in einem MIG zwischen zwei Versionen hinzukommen, gelöscht oder geändert wurden</summary>
+<br>
+
+Dafür gibt es die View `v_mig_diff`, die mit `create_mig_diff_view(session)` erstellt werden kann:
+```python
+from fundamend.sqlmodels import create_mig_diff_view
+create_mig_diff_view(session)
+```
+
+Die View erwartet 4 Filter-Parameter beim Abfragen und liefert einen `diff_status`:
+- `added`: Zeile existiert in der neuen Version, aber nicht in der alten
+- `deleted`: Zeile existiert in der alten Version, aber nicht in der neuen
+- `modified`: Zeile existiert in beiden Versionen, aber mit unterschiedlichen Werten (bei `modified` enthält `changed_columns` die Liste der geänderten Spalten)
+- `unchanged`: Zeile ist in beiden Versionen identisch
+
+Alle Wert-Spalten existieren doppelt (`old_*` und `new_*`), um die Werte aus beiden Versionen nebeneinander anzuzeigen.
+
+**Matching-Strategie:** Anders als AHBs (die Prüfidentifikatoren als stabile semantische Anker haben) repräsentieren MIGs die vollständige Nachrichtenstruktur ohne solche Anker. Diese View matched Zeilen anhand ihrer lesbaren `path`-Spalte (z.B. "Nachrichten-Kopfsegment > Nachrichten-Kennung > ...") statt struktureller IDs. Das liefert semantisch sinnvollere Vergleiche, hat aber Einschränkungen:
+- Wenn ein Element zwischen Versionen umbenannt wird, erscheint es als added+deleted statt modified
+- Elemente mit identischen Namen an unterschiedlichen strukturellen Positionen könnten falsch gematcht werden
+
+```sql
+-- Alle Änderungen zwischen zwei MIG-Versionen anzeigen
+SELECT path, diff_status, changed_columns,
+       old_line_status_std, new_line_status_std,
+       old_line_status_specification, new_line_status_specification,
+       old_line_name, new_line_name
+FROM v_mig_diff
+WHERE old_format_version = 'FV2504'
+  AND new_format_version = 'FV2510'
+  AND old_format = 'IFTSTA'
+  AND new_format = 'IFTSTA'
+  AND diff_status != 'unchanged'
+ORDER BY sort_path;
+```
+
+</details>
+
 ### CLI Tool für XML➡️JSON Konvertierung
 Mit
 ```bash
