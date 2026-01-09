@@ -135,8 +135,6 @@ def test_mig_diff_view_with_two_versions() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
-
     # Find UTILTS MIG files from different format versions
     fv2410_migs = list((private_submodule_root / "FV2410").rglob("**/UTILTS_MIG*.xml"))
     fv2504_migs = list((private_submodule_root / "FV2504").rglob("**/UTILTS_MIG*.xml"))
