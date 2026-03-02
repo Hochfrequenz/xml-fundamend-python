@@ -25,7 +25,7 @@ def create_ahbtabellen_view(session: Session) -> None:
     """
     _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "create_ahbtabellen_view.sql")
     number_of_rows = session.scalar(
-        select(func.count(AhbTabellenLine.id))  # type:ignore[arg-type] # pylint:disable=not-callable
+        select(func.count(AhbTabellenLine.id))  # type: ignore[arg-type] # pylint:disable=not-callable
     )
     _logger.info(
         "There are %d rows in the AHBTabellen view %s",

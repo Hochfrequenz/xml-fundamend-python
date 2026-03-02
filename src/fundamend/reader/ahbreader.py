@@ -189,17 +189,17 @@ class AhbReader:
 
     def get_bedingungen(self) -> list[Bedingung]:
         """returns the plain bedingungen"""
-        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]  # type:ignore[union-attr]
+        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]  # type: ignore[union-attr]
 
     def get_ub_bedingungen(self) -> list[UbBedingung]:
         """returns the UB Bedingungen"""
         return [
-            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type:ignore[union-attr]
+            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type: ignore[union-attr]
         ]
 
     def get_pakete(self) -> list[Paket]:
         """returns the package definitions"""
-        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]  # type:ignore[union-attr]
+        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]  # type: ignore[union-attr]
 
     def get_anwendungsfall(self, pruefidentifikator: str) -> Anwendungsfall | None:
         """find the anwendungsfall matching the pruefidentifikator or return None"""
