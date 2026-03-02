@@ -33,14 +33,14 @@ ahbicht = [
     "ahbicht>=1.0.0,<2"
 ]
 coverage = [
-    "coverage==7.13.1"
+    "coverage==7.13.4"
 ]
 formatting = [
     "black==25.12.0",
-    "isort==7.0.0"
+    "isort==8.0.1"
 ]
 linting = [
-    "pylint==4.0.4"
+    "pylint==4.0.5"
 ]
 cli = [
     "typer" # if you install fundamend[cli], the cli commands are available via typer
@@ -49,12 +49,12 @@ spellcheck = [
     "codespell==2.4.1"
 ]
 test_packaging = [
-    "build==1.3.0",
+    "build==1.4.0",
     "twine==6.2.0"
 ]
 tests = [
     "pytest==9.0.2",
-    "syrupy==5.0.0"
+    "syrupy==5.1.0"
 ]
 type_check = [
     "mypy==1.19.1"
