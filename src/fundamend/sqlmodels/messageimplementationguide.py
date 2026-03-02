@@ -246,7 +246,7 @@ class MigSegment(SQLModel, table=True):
             data_elements=tuple(
                 x.to_model()
                 for x in sorted(
-                    (self.data_elements or []) + (self.data_element_groups or []),  # type:ignore[operator]
+                    (self.data_elements or []) + (self.data_element_groups or []),  # type: ignore[operator]
                     key=lambda y: y.position or 0,
                 )
             ),
@@ -342,7 +342,7 @@ class MigSegmentGroup(SQLModel, table=True):
             elements=tuple(
                 x.to_model()
                 for x in sorted(
-                    (self.segments or []) + (self.segment_groups or []),  # type:ignore[operator]
+                    (self.segments or []) + (self.segment_groups or []),  # type: ignore[operator]
                     key=lambda y: y.position or 0,
                 )
             ),
@@ -416,7 +416,7 @@ class MessageImplementationGuide(SQLModel, table=True):
             elements=tuple(
                 x.to_model()
                 for x in sorted(
-                    ((self.segments or []) + (self.segment_groups or [])),  # type:ignore[operator]
+                    ((self.segments or []) + (self.segment_groups or [])),  # type: ignore[operator]
                     key=lambda y: y.position or 0,
                 )
             ),

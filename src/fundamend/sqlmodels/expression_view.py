@@ -170,9 +170,9 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
             ahb_status_col,
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
         )
-        rows.extend(session.exec(stmt))  # type:ignore[arg-type]
+        rows.extend(session.exec(stmt))  # type: ignore[arg-type]
     non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID]] = [
-        r for r in rows if r[2] is not None and r[0] is not None and r[2].strip()  # type:ignore[misc]
+        r for r in rows if r[2] is not None and r[0] is not None and r[2].strip()  # type: ignore[misc]
     ]
     if not any(rows):
         raise ValueError(
@@ -184,7 +184,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         row
         for row in non_empty_rows
         if (key := (row[0], row[1], row[2].strip())) not in seen
-        and not seen.add(key)  # type:ignore[ func-returns-value]
+        and not seen.add(key)  # type: ignore[ func-returns-value]
     ]
     ahb_expression_rows: list[AhbExpression] = []
     for row in unique_rows:  # there are ~3600 unique rows for FV2410+FV2504 as of 2025-04-15
