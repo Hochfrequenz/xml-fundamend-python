@@ -52,7 +52,7 @@ def create_ahb_view(session: Session) -> None:
     _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "materialize_ahb_view.sql")
 
     number_of_inserted_rows = session.scalar(
-        select(func.count(AhbHierarchyMaterialized.id))  # type:ignore[arg-type] # pylint:disable=not-callable #
+        select(func.count(AhbHierarchyMaterialized.id))  # type: ignore[arg-type] # pylint:disable=not-callable #
     )
     _logger.info(
         "Inserted %d rows into the materialized view %s",

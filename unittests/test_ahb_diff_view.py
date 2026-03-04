@@ -79,18 +79,14 @@ def test_diff_view_no_duplicate_id_paths(session_fv2410_fv2504_with_diff_view: S
     Test that there are no duplicate id_paths for the same version pair comparison.
     Each id_path should appear exactly once in the diff results.
     """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
+    result = session_fv2410_fv2504_with_diff_view.execute(text("""
         SELECT id_path, COUNT(*) as cnt
         FROM v_ahb_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
         GROUP BY id_path
         HAVING COUNT(*) > 1
-    """
-        )
-    )
+    """))
     duplicates = list(result)
     assert len(duplicates) == 0, f"Found duplicate id_paths in diff results: {duplicates[:5]}"
 
@@ -100,9 +96,7 @@ def test_diff_view_added_rows_have_null_old_columns(session_fv2410_fv2504_with_d
     Test that 'added' rows have NULL values for old_* columns and populated new_* columns.
     This verifies the SQL is correctly setting NULL for the old version.
     """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
+    result = session_fv2410_fv2504_with_diff_view.execute(text("""
         SELECT
             SUM(CASE WHEN old_segment_code IS NOT NULL THEN 1 ELSE 0 END) as old_segment_not_null,
             SUM(CASE WHEN old_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as old_status_not_null,
@@ -111,9 +105,7 @@ def test_diff_view_added_rows_have_null_old_columns(session_fv2410_fv2504_with_d
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'added'
-    """
-        )
-    )
+    """))
     row = list(result)[0]
     assert row[0] == 0, "Added rows should have NULL old_segment_code"
     assert row[1] == 0, "Added rows should have NULL old_line_ahb_status"
@@ -125,9 +117,7 @@ def test_diff_view_deleted_rows_have_null_new_columns(session_fv2410_fv2504_with
     Test that 'deleted' rows have NULL values for new_* columns and populated old_* columns.
     This verifies the SQL is correctly setting NULL for the new version.
     """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
+    result = session_fv2410_fv2504_with_diff_view.execute(text("""
         SELECT
             SUM(CASE WHEN new_segment_code IS NOT NULL THEN 1 ELSE 0 END) as new_segment_not_null,
             SUM(CASE WHEN new_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as new_status_not_null,
@@ -136,9 +126,7 @@ def test_diff_view_deleted_rows_have_null_new_columns(session_fv2410_fv2504_with
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'deleted'
-    """
-        )
-    )
+    """))
     row = list(result)[0]
     assert row[0] == 0, "Deleted rows should have NULL new_segment_code"
     assert row[1] == 0, "Deleted rows should have NULL new_line_ahb_status"
@@ -150,18 +138,14 @@ def test_diff_view_modified_rows_have_actual_differences(session_fv2410_fv2504_w
     Test that 'modified' rows actually have differences in at least one compared field.
     This verifies the CASE statement logic is correct.
     """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
+    result = session_fv2410_fv2504_with_diff_view.execute(text("""
         SELECT id_path, old_line_ahb_status, new_line_ahb_status,
                old_line_name, new_line_name, old_bedingung, new_bedingung
         FROM v_ahb_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'modified'
-    """
-        )
-    )
+    """))
     for row in result:
         id_path, old_status, new_status, old_name, new_name, old_bed, new_bed = row
         # At least one of status, name, or bedingung must be different
@@ -175,15 +159,11 @@ def test_diff_view_nonexistent_pruefi_returns_empty(session_fv2410_fv2504_with_d
     """
     Test that querying a non-existent prüfidentifikator returns empty results.
     """
-    result = session_fv2410_fv2504_with_diff_view.execute(
-        text(
-            """
+    result = session_fv2410_fv2504_with_diff_view.execute(text("""
         SELECT COUNT(*) FROM v_ahb_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '99999' AND new_pruefidentifikator = '99999'
-    """
-        )
-    )
+    """))
     count = list(result)[0][0]
     assert count == 0, "Non-existent prüfi should return no results"
 
