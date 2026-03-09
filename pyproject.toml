@@ -46,7 +46,7 @@ cli = [
     "typer" # if you install fundamend[cli], the cli commands are available via typer
 ]
 spellcheck = [
-    "codespell==2.4.1"
+    "codespell==2.4.2"
 ]
 test_packaging = [
     "build==1.4.0",
