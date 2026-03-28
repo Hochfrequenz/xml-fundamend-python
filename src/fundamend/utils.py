@@ -162,11 +162,25 @@ def remove_unnecessary_hyphens(candidate: Optional[str]) -> Optional[str]:
     return _unnecessary_hyphen_pattern.sub("", candidate)
 
 
+_HASHTAG_PREFIX_PATTERN = re.compile(r"^#\w+# ")
+"""matches leading prefixes like '#kv# ', '#nv# ' etc. that XML authors erroneously add to attribute values"""
+
+
+def remove_hashtag_prefix(text: str) -> str:
+    """
+    Removes leading '#xx# ' prefixes (e.g. '#kv# ', '#nv# ') that some XML authors erroneously add to attribute values.
+    The pattern (^#\\w+# ) intentionally does NOT match double-hash markers like '##alt##' or '##veraltet##'
+    because those are used by Anwendungsfall.is_outdated to flag outdated entries.
+    """
+    return _HASHTAG_PREFIX_PATTERN.sub("", text)
+
+
 __all__ = [
     "lstrip",
     "rstrip",
     "strip",
     "parse_kommunikation_von",
+    "remove_hashtag_prefix",
     "remove_linebreaks_and_hyphens",
     "remove_unnecessary_hyphens",
 ]
