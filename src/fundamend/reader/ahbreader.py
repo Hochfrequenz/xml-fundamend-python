@@ -31,7 +31,13 @@ from fundamend.reader.element_distinction import (
     _is_segment_group,
     _is_uebertragungsdatei,
 )
-from fundamend.utils import lstrip, remove_kv_prefix, remove_linebreaks_and_hyphens, remove_unnecessary_hyphens, strip
+from fundamend.utils import (
+    lstrip,
+    remove_hashtag_prefix,
+    remove_linebreaks_and_hyphens,
+    remove_unnecessary_hyphens,
+    strip,
+)
 
 # pylint:disable=duplicate-code
 # yes, it's very similar to the MigReader
@@ -53,14 +59,14 @@ def _to_code(element: ET.Element) -> Code:
 def _to_bedingung(element: ET.Element) -> Bedingung:
     return Bedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=remove_kv_prefix((element.text or "").strip()),
+        text=remove_hashtag_prefix((element.text or "").strip()),
     )
 
 
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
     return UbBedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=remove_kv_prefix((element.text or "").strip()),
+        text=remove_hashtag_prefix((element.text or "").strip()),
     )
 
 
@@ -208,7 +214,7 @@ class AhbReader:
         for element in self._element_tree.getroot():
             if element.tag != "AWF":
                 continue
-            raw_pruefi = remove_kv_prefix(element.attrib["Pruefidentifikator"]).strip()
+            raw_pruefi = remove_hashtag_prefix(element.attrib["Pruefidentifikator"]).strip()
             if raw_pruefi != pruefidentifikator:
                 continue
             return self._read_anwendungsfall(element)
@@ -251,9 +257,9 @@ class AhbReader:
         if not format_element.tag.startswith("M_"):
             format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
         return Anwendungsfall(
-            pruefidentifikator=remove_kv_prefix(original_element.attrib["Pruefidentifikator"]).strip(),
+            pruefidentifikator=remove_hashtag_prefix(original_element.attrib["Pruefidentifikator"]).strip(),
             beschreibung=remove_unnecessary_hyphens(
-                remove_linebreaks_and_hyphens(remove_kv_prefix(original_element.attrib["Beschreibung"]))
+                remove_linebreaks_and_hyphens(remove_hashtag_prefix(original_element.attrib["Beschreibung"]))
             ),
             kommunikation_von=original_element.attrib["Kommunikation_von"].strip(),
             format=EdifactFormat(lstrip("M_", format_element.tag)),

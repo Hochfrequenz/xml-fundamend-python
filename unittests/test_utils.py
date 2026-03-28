@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Generator
 
@@ -6,7 +7,7 @@ import pytest
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungsfall
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.utils import parse_kommunikation_von, remove_kv_prefix, remove_linebreaks_and_hyphens
+from fundamend.utils import parse_kommunikation_von, remove_hashtag_prefix, remove_linebreaks_and_hyphens
 
 from .conftest import is_private_submodule_checked_out
 
@@ -128,44 +129,51 @@ def test_parsing_all_kommunikation_von_there_is() -> None:
         _ = parse_kommunikation_von(kommunikation_von)  # must not crash
 
 
+_hashtag_prefix_pattern = re.compile(r"^#\w+# ")
+
+
 @pytest.mark.parametrize(
     "original, expected",
     [
         pytest.param("hello", "hello", id="no prefix"),
-        pytest.param("#kv# 55038", "55038", id="pruefidentifikator with kv prefix"),
-        pytest.param("#kv# Info-Meldung zur Aufhebung", "Info-Meldung zur Aufhebung", id="beschreibung with kv prefix"),
-        pytest.param("#kv# Wenn die Messlokation", "Wenn die Messlokation", id="bedingung text with kv prefix"),
-        pytest.param("#kv#no space", "#kv#no space", id="kv without trailing space is not stripped"),
+        pytest.param("#kv# 55038", "55038", id="pruefidentifikator with #kv# prefix"),
+        pytest.param(
+            "#kv# Info-Meldung zur Aufhebung", "Info-Meldung zur Aufhebung", id="beschreibung with #kv# prefix"
+        ),
+        pytest.param("#kv# Wenn die Messlokation", "Wenn die Messlokation", id="bedingung text with #kv# prefix"),
+        pytest.param("#nv# Anfrage an MSB mit Abhängigkeiten", "Anfrage an MSB mit Abhängigkeiten", id="#nv# prefix"),
+        pytest.param("#nv# Nicht bila.rel. Änderung vom LF", "Nicht bila.rel. Änderung vom LF", id="#nv# prefix 2"),
+        pytest.param("#kv#no space", "#kv#no space", id="hashtag prefix without trailing space is not stripped"),
         pytest.param("", "", id="empty string"),
     ],
 )
-def test_remove_kv_prefix(original: str, expected: str) -> None:
-    actual = remove_kv_prefix(original)
+def test_remove_hashtag_prefix(original: str, expected: str) -> None:
+    actual = remove_hashtag_prefix(original)
     assert actual == expected
 
 
-def test_no_kv_prefix_leaks_through_ahb_reader() -> None:
-    """Ensures that the '#kv# ' prefix introduced by XML authors is stripped during reading."""
+def test_no_hashtag_prefix_leaks_through_ahb_reader() -> None:
+    """Ensures that '#xx# ' prefixes introduced by XML authors are stripped during reading."""
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         for awf in ahb.anwendungsfaelle:
-            assert not awf.pruefidentifikator.startswith(
-                "#kv#"
-            ), f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has #kv# prefix"
-            assert not awf.beschreibung.startswith(
-                "#kv#"
-            ), f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has #kv# prefix"
+            assert not _hashtag_prefix_pattern.match(
+                awf.pruefidentifikator
+            ), f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has a hashtag prefix"
+            assert not _hashtag_prefix_pattern.match(
+                awf.beschreibung
+            ), f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has a hashtag prefix"
         for bedingung in ahb.bedingungen:
-            assert not bedingung.text.startswith(
-                "#kv#"
-            ), f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has #kv# prefix"
+            assert not _hashtag_prefix_pattern.match(
+                bedingung.text
+            ), f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
         for ub_bedingung in ahb.ub_bedingungen:
-            assert not ub_bedingung.text.startswith(
-                "#kv#"
-            ), f"ub_bedingung '{ub_bedingung.nummer}' text in {ahb_file_path} still has #kv# prefix"
+            assert not _hashtag_prefix_pattern.match(
+                ub_bedingung.text
+            ), f"ub_bedingung '{ub_bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
 
 
 @pytest.mark.parametrize(
