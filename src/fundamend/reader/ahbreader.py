@@ -31,7 +31,13 @@ from fundamend.reader.element_distinction import (
     _is_segment_group,
     _is_uebertragungsdatei,
 )
-from fundamend.utils import lstrip, remove_linebreaks_and_hyphens, remove_unnecessary_hyphens, strip
+from fundamend.utils import (
+    lstrip,
+    remove_hashtag_prefix,
+    remove_linebreaks_and_hyphens,
+    remove_unnecessary_hyphens,
+    strip,
+)
 
 # pylint:disable=duplicate-code
 # yes, it's very similar to the MigReader
@@ -53,14 +59,14 @@ def _to_code(element: ET.Element) -> Code:
 def _to_bedingung(element: ET.Element) -> Bedingung:
     return Bedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=(element.text or "").strip(),
+        text=remove_hashtag_prefix((element.text or "").strip()),
     )
 
 
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
     return UbBedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=(element.text or "").strip(),
+        text=remove_hashtag_prefix((element.text or "").strip()),
     )
 
 
@@ -189,17 +195,17 @@ class AhbReader:
 
     def get_bedingungen(self) -> list[Bedingung]:
         """returns the plain bedingungen"""
-        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]  # type:ignore[union-attr]
+        return [_to_bedingung(x) for x in self._element_tree.getroot().find("Bedingungen")]  # type: ignore[union-attr]
 
     def get_ub_bedingungen(self) -> list[UbBedingung]:
         """returns the UB Bedingungen"""
         return [
-            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type:ignore[union-attr]
+            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type: ignore[union-attr]
         ]
 
     def get_pakete(self) -> list[Paket]:
         """returns the package definitions"""
-        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]  # type:ignore[union-attr]
+        return [_to_paket(x) for x in self._element_tree.getroot().find("Pakete")]  # type: ignore[union-attr]
 
     def get_anwendungsfall(self, pruefidentifikator: str) -> Anwendungsfall | None:
         """find the anwendungsfall matching the pruefidentifikator or return None"""
@@ -208,10 +214,10 @@ class AhbReader:
         for element in self._element_tree.getroot():
             if element.tag != "AWF":
                 continue
-            if element.attrib["Pruefidentifikator"] != pruefidentifikator:
+            raw_pruefi = remove_hashtag_prefix(element.attrib["Pruefidentifikator"]).strip()
+            if raw_pruefi != pruefidentifikator:
                 continue
-            if element.tag == "AWF" and element.attrib["Pruefidentifikator"] == pruefidentifikator:
-                return self._read_anwendungsfall(element)
+            return self._read_anwendungsfall(element)
         return None
 
     def get_anwendungsfaelle(self) -> list[Anwendungsfall]:
@@ -251,9 +257,9 @@ class AhbReader:
         if not format_element.tag.startswith("M_"):
             format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
         return Anwendungsfall(
-            pruefidentifikator=original_element.attrib["Pruefidentifikator"],
+            pruefidentifikator=remove_hashtag_prefix(original_element.attrib["Pruefidentifikator"]).strip(),
             beschreibung=remove_unnecessary_hyphens(
-                remove_linebreaks_and_hyphens(original_element.attrib["Beschreibung"])
+                remove_linebreaks_and_hyphens(remove_hashtag_prefix(original_element.attrib["Beschreibung"]))
             ),
             kommunikation_von=original_element.attrib["Kommunikation_von"].strip(),
             format=EdifactFormat(lstrip("M_", format_element.tag)),

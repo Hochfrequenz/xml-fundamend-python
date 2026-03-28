@@ -11,8 +11,6 @@
 # name: test_sanitizing_all_awf_beschreibungen
   list([
     '',
-    '#nv# Anfrage an MSB mit Abhängigkeiten',
-    '#nv# Nicht bila.rel. Änderung vom LF',
     '(Ankündigung) Zuordnung des LF zur erz. MaLo/ Tranche',
     'Ab-/Bestellung BK-SZR auf Aggregationsebene RZ',
     'Abbestellung von Werten',
@@ -274,6 +272,9 @@
     'Gerätestatus',
     'Grundlage POG-Ermittlung',
     'Info Entsperrauftrag',
+    'Info-Meldung zur Aufhebung einer zuk. Zuordnung',
+    'Info-Meldung zur Beendigung der Zuordnung',
+    'Info-Meldung über existierende Zuordnung',
     'Informationsmeldung',
     'Informationsmeldung zur Aufhebung einer zuk. Zuordnung',
     'Informationsmeldung zur Beendigung der Zuordnung',
