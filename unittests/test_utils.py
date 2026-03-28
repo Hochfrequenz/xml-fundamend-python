@@ -152,16 +152,20 @@ def test_no_kv_prefix_leaks_through_ahb_reader() -> None:
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         for awf in ahb.anwendungsfaelle:
-            assert not awf.pruefidentifikator.startswith("#kv#"), (
-                f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has #kv# prefix"
-            )
-            assert not awf.beschreibung.startswith("#kv#"), (
-                f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has #kv# prefix"
-            )
+            assert not awf.pruefidentifikator.startswith(
+                "#kv#"
+            ), f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has #kv# prefix"
+            assert not awf.beschreibung.startswith(
+                "#kv#"
+            ), f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has #kv# prefix"
         for bedingung in ahb.bedingungen:
-            assert not bedingung.text.startswith("#kv#"), (
-                f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has #kv# prefix"
-            )
+            assert not bedingung.text.startswith(
+                "#kv#"
+            ), f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has #kv# prefix"
+        for ub_bedingung in ahb.ub_bedingungen:
+            assert not ub_bedingung.text.startswith(
+                "#kv#"
+            ), f"ub_bedingung '{ub_bedingung.nummer}' text in {ahb_file_path} still has #kv# prefix"
 
 
 @pytest.mark.parametrize(

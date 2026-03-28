@@ -60,7 +60,7 @@ def _to_bedingung(element: ET.Element) -> Bedingung:
 def _to_ub_bedingung(element: ET.Element) -> UbBedingung:
     return UbBedingung(
         nummer=strip("[", element.attrib["Nummer"], "]"),
-        text=(element.text or "").strip(),
+        text=remove_kv_prefix((element.text or "").strip()),
     )
 
 
