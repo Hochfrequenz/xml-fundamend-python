@@ -144,6 +144,9 @@ _hashtag_prefix_pattern = re.compile(r"^#\w+# ")
         pytest.param("#nv# Anfrage an MSB mit Abhängigkeiten", "Anfrage an MSB mit Abhängigkeiten", id="#nv# prefix"),
         pytest.param("#nv# Nicht bila.rel. Änderung vom LF", "Nicht bila.rel. Änderung vom LF", id="#nv# prefix 2"),
         pytest.param("#kv#no space", "#kv#no space", id="hashtag prefix without trailing space is not stripped"),
+        pytest.param("##alt##", "##alt##", id="##alt## marker must not be stripped (used by is_outdated)"),
+        pytest.param("##alt## 55001", "##alt## 55001", id="##alt## with pruefidentifikator must not be stripped"),
+        pytest.param("##veraltet##", "##veraltet##", id="##veraltet## marker must not be stripped"),
         pytest.param("", "", id="empty string"),
     ],
 )
