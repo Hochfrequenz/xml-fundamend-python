@@ -169,6 +169,8 @@ _HASHTAG_PREFIX_PATTERN = re.compile(r"^#\w+# ")
 def remove_hashtag_prefix(text: str) -> str:
     """
     Removes leading '#xx# ' prefixes (e.g. '#kv# ', '#nv# ') that some XML authors erroneously add to attribute values.
+    The pattern (^#\\w+# ) intentionally does NOT match double-hash markers like '##alt##' or '##veraltet##'
+    because those are used by Anwendungsfall.is_outdated to flag outdated entries.
     """
     return _HASHTAG_PREFIX_PATTERN.sub("", text)
 
