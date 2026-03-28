@@ -162,11 +162,22 @@ def remove_unnecessary_hyphens(candidate: Optional[str]) -> Optional[str]:
     return _unnecessary_hyphen_pattern.sub("", candidate)
 
 
+_KV_PREFIX = "#kv# "
+
+
+def remove_kv_prefix(text: str) -> str:
+    """
+    Removes the leading '#kv# ' prefix that some XML authors erroneously add to attribute values.
+    """
+    return lstrip(_KV_PREFIX, text)
+
+
 __all__ = [
     "lstrip",
     "rstrip",
     "strip",
     "parse_kommunikation_von",
+    "remove_kv_prefix",
     "remove_linebreaks_and_hyphens",
     "remove_unnecessary_hyphens",
 ]
