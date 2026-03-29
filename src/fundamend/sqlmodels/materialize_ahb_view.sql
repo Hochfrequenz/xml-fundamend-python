@@ -103,13 +103,23 @@ SELECT de.primary_key AS pk,
 FROM dataelement de;
 CREATE INDEX _idx_de_qual ON _de_qual(pk);
 
--- Data elements that need qualification: those with a sibling (under same DEG) sharing the same id
+-- Data elements that need qualification: those with a sibling sharing the same id
 DROP TABLE IF EXISTS _de_needs_qual;
 CREATE TEMP TABLE _de_needs_qual AS
+-- DEs under same DEG with same id
 SELECT de1.primary_key AS pk FROM dataelement de1
 WHERE de1.data_element_group_primary_key IS NOT NULL
   AND EXISTS (SELECT 1 FROM dataelement de2
               WHERE de2.data_element_group_primary_key = de1.data_element_group_primary_key
+                AND de2.id = de1.id AND de2.primary_key != de1.primary_key)
+UNION ALL
+-- Bare DEs directly under same segment (no DEG parent) with same id
+SELECT de1.primary_key FROM dataelement de1
+WHERE de1.data_element_group_primary_key IS NULL
+  AND de1.segment_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM dataelement de2
+              WHERE de2.segment_primary_key = de1.segment_primary_key
+                AND de2.data_element_group_primary_key IS NULL
                 AND de2.id = de1.id AND de2.primary_key != de1.primary_key);
 CREATE INDEX _idx_de_needs_qual ON _de_needs_qual(pk);
 
@@ -431,7 +441,11 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-',
-                         h.id_path || de.id || '>',
+                         h.id_path || de.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _de_needs_qual dnq WHERE dnq.pk = de.primary_key)
+                                 THEN COALESCE('+' || (SELECT dq.qualifier FROM _de_qual dq WHERE dq.pk = de.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
