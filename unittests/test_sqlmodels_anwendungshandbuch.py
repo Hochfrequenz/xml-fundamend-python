@@ -350,8 +350,7 @@ def test_id_path_stable_across_versions_utilmd() -> None:
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
         # Count how many id_paths are shared between versions for UTILMD/44001
-        shared_count = session.execute(
-            text("""
+        shared_count = session.execute(text("""
                 SELECT COUNT(*) FROM (
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
@@ -359,14 +358,11 @@ def test_id_path_stable_across_versions_utilmd() -> None:
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2604' AND pruefidentifikator = '44001'
                 )
-            """)
-        ).scalar()
-        old_count = session.execute(
-            text("""
+            """)).scalar()
+        old_count = session.execute(text("""
                 SELECT COUNT(*) FROM ahb_hierarchy_materialized
                 WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
-            """)
-        ).scalar()
+            """)).scalar()
         assert old_count is not None and old_count > 0, "Expected UTILMD/44001 rows in FV2510"
         assert shared_count is not None
         overlap_ratio = shared_count / old_count
