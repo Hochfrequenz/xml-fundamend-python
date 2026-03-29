@@ -9,7 +9,7 @@ from typing import Generator
 import pytest
 from efoli import EdifactFormatVersion
 from pydantic import RootModel
-from sqlalchemy import func
+from sqlalchemy import func, text
 from sqlmodel import Session, SQLModel, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
@@ -254,14 +254,16 @@ def _check_id_paths_use_qualifiers_not_sort_path(sqlite_path: Path) -> None:
     engine = create_engine(f"sqlite:///{sqlite_path}")
     with Session(bind=engine) as session:
         # No id_path should contain the old @sort_path pattern
-        stmt_at = select(func.count()).where(AhbHierarchyMaterialized.id_path.contains("@"))  # type: ignore[attr-defined]
-        at_count = session.exec(stmt_at).one()
+        at_count = session.execute(
+            text("SELECT COUNT(*) FROM ahb_hierarchy_materialized WHERE id_path LIKE '%@%'")
+        ).scalar()
         assert at_count == 0, f"Found {at_count} id_paths with old @sort_path pattern"
 
         # At least some id_paths should contain qualifier (+) pattern
-        stmt_plus = select(func.count()).where(AhbHierarchyMaterialized.id_path.contains("+"))  # type: ignore[attr-defined]
-        plus_count = session.exec(stmt_plus).one()
-        assert plus_count > 0, "Expected some id_paths with semantic qualifiers (+)"
+        plus_count = session.execute(
+            text("SELECT COUNT(*) FROM ahb_hierarchy_materialized WHERE id_path LIKE '%+%'")
+        ).scalar()
+        assert plus_count is not None and plus_count > 0, "Expected some id_paths with semantic qualifiers (+)"
 
 
 @pytest.mark.parametrize(
@@ -347,35 +349,30 @@ def test_id_path_stable_across_versions_utilmd() -> None:
     # Verify cross-version id_path overlap: most id_paths from FV2510 should also exist in FV2604
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
-        # For a given pruefidentifikator, count how many id_paths are shared between versions
-        result = session.execute(
-            select(func.count()).select_from(
-                select(AhbHierarchyMaterialized.id_path)
-                .where(AhbHierarchyMaterialized.edifact_format_version == "FV2510")
-                .where(AhbHierarchyMaterialized.pruefidentifikator == "44001")
-                .intersect(
-                    select(AhbHierarchyMaterialized.id_path)
-                    .where(AhbHierarchyMaterialized.edifact_format_version == "FV2604")
-                    .where(AhbHierarchyMaterialized.pruefidentifikator == "44001")
+        # Count how many id_paths are shared between versions for UTILMD/44001
+        shared_count = session.execute(
+            text("""
+                SELECT COUNT(*) FROM (
+                    SELECT id_path FROM ahb_hierarchy_materialized
+                    WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
+                    INTERSECT
+                    SELECT id_path FROM ahb_hierarchy_materialized
+                    WHERE edifact_format_version = 'FV2604' AND pruefidentifikator = '44001'
                 )
-                .subquery()
-            )
-        )
-        shared_count = result.scalar()
-        # Count total in old version
-        result = session.execute(
-            select(func.count())
-            .where(AhbHierarchyMaterialized.edifact_format_version == "FV2510")
-            .where(AhbHierarchyMaterialized.pruefidentifikator == "44001")
-        )
-        old_count = result.scalar()
+            """)
+        ).scalar()
+        old_count = session.execute(
+            text("""
+                SELECT COUNT(*) FROM ahb_hierarchy_materialized
+                WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
+            """)
+        ).scalar()
         assert old_count is not None and old_count > 0, "Expected UTILMD/44001 rows in FV2510"
         assert shared_count is not None
-        if old_count > 0:
-            overlap_ratio = shared_count / old_count
-            # With semantic id_paths, the vast majority should match (>90%)
-            # With the old @sort_path approach, this ratio was much lower due to positional shifts
-            assert overlap_ratio > 0.9, (
-                f"Only {shared_count}/{old_count} ({overlap_ratio:.0%}) id_paths shared between "
-                f"FV2510 and FV2604 for UTILMD/44001. Semantic id_paths should be stable across versions."
-            )
+        overlap_ratio = shared_count / old_count
+        # With semantic id_paths, the vast majority should match (>90%)
+        # With the old @sort_path approach, this ratio was much lower due to positional shifts
+        assert overlap_ratio > 0.9, (
+            f"Only {shared_count}/{old_count} ({overlap_ratio:.0%}) id_paths shared between "
+            f"FV2510 and FV2604 for UTILMD/44001. Semantic id_paths should be stable across versions."
+        )
