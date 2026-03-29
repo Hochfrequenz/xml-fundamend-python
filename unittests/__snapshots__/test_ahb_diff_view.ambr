@@ -1237,7 +1237,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>',
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Soll [25] ∧ [479]',
@@ -1251,7 +1251,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>CCI>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>CCI>',
       'line_type': 'segment',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss',
@@ -1266,7 +1266,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>CCI>D_7059>Z23>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>CCI>D_7059>Z23>',
       'line_type': 'code',
       'new_data_element': 'D_7059',
       'new_format_version': 'FV2504',
@@ -1283,7 +1283,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>CCI>C_C240>D_7037>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>CCI>C_C240>D_7037>',
       'line_type': 'dataelement',
       'new_data_element': 'D_7037',
       'new_format_version': 'FV2504',
@@ -1299,7 +1299,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>CCI>C_C240>D_1131>LAND>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>CCI>C_C240>D_1131>LAND>',
       'line_type': 'code',
       'new_data_element': 'D_1131',
       'new_format_version': 'FV2504',
@@ -1316,7 +1316,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG8+Z01>SG10+LAND>CCI>C_C240>D_3055>293>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z23>CCI>C_C240>D_3055>293>',
       'line_type': 'code',
       'new_data_element': 'D_3055',
       'new_format_version': 'FV2504',
@@ -1415,7 +1415,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG8+Z01>SG10+Z06>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z30>',
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1429,7 +1429,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG8+Z01>SG10+Z06>CCI>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z30>CCI>',
       'line_type': 'segment',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1444,7 +1444,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG8+Z01>SG10+Z06>CCI>D_7059>Z30>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z30>CCI>D_7059>Z30>',
       'line_type': 'code',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1461,7 +1461,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG8+Z01>SG10+Z06>CCI>C_C240>D_7037>Z06>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z30>CCI>C_C240>D_7037>Z06>',
       'line_type': 'code',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1478,7 +1478,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG8+Z01>SG10+Z06>CCI>C_C240>D_7037>Z07>',
+      'id_path': 'SG4>SG8+Z01>SG10+Z30>CCI>C_C240>D_7037>Z07>',
       'line_type': 'code',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1496,7 +1496,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG4>SG12+Z01>#1',
+      'id_path': 'SG4>SG12+Z09>',
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [480] ∧ [2004]',
@@ -1513,7 +1513,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG12+Z01>RFF+Z46>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z46>',
       'line_type': 'segment',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss',
@@ -1528,7 +1528,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG12+Z01>RFF+Z46>C_C506>D_1153>Z46>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z46>C_C506>D_1153>Z46>',
       'line_type': 'code',
       'new_data_element': 'D_1153',
       'new_format_version': 'FV2504',
@@ -1545,7 +1545,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG12+Z01>RFF+Z46>C_C506>D_1154>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z46>C_C506>D_1154>',
       'line_type': 'dataelement',
       'new_data_element': 'D_1154',
       'new_format_version': 'FV2504',
@@ -1562,7 +1562,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG4>SG12+Z01>#2',
+      'id_path': 'SG4>SG12+Z04>',
       'line_type': 'segment_group',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss [480] ∧ [2004]',
@@ -1580,7 +1580,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG4>SG12+Z01>RFF>',
+      'id_path': 'SG4>SG12+Z04>RFF>',
       'line_type': 'segment',
       'new_format_version': 'FV2504',
       'new_line_ahb_status': 'Muss',
@@ -1599,7 +1599,7 @@
     }),
     dict({
       'diff_status': 'added',
-      'id_path': 'SG4>SG12+Z01>RFF>C_C506>D_1153>Z46>',
+      'id_path': 'SG4>SG12+Z04>RFF>C_C506>D_1153>Z46>',
       'line_type': 'code',
       'new_data_element': 'D_1153',
       'new_format_version': 'FV2504',
@@ -1617,7 +1617,7 @@
     dict({
       'changed_columns': 'line_ahb_status, line_name',
       'diff_status': 'modified',
-      'id_path': 'SG4>SG12+Z01>RFF>C_C506>D_1154>',
+      'id_path': 'SG4>SG12+Z04>RFF>C_C506>D_1154>',
       'line_type': 'dataelement',
       'new_data_element': 'D_1154',
       'new_format_version': 'FV2504',
@@ -1638,7 +1638,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG12+Z01>RFF+Z18>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z18>',
       'line_type': 'segment',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1653,7 +1653,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG12+Z01>RFF+Z18>C_C506>D_1153>Z18>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z18>C_C506>D_1153>Z18>',
       'line_type': 'code',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1670,7 +1670,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG12+Z01>RFF+Z18>C_C506>D_1154>',
+      'id_path': 'SG4>SG12+Z09>RFF+Z18>C_C506>D_1154>',
       'line_type': 'dataelement',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1686,7 +1686,7 @@
     }),
     dict({
       'diff_status': 'deleted',
-      'id_path': 'SG4>SG12+Z01>RFF>C_C506>D_1153>Z18>',
+      'id_path': 'SG4>SG12+Z04>RFF>C_C506>D_1153>Z18>',
       'line_type': 'code',
       'new_format_version': 'FV2504',
       'new_pruefidentifikator': '55109',
@@ -1872,7 +1872,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG3+9>SG6>COM>C_C076>D_3148>',
+      'id_path': 'SG3+MS>SG6>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',
@@ -2083,7 +2083,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG1+9>SG2>COM>C_C076>D_3148>',
+      'id_path': 'SG1+MS>SG2>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',
@@ -2137,7 +2137,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG1+9>SG2>COM>C_C076>D_3148>',
+      'id_path': 'SG1+MS>SG2>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',
@@ -2245,7 +2245,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>NAD>C_C082>D_3055>9>#1',
+      'id_path': 'SG2+MS>NAD>C_C082>D_3055>9>',
       'line_type': 'code',
       'new_data_element': 'D_3055',
       'new_format_version': 'FV2504',
@@ -2269,7 +2269,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>NAD>C_C082>D_3055>293>#1',
+      'id_path': 'SG2+MS>NAD>C_C082>D_3055>293>',
       'line_type': 'code',
       'new_data_element': 'D_3055',
       'new_format_version': 'FV2504',
@@ -2293,7 +2293,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>SG3>COM>C_C076>D_3148>',
+      'id_path': 'SG2+MS>SG3>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',
@@ -2315,7 +2315,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>SG3>COM>C_C076>D_3155>AJ>',
+      'id_path': 'SG2+MS>SG3>COM>C_C076>D_3155>AJ>',
       'line_type': 'code',
       'new_data_element': 'D_3155',
       'new_format_version': 'FV2504',
@@ -2339,7 +2339,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>SG3>COM>C_C076>D_3155>AL>',
+      'id_path': 'SG2+MS>SG3>COM>C_C076>D_3155>AL>',
       'line_type': 'code',
       'new_data_element': 'D_3155',
       'new_format_version': 'FV2504',
@@ -2363,7 +2363,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>NAD>C_C082>D_3055>9>#2',
+      'id_path': 'SG2+MR>NAD>C_C082>D_3055>9>',
       'line_type': 'code',
       'new_data_element': 'D_3055',
       'new_format_version': 'FV2504',
@@ -2387,7 +2387,7 @@
     dict({
       'changed_columns': 'line_name',
       'diff_status': 'modified',
-      'id_path': 'SG2+9>NAD>C_C082>D_3055>293>#2',
+      'id_path': 'SG2+MR>NAD>C_C082>D_3055>293>',
       'line_type': 'code',
       'new_data_element': 'D_3055',
       'new_format_version': 'FV2504',
@@ -4011,7 +4011,7 @@
     dict({
       'changed_columns': 'line_ahb_status',
       'diff_status': 'modified',
-      'id_path': 'SG3+9>SG6>COM>C_C076>D_3148>',
+      'id_path': 'SG3+MS>SG6>COM>C_C076>D_3148>',
       'line_type': 'dataelement',
       'new_data_element': 'D_3148',
       'new_format_version': 'FV2504',

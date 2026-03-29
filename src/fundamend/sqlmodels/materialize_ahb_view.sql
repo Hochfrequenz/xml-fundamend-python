@@ -13,22 +13,17 @@ DROP TABLE IF EXISTS ahb_hierarchy_materialized;
 
 -- Segment qualifier: first code value reachable from segment → DE → code (or segment → DEG → DE → code)
 DROP TABLE IF EXISTS _seg_qual;
--- We prefer DEG-based codes (from EDIFACT composites like C_C082, C_C507) over direct DE codes (like D_3035)
--- because DEG structure comes from the MIG (stable across AHB versions), whereas direct DE codes
--- are AHB customizations that may be added/removed between format versions.
--- Example: NAD's D_3035 qualifier was absent in FV2510 but added in FV2604, which would change
--- the qualifier from 9 (C_C082>D_3055) to MS (D_3035). Using DEG-first keeps it stable as 9.
 CREATE TEMP TABLE _seg_qual AS
 SELECT s.primary_key AS pk,
        COALESCE(
+           (SELECT c.value FROM dataelement de JOIN code c ON c.data_element_primary_key = de.primary_key
+            WHERE de.segment_primary_key = s.primary_key AND de.data_element_group_primary_key IS NULL
+            ORDER BY de.position, c.position LIMIT 1),
            (SELECT c.value FROM dataelementgroup deg
             JOIN dataelement de ON de.data_element_group_primary_key = deg.primary_key
             JOIN code c ON c.data_element_primary_key = de.primary_key
             WHERE deg.segment_primary_key = s.primary_key
-            ORDER BY deg.position, de.position, c.position LIMIT 1),
-           (SELECT c.value FROM dataelement de JOIN code c ON c.data_element_primary_key = de.primary_key
-            WHERE de.segment_primary_key = s.primary_key AND de.data_element_group_primary_key IS NULL
-            ORDER BY de.position, c.position LIMIT 1)
+            ORDER BY deg.position, de.position, c.position LIMIT 1)
        ) AS qualifier
 FROM segment s;
 CREATE INDEX _idx_seg_qual ON _seg_qual(pk);
