@@ -74,21 +74,21 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
 # haven't been pushed down to the CTE level to reduce the number of entries there.
 
 
-def test_diff_view_no_duplicate_id_paths(session_fv2410_fv2504_with_diff_view: Session) -> None:
+def test_diff_view_no_duplicate_join_keys(session_fv2410_fv2504_with_diff_view: Session) -> None:
     """
-    Test that there are no duplicate id_paths for the same version pair comparison.
-    Each id_path should appear exactly once in the diff results.
+    Test that there are no duplicate (path, segment_code) pairs for the same version pair comparison.
+    Each (path, segment_code) combination should appear exactly once in the diff results.
     """
     result = session_fv2410_fv2504_with_diff_view.execute(text("""
-        SELECT id_path, COUNT(*) as cnt
+        SELECT path, COALESCE(new_segment_code, old_segment_code) as seg, COUNT(*) as cnt
         FROM v_ahb_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
-        GROUP BY id_path
+        GROUP BY path, seg
         HAVING COUNT(*) > 1
     """))
     duplicates = list(result)
-    assert len(duplicates) == 0, f"Found duplicate id_paths in diff results: {duplicates[:5]}"
+    assert len(duplicates) == 0, f"Found duplicate (path, segment_code) in diff results: {duplicates[:5]}"
 
 
 def test_diff_view_added_rows_have_null_old_columns(session_fv2410_fv2504_with_diff_view: Session) -> None:
