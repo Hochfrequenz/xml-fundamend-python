@@ -78,7 +78,8 @@ WITH version_pairs AS (SELECT DISTINCT old_v.format_version     AS old_format_ve
                                  JOIN v_ahbtabellen old_tbl
                                       ON old_tbl.format_version = vp.old_format_version
                                           AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
-                                          AND old_tbl.id_path = new_tbl.id_path)
+                                          AND old_tbl.path IS new_tbl.path
+                                          AND old_tbl.segment_code IS new_tbl.segment_code)
 
 -- Modified and unchanged rows
 SELECT CASE WHEN changed_columns != '' THEN 'modified' ELSE 'unchanged' END AS diff_status,
@@ -146,7 +147,8 @@ WHERE NOT EXISTS (SELECT 1
                   FROM v_ahbtabellen old_tbl
                   WHERE old_tbl.format_version = vp.old_format_version
                     AND old_tbl.pruefidentifikator = vp.old_pruefidentifikator
-                    AND old_tbl.id_path = new_tbl.id_path)
+                    AND old_tbl.path IS new_tbl.path
+                    AND old_tbl.segment_code IS new_tbl.segment_code)
 
 UNION ALL
 
@@ -185,4 +187,5 @@ WHERE NOT EXISTS (SELECT 1
                   FROM v_ahbtabellen new_tbl
                   WHERE new_tbl.format_version = vp.new_format_version
                     AND new_tbl.pruefidentifikator = vp.new_pruefidentifikator
-                    AND new_tbl.id_path = old_tbl.id_path);
+                    AND new_tbl.path IS old_tbl.path
+                    AND new_tbl.segment_code IS old_tbl.segment_code);
