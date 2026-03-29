@@ -5,7 +5,113 @@
 -- Drop previous materialized table if it exists
 DROP TABLE IF EXISTS ahb_hierarchy_materialized;
 
+-- ============================================================================
+-- Pre-compute semantic qualifiers for segments, segment groups, and data elements.
+-- These are used to build stable, version-independent id_paths.
+-- A "qualifier" is the first code value in an element's subtree, e.g. '92' for DTM+92.
+-- ============================================================================
+
+-- Segment qualifier: first code value reachable from segment → DE → code (or segment → DEG → DE → code)
+DROP TABLE IF EXISTS _seg_qual;
+CREATE TEMP TABLE _seg_qual AS
+SELECT s.primary_key AS pk,
+       COALESCE(
+           (SELECT c.value FROM dataelement de JOIN code c ON c.data_element_primary_key = de.primary_key
+            WHERE de.segment_primary_key = s.primary_key AND de.data_element_group_primary_key IS NULL
+            ORDER BY de.position, c.position LIMIT 1),
+           (SELECT c.value FROM dataelementgroup deg
+            JOIN dataelement de ON de.data_element_group_primary_key = deg.primary_key
+            JOIN code c ON c.data_element_primary_key = de.primary_key
+            WHERE deg.segment_primary_key = s.primary_key
+            ORDER BY deg.position, de.position, c.position LIMIT 1)
+       ) AS qualifier
+FROM segment s;
+CREATE INDEX _idx_seg_qual ON _seg_qual(pk);
+
+-- Segments that need qualification: those with a sibling (under same parent) sharing the same id
+DROP TABLE IF EXISTS _seg_needs_qual;
+CREATE TEMP TABLE _seg_needs_qual AS
+SELECT s1.primary_key AS pk FROM segment s1
+WHERE s1.segmentgroup_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM segment s2
+              WHERE s2.segmentgroup_primary_key = s1.segmentgroup_primary_key
+                AND s2.id = s1.id AND s2.primary_key != s1.primary_key)
+UNION ALL
+SELECT s1.primary_key FROM segment s1
+WHERE s1.segmentgroup_primary_key IS NULL
+  AND EXISTS (SELECT 1 FROM segment s2
+              WHERE s2.segmentgroup_primary_key IS NULL
+                AND s2.anwendungsfall_primary_key = s1.anwendungsfall_primary_key
+                AND s2.id = s1.id AND s2.primary_key != s1.primary_key);
+CREATE INDEX _idx_seg_needs_qual ON _seg_needs_qual(pk);
+
+-- Segment group qualifier: first code value in the SG's subtree (recursing through child SGs if needed)
+DROP TABLE IF EXISTS _sg_qual;
+CREATE TEMP TABLE _sg_qual AS
+WITH RECURSIVE sg_qual_cte AS (
+    -- Base: SGs that directly contain segments → use first segment's qualifier
+    SELECT s.segmentgroup_primary_key AS sg_pk,
+           (SELECT sq.qualifier FROM _seg_qual sq
+            JOIN segment s2 ON sq.pk = s2.primary_key
+            WHERE s2.segmentgroup_primary_key = s.segmentgroup_primary_key
+            ORDER BY s2.position LIMIT 1) AS qualifier
+    FROM segment s
+    WHERE s.segmentgroup_primary_key IS NOT NULL
+    GROUP BY s.segmentgroup_primary_key
+    UNION
+    -- Recursive: SGs without direct segments get qualifier from first child SG
+    SELECT link.parent_id AS sg_pk, child_q.qualifier
+    FROM segmentgrouplink link
+    JOIN sg_qual_cte child_q ON child_q.sg_pk = link.child_id
+    WHERE NOT EXISTS (SELECT 1 FROM segment s WHERE s.segmentgroup_primary_key = link.parent_id)
+)
+SELECT sg_pk AS pk, MIN(qualifier) AS qualifier FROM sg_qual_cte GROUP BY sg_pk HAVING qualifier IS NOT NULL;
+CREATE INDEX _idx_sg_qual ON _sg_qual(pk);
+
+-- Segment groups that need qualification: those with a sibling (under same parent) sharing the same id
+DROP TABLE IF EXISTS _sg_needs_qual;
+CREATE TEMP TABLE _sg_needs_qual AS
+-- Child SGs under same parent SG
+SELECT child1.primary_key AS pk
+FROM segmentgrouplink link1
+JOIN segmentgroup child1 ON link1.child_id = child1.primary_key
+WHERE EXISTS (SELECT 1 FROM segmentgrouplink link2
+              JOIN segmentgroup child2 ON link2.child_id = child2.primary_key
+              WHERE link2.parent_id = link1.parent_id
+                AND child2.id = child1.id AND child2.primary_key != child1.primary_key)
+UNION ALL
+-- Root-level SGs (no parent link) with same id under same anwendungsfall
+SELECT sg1.primary_key FROM segmentgroup sg1
+WHERE NOT EXISTS (SELECT 1 FROM segmentgrouplink link WHERE link.child_id = sg1.primary_key)
+  AND EXISTS (SELECT 1 FROM segmentgroup sg2
+              WHERE sg2.anwendungsfall_primary_key = sg1.anwendungsfall_primary_key
+                AND sg2.id = sg1.id AND sg2.primary_key != sg1.primary_key
+                AND NOT EXISTS (SELECT 1 FROM segmentgrouplink link WHERE link.child_id = sg2.primary_key));
+CREATE INDEX _idx_sg_needs_qual ON _sg_needs_qual(pk);
+
+-- Data element qualifier: first code value under the data element
+DROP TABLE IF EXISTS _de_qual;
+CREATE TEMP TABLE _de_qual AS
+SELECT de.primary_key AS pk,
+       (SELECT c.value FROM code c WHERE c.data_element_primary_key = de.primary_key
+        ORDER BY c.position LIMIT 1) AS qualifier
+FROM dataelement de;
+CREATE INDEX _idx_de_qual ON _de_qual(pk);
+
+-- Data elements that need qualification: those with a sibling (under same DEG) sharing the same id
+DROP TABLE IF EXISTS _de_needs_qual;
+CREATE TEMP TABLE _de_needs_qual AS
+SELECT de1.primary_key AS pk FROM dataelement de1
+WHERE de1.data_element_group_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM dataelement de2
+              WHERE de2.data_element_group_primary_key = de1.data_element_group_primary_key
+                AND de2.id = de1.id AND de2.primary_key != de1.primary_key);
+CREATE INDEX _idx_de_needs_qual ON _de_needs_qual(pk);
+
+-- ============================================================================
 -- Materialize hierarchy for ALL anwendungsfaelle
+-- ============================================================================
+
 CREATE TABLE ahb_hierarchy_materialized AS -- we use a table and not a view because views may come with performance issues e.g. when joining them
 WITH RECURSIVE
 
@@ -75,7 +181,15 @@ WITH RECURSIVE
                               o.type,
                               o.primary_key                                                        AS source_id,
                               substr('00000' || o.position, -5) || '-'                             AS sort_path,
-                              o.root_id_text || '>'                                                AS id_path,
+                              o.root_id_text || CASE
+                                  WHEN o.type = 'segment_group'
+                                       AND EXISTS (SELECT 1 FROM _sg_needs_qual sgnq WHERE sgnq.pk = o.primary_key)
+                                      THEN COALESCE('+' || (SELECT sgq.qualifier FROM _sg_qual sgq WHERE sgq.pk = o.primary_key), '')
+                                  WHEN o.type = 'segment'
+                                       AND EXISTS (SELECT 1 FROM _seg_needs_qual snq WHERE snq.pk = o.primary_key)
+                                      THEN COALESCE('+' || (SELECT sq.qualifier FROM _seg_qual sq WHERE sq.pk = o.primary_key), '')
+                                  ELSE ''
+                              END || '>'                                                           AS id_path,
                               o.pruefidentifikator,
                               o.format,
                               o.versionsnummer,
@@ -134,7 +248,11 @@ WITH RECURSIVE
                          'segment_group',
                          h.source_id,
                          h.sort_path || substr('00000' || child.position, -5) || '-',
-                         h.id_path || child.id || '>',
+                         h.id_path || child.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _sg_needs_qual sgnq WHERE sgnq.pk = child.primary_key)
+                                 THEN COALESCE('+' || (SELECT sgq.qualifier FROM _sg_qual sgq WHERE sgq.pk = child.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -192,7 +310,11 @@ WITH RECURSIVE
                          'segment',
                          h.source_id,
                          h.sort_path || substr('00000' || s.position, -5) || '-',
-                         h.id_path || s.id || '>',
+                         h.id_path || s.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _seg_needs_qual snq WHERE snq.pk = s.primary_key)
+                                 THEN COALESCE('+' || (SELECT sq.qualifier FROM _seg_qual sq WHERE sq.pk = s.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -361,7 +483,11 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-',
-                         h.id_path || de.id || '>',
+                         h.id_path || de.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _de_needs_qual dnq WHERE dnq.pk = de.primary_key)
+                                 THEN COALESCE('+' || (SELECT dq.qualifier FROM _de_qual dq WHERE dq.pk = de.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.pruefidentifikator,
                          h.format,
                          h.versionsnummer,
@@ -538,10 +664,23 @@ CREATE INDEX idx_line_name ON ahb_hierarchy_materialized (line_name);
 CREATE INDEX idx_line_name_lower ON ahb_hierarchy_materialized (lower(line_name));
 CREATE INDEX idx_hierarchy_sort_path_per_ahb ON ahb_hierarchy_materialized (sort_path, pruefidentifikator, edifact_format_version);
 
--- Append position to id_path only where duplicates exist (to ensure uniqueness while keeping paths clean)
--- This updates id_paths that are not unique per (pruefidentifikator, edifact_format_version) by appending the sort_path
-UPDATE ahb_hierarchy_materialized
-SET id_path = id_path || '@' || sort_path
+-- Fallback: append occurrence counter '#N' to any id_paths that are still not unique after qualifier injection.
+-- This handles edge cases where the qualifier is NULL (no code children) or shared among siblings:
+-- - IFTSTA (prüfi 21045): flat segment group naming leads to multiple STS segments with the same
+--   qualifier under identical structural paths. See #258 by hf-mrdachner for details.
+-- - PARTIN FII: repeated "Name des Kontoinhabers" (D_3192) fields, see #259
+-- - PRICAT IMD: repeated IMD segments under the same path
+-- The counter is local (counts only within the duplicate group), so it's stable as long as the
+-- number and order of identical siblings doesn't change between versions.
+-- NOTE: We pre-compute counter values in a temp table because SQLite's UPDATE processes rows sequentially,
+-- which means subqueries in the SET clause see already-modified rows, breaking self-referencing counters.
+CREATE TEMP TABLE _id_path_counter_fix AS
+SELECT id,
+       id_path || '#' || ROW_NUMBER() OVER (
+           PARTITION BY id_path, pruefidentifikator, edifact_format_version
+           ORDER BY sort_path, id
+       ) AS new_id_path
+FROM ahb_hierarchy_materialized
 WHERE id IN (SELECT h1.id
              FROM ahb_hierarchy_materialized h1
              WHERE EXISTS (SELECT 1
@@ -551,6 +690,22 @@ WHERE id IN (SELECT h1.id
                              AND (h2.edifact_format_version = h1.edifact_format_version OR
                                   (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
                              AND h2.id != h1.id));
+
+CREATE UNIQUE INDEX _idx_counter_fix ON _id_path_counter_fix(id);
+
+UPDATE ahb_hierarchy_materialized
+SET id_path = (SELECT cf.new_id_path FROM _id_path_counter_fix cf WHERE cf.id = ahb_hierarchy_materialized.id)
+WHERE id IN (SELECT id FROM _id_path_counter_fix);
+
+DROP TABLE _id_path_counter_fix;
+
+-- Clean up temporary qualifier tables
+DROP TABLE IF EXISTS _seg_qual;
+DROP TABLE IF EXISTS _seg_needs_qual;
+DROP TABLE IF EXISTS _sg_qual;
+DROP TABLE IF EXISTS _sg_needs_qual;
+DROP TABLE IF EXISTS _de_qual;
+DROP TABLE IF EXISTS _de_needs_qual;
 
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 -- column order optimized for v_ahb_diff queries: filter by (version, pruefi) first, then lookup by id_path/path
