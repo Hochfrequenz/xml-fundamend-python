@@ -9,7 +9,7 @@ from typing import Generator
 import pytest
 from efoli import EdifactFormatVersion
 from pydantic import RootModel
-from sqlalchemy import func
+from sqlalchemy import func, text
 from sqlmodel import Session, SQLModel, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
@@ -249,6 +249,23 @@ def test_id_path_uniqueness_per_pruefidentifikator_utilts() -> None:
     _check_uniqueness_of_id_paths(actual_sqlite_path)
 
 
+def _check_id_paths_use_qualifiers_not_sort_path(sqlite_path: Path) -> None:
+    """Verify that id_paths use semantic qualifiers (+) instead of positional sort_path (@)."""
+    engine = create_engine(f"sqlite:///{sqlite_path}")
+    with Session(bind=engine) as session:
+        # No id_path should contain the old @sort_path pattern
+        at_count = session.execute(
+            text("SELECT COUNT(*) FROM ahb_hierarchy_materialized WHERE id_path LIKE '%@%'")
+        ).scalar()
+        assert at_count == 0, f"Found {at_count} id_paths with old @sort_path pattern"
+
+        # At least some id_paths should contain qualifier (+) pattern
+        plus_count = session.execute(
+            text("SELECT COUNT(*) FROM ahb_hierarchy_materialized WHERE id_path LIKE '%+%'")
+        ).scalar()
+        assert plus_count is not None and plus_count > 0, "Expected some id_paths with semantic qualifiers (+)"
+
+
 @pytest.mark.parametrize(
     "format_version,gueltig_von,gueltig_bis",
     [
@@ -271,3 +288,88 @@ def test_sqlmodels_all_id_path_uniqueness(format_version: str, gueltig_von: date
     relevant_files = [(p, gueltig_von, gueltig_bis) for p in format_version_path.rglob("**/*AHB*.xml")]
     actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
     _check_uniqueness_of_id_paths(actual_sqlite_path)
+
+
+@pytest.mark.parametrize(
+    "message_type",
+    [
+        pytest.param("IFTSTA", id="IFTSTA-flat-SG-paths"),
+        pytest.param("PARTIN", id="PARTIN-repeated-FII-D_3192"),
+        pytest.param("MSCONS", id="MSCONS-repeated-segment-groups"),
+        pytest.param("PRICAT", id="PRICAT-repeated-IMD"),
+        pytest.param("UTILMD", id="UTILMD-inserted-segments"),
+    ],
+)
+def test_id_path_uniqueness_per_message_type(message_type: str) -> None:
+    """
+    Test id_path uniqueness for specific message types known to have structural duplicates.
+    These are regression tests for issues #256, #258, #259:
+    - IFTSTA: flat segment group naming, duplicate STS segments (#258)
+    - PARTIN: repeated FII/D_3192 "Name des Kontoinhabers" (#259)
+    - MSCONS: repeated segment groups "Referenzangaben" (#259)
+    - PRICAT: repeated IMD segments (#259)
+    - UTILMD: segment insertions between versions (#256)
+    """
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+    fv2510_path = private_submodule_root / "FV2510"
+    if not fv2510_path.exists():
+        pytest.skip("FV2510 not found in submodule")
+    relevant_files = [
+        (p, date(2025, 10, 1), date(2026, 4, 1)) for p in fv2510_path.rglob(f"**/{message_type}_AHB*.xml")
+    ]
+    if not relevant_files:
+        pytest.skip(f"No AHB files found for {message_type}")
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
+    _check_id_paths_use_qualifiers_not_sort_path(actual_sqlite_path)
+
+
+def test_id_path_stable_across_versions_utilmd() -> None:
+    """
+    Regression test for #256: verify that id_paths are stable when comparing UTILMD across format versions.
+    When a segment is inserted in a new version, id_paths of unchanged elements should not shift.
+    """
+    if not is_private_submodule_checked_out():
+        pytest.skip("Skipping test because of missing private submodule")
+    private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
+    fv2510_path = private_submodule_root / "FV2510"
+    fv2604_path = private_submodule_root / "FV2604"
+    if not fv2510_path.exists() or not fv2604_path.exists():
+        pytest.skip("FV2510 or FV2604 not found in submodule")
+    relevant_files = [
+        (p, date(2025, 10, 1), date(2026, 4, 1)) for p in fv2510_path.rglob("**/UTILMD_AHB*Strom*.xml")
+    ] + [(p, date(2026, 4, 1), None) for p in fv2604_path.rglob("**/UTILMD_AHB*Strom*.xml")]
+    if not relevant_files:
+        pytest.skip("No UTILMD Strom AHB files found")
+    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    _check_uniqueness_of_id_paths(actual_sqlite_path)
+
+    # Verify cross-version id_path overlap: most id_paths from FV2510 should also exist in FV2604
+    engine = create_engine(f"sqlite:///{actual_sqlite_path}")
+    with Session(bind=engine) as session:
+        # Count how many id_paths are shared between versions for UTILMD/44001
+        shared_count = session.execute(text("""
+                SELECT COUNT(*) FROM (
+                    SELECT id_path FROM ahb_hierarchy_materialized
+                    WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
+                    INTERSECT
+                    SELECT id_path FROM ahb_hierarchy_materialized
+                    WHERE edifact_format_version = 'FV2604' AND pruefidentifikator = '44001'
+                )
+            """)).scalar()
+        old_count = session.execute(text("""
+                SELECT COUNT(*) FROM ahb_hierarchy_materialized
+                WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
+            """)).scalar()
+        if old_count is None or old_count == 0:
+            pytest.skip("UTILMD/44001 not found in FV2510 — data may not include this pruefidentifikator")
+        assert shared_count is not None
+        overlap_ratio = shared_count / old_count
+        # With semantic id_paths, the vast majority should match (>90%)
+        # With the old @sort_path approach, this ratio was much lower due to positional shifts
+        assert overlap_ratio > 0.9, (
+            f"Only {shared_count}/{old_count} ({overlap_ratio:.0%}) id_paths shared between "
+            f"FV2510 and FV2604 for UTILMD/44001. Semantic id_paths should be stable across versions."
+        )
