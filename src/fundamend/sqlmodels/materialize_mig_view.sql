@@ -5,7 +5,109 @@
 -- Drop previous materialized table if it exists
 DROP TABLE IF EXISTS mig_hierarchy_materialized;
 
+-- ============================================================================
+-- Pre-compute semantic qualifiers for segments, segment groups, and data elements.
+-- Same approach as materialize_ahb_view.sql — see that file for detailed comments.
+-- ============================================================================
+
+DROP TABLE IF EXISTS _seg_qual;
+CREATE TEMP TABLE _seg_qual AS
+SELECT s.primary_key AS pk,
+       COALESCE(
+           (SELECT c.value FROM migdataelement de JOIN migcode c ON c.data_element_primary_key = de.primary_key
+            WHERE de.segment_primary_key = s.primary_key AND de.data_element_group_primary_key IS NULL
+            ORDER BY de.position, c.position LIMIT 1),
+           (SELECT c.value FROM migdataelementgroup deg
+            JOIN migdataelement de ON de.data_element_group_primary_key = deg.primary_key
+            JOIN migcode c ON c.data_element_primary_key = de.primary_key
+            WHERE deg.segment_primary_key = s.primary_key
+            ORDER BY deg.position, de.position, c.position LIMIT 1)
+       ) AS qualifier
+FROM migsegment s;
+CREATE INDEX _idx_seg_qual ON _seg_qual(pk);
+
+DROP TABLE IF EXISTS _seg_needs_qual;
+CREATE TEMP TABLE _seg_needs_qual AS
+SELECT s1.primary_key AS pk FROM migsegment s1
+WHERE s1.segmentgroup_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM migsegment s2
+              WHERE s2.segmentgroup_primary_key = s1.segmentgroup_primary_key
+                AND s2.id = s1.id AND s2.primary_key != s1.primary_key)
+UNION ALL
+SELECT s1.primary_key FROM migsegment s1
+WHERE s1.segmentgroup_primary_key IS NULL
+  AND EXISTS (SELECT 1 FROM migsegment s2
+              WHERE s2.segmentgroup_primary_key IS NULL
+                AND s2.mig_primary_key = s1.mig_primary_key
+                AND s2.id = s1.id AND s2.primary_key != s1.primary_key);
+CREATE INDEX _idx_seg_needs_qual ON _seg_needs_qual(pk);
+
+DROP TABLE IF EXISTS _sg_qual;
+CREATE TEMP TABLE _sg_qual AS
+WITH RECURSIVE sg_qual_cte AS (
+    SELECT s.segmentgroup_primary_key AS sg_pk,
+           (SELECT sq.qualifier FROM _seg_qual sq
+            JOIN migsegment s2 ON sq.pk = s2.primary_key
+            WHERE s2.segmentgroup_primary_key = s.segmentgroup_primary_key
+            ORDER BY s2.position LIMIT 1) AS qualifier
+    FROM migsegment s
+    WHERE s.segmentgroup_primary_key IS NOT NULL
+    GROUP BY s.segmentgroup_primary_key
+    UNION
+    SELECT link.parent_id AS sg_pk, child_q.qualifier
+    FROM migsegmentgrouplink link
+    JOIN sg_qual_cte child_q ON child_q.sg_pk = link.child_id
+    WHERE NOT EXISTS (SELECT 1 FROM migsegment s WHERE s.segmentgroup_primary_key = link.parent_id)
+)
+SELECT sg_pk AS pk, MIN(qualifier) AS qualifier FROM sg_qual_cte GROUP BY sg_pk HAVING qualifier IS NOT NULL;
+CREATE INDEX _idx_sg_qual ON _sg_qual(pk);
+
+DROP TABLE IF EXISTS _sg_needs_qual;
+CREATE TEMP TABLE _sg_needs_qual AS
+SELECT child1.primary_key AS pk
+FROM migsegmentgrouplink link1
+JOIN migsegmentgroup child1 ON link1.child_id = child1.primary_key
+WHERE EXISTS (SELECT 1 FROM migsegmentgrouplink link2
+              JOIN migsegmentgroup child2 ON link2.child_id = child2.primary_key
+              WHERE link2.parent_id = link1.parent_id
+                AND child2.id = child1.id AND child2.primary_key != child1.primary_key)
+UNION ALL
+SELECT sg1.primary_key FROM migsegmentgroup sg1
+WHERE NOT EXISTS (SELECT 1 FROM migsegmentgrouplink link WHERE link.child_id = sg1.primary_key)
+  AND EXISTS (SELECT 1 FROM migsegmentgroup sg2
+              WHERE sg2.mig_primary_key = sg1.mig_primary_key
+                AND sg2.id = sg1.id AND sg2.primary_key != sg1.primary_key
+                AND NOT EXISTS (SELECT 1 FROM migsegmentgrouplink link WHERE link.child_id = sg2.primary_key));
+CREATE INDEX _idx_sg_needs_qual ON _sg_needs_qual(pk);
+
+DROP TABLE IF EXISTS _de_qual;
+CREATE TEMP TABLE _de_qual AS
+SELECT de.primary_key AS pk,
+       (SELECT c.value FROM migcode c WHERE c.data_element_primary_key = de.primary_key
+        ORDER BY c.position LIMIT 1) AS qualifier
+FROM migdataelement de;
+CREATE INDEX _idx_de_qual ON _de_qual(pk);
+
+DROP TABLE IF EXISTS _de_needs_qual;
+CREATE TEMP TABLE _de_needs_qual AS
+SELECT de1.primary_key AS pk FROM migdataelement de1
+WHERE de1.data_element_group_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM migdataelement de2
+              WHERE de2.data_element_group_primary_key = de1.data_element_group_primary_key
+                AND de2.id = de1.id AND de2.primary_key != de1.primary_key)
+UNION ALL
+SELECT de1.primary_key FROM migdataelement de1
+WHERE de1.data_element_group_primary_key IS NULL
+  AND de1.segment_primary_key IS NOT NULL
+  AND EXISTS (SELECT 1 FROM migdataelement de2
+              WHERE de2.segment_primary_key = de1.segment_primary_key
+                AND de2.data_element_group_primary_key IS NULL
+                AND de2.id = de1.id AND de2.primary_key != de1.primary_key);
+CREATE INDEX _idx_de_needs_qual ON _de_needs_qual(pk);
+
+-- ============================================================================
 -- Materialize hierarchy for ALL MIGs
+-- ============================================================================
 CREATE TABLE mig_hierarchy_materialized AS
 WITH RECURSIVE
 
@@ -81,7 +183,15 @@ WITH RECURSIVE
                               o.type,
                               o.primary_key                                                        AS source_id,
                               substr('00000' || o.position, -5) || '-'                             AS sort_path,
-                              o.root_id_text || '>'                                                AS id_path,
+                              o.root_id_text || CASE
+                                  WHEN o.type = 'segment_group'
+                                       AND EXISTS (SELECT 1 FROM _sg_needs_qual sgnq WHERE sgnq.pk = o.primary_key)
+                                      THEN COALESCE('+' || (SELECT sgq.qualifier FROM _sg_qual sgq WHERE sgq.pk = o.primary_key), '')
+                                  WHEN o.type = 'segment'
+                                       AND EXISTS (SELECT 1 FROM _seg_needs_qual snq WHERE snq.pk = o.primary_key)
+                                      THEN COALESCE('+' || (SELECT sq.qualifier FROM _seg_qual sq WHERE sq.pk = o.primary_key), '')
+                                  ELSE ''
+                              END || '>'                                                           AS id_path,
                               o.format,
                               o.versionsnummer,
                               o.gueltig_von,
@@ -166,7 +276,11 @@ WITH RECURSIVE
                          'segment_group',
                          h.source_id,
                          h.sort_path || substr('00000' || child.position, -5) || '-',
-                         h.id_path || child.id || '>',
+                         h.id_path || child.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _sg_needs_qual sgnq WHERE sgnq.pk = child.primary_key)
+                                 THEN COALESCE('+' || (SELECT sgq.qualifier FROM _sg_qual sgq WHERE sgq.pk = child.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.format,
                          h.versionsnummer,
                          h.gueltig_von,
@@ -238,7 +352,11 @@ WITH RECURSIVE
                          'segment',
                          h.source_id,
                          h.sort_path || substr('00000' || s.position, -5) || '-',
-                         h.id_path || s.id || '>',
+                         h.id_path || s.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _seg_needs_qual snq WHERE snq.pk = s.primary_key)
+                                 THEN COALESCE('+' || (SELECT sq.qualifier FROM _seg_qual sq WHERE sq.pk = s.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.format,
                          h.versionsnummer,
                          h.gueltig_von,
@@ -380,7 +498,11 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-',
-                         h.id_path || de.id || '>',
+                         h.id_path || de.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _de_needs_qual dnq WHERE dnq.pk = de.primary_key)
+                                 THEN COALESCE('+' || (SELECT dq.qualifier FROM _de_qual dq WHERE dq.pk = de.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.format,
                          h.versionsnummer,
                          h.gueltig_von,
@@ -452,7 +574,11 @@ WITH RECURSIVE
                          'dataelement',
                          h.source_id,
                          h.sort_path || substr('00000' || de.position, -5) || '-',
-                         h.id_path || de.id || '>',
+                         h.id_path || de.id || CASE
+                             WHEN EXISTS (SELECT 1 FROM _de_needs_qual dnq WHERE dnq.pk = de.primary_key)
+                                 THEN COALESCE('+' || (SELECT dq.qualifier FROM _de_qual dq WHERE dq.pk = de.primary_key), '')
+                             ELSE ''
+                         END || '>',
                          h.format,
                          h.versionsnummer,
                          h.gueltig_von,
@@ -660,9 +786,14 @@ CREATE INDEX idx_mig_line_name ON mig_hierarchy_materialized (line_name);
 CREATE INDEX idx_mig_line_status_std ON mig_hierarchy_materialized (line_status_std);
 CREATE INDEX idx_mig_line_status_specification ON mig_hierarchy_materialized (line_status_specification);
 
--- Append position to id_path only where duplicates exist (to ensure uniqueness)
-UPDATE mig_hierarchy_materialized
-SET id_path = id_path || '@' || sort_path
+-- Fallback: append occurrence counter '#N' to any id_paths still not unique after qualifier injection.
+CREATE TEMP TABLE _id_path_counter_fix AS
+SELECT id,
+       id_path || '#' || ROW_NUMBER() OVER (
+           PARTITION BY id_path, format, edifact_format_version
+           ORDER BY sort_path, id
+       ) AS new_id_path
+FROM mig_hierarchy_materialized
 WHERE id IN (SELECT h1.id
              FROM mig_hierarchy_materialized h1
              WHERE EXISTS (SELECT 1
@@ -673,9 +804,30 @@ WHERE id IN (SELECT h1.id
                                   (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
                              AND h2.id != h1.id));
 
--- Append position to path only where duplicates exist (to ensure uniqueness for diff view matching)
+CREATE UNIQUE INDEX _idx_counter_fix ON _id_path_counter_fix(id);
+
 UPDATE mig_hierarchy_materialized
-SET path = path || ' @' || sort_path
+SET id_path = (SELECT cf.new_id_path FROM _id_path_counter_fix cf WHERE cf.id = mig_hierarchy_materialized.id)
+WHERE id IN (SELECT id FROM _id_path_counter_fix);
+
+DROP TABLE _id_path_counter_fix;
+
+-- Clean up qualifier temp tables
+DROP TABLE IF EXISTS _seg_qual;
+DROP TABLE IF EXISTS _seg_needs_qual;
+DROP TABLE IF EXISTS _sg_qual;
+DROP TABLE IF EXISTS _sg_needs_qual;
+DROP TABLE IF EXISTS _de_qual;
+DROP TABLE IF EXISTS _de_needs_qual;
+
+-- Append counter '#N' to path where duplicates exist (for diff view matching)
+CREATE TEMP TABLE _path_counter_fix AS
+SELECT id,
+       path || ' #' || ROW_NUMBER() OVER (
+           PARTITION BY path, format, edifact_format_version
+           ORDER BY sort_path, id
+       ) AS new_path
+FROM mig_hierarchy_materialized
 WHERE id IN (SELECT h1.id
              FROM mig_hierarchy_materialized h1
              WHERE EXISTS (SELECT 1
@@ -685,6 +837,14 @@ WHERE id IN (SELECT h1.id
                              AND (h2.edifact_format_version = h1.edifact_format_version OR
                                   (h2.edifact_format_version IS NULL AND h1.edifact_format_version IS NULL))
                              AND h2.id != h1.id));
+
+CREATE UNIQUE INDEX _idx_path_counter_fix ON _path_counter_fix(id);
+
+UPDATE mig_hierarchy_materialized
+SET path = (SELECT pf.new_path FROM _path_counter_fix pf WHERE pf.id = mig_hierarchy_materialized.id)
+WHERE id IN (SELECT id FROM _path_counter_fix);
+
+DROP TABLE _path_counter_fix;
 
 -- Unique indexes for diff view support
 CREATE UNIQUE INDEX idx_mig_hierarchy_id_path_per_mig ON mig_hierarchy_materialized (edifact_format_version, format, id_path);
