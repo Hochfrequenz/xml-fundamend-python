@@ -18,13 +18,10 @@
 -- For added rows, new_ columns are populated and old_ columns are NULL.
 --
 -- MATCHING STRATEGY:
--- Unlike AHBs (which have Prüfidentifikatoren as stable semantic anchors), MIGs represent the complete
--- message structure without such anchors. This view matches rows by their human-readable 'path' column
--- (e.g., "Nachrichten-Kopfsegment > Nachrichten-Kennung > ...") rather than structural id_path.
--- This provides more semantically meaningful comparisons but has limitations:
--- - If an element is renamed between versions, it appears as added+deleted rather than modified
--- - Elements with identical names at different structural positions may be incorrectly matched
--- For structural comparisons, use id_path directly from mig_hierarchy_materialized.
+-- This view matches rows by their id_path column, which uses semantic qualifiers
+-- (e.g., "SG2>SG3>FTX+ACD>C_C107>D_4441>") to identify rows across versions.
+-- This is consistent with how the AHB diff view works.
+-- Note: SQLite's "IS NOT" is a NULL-safe inequality operator (equivalent to SQL standard "IS DISTINCT FROM")
 
 DROP TABLE IF EXISTS v_mig_diff;
 DROP VIEW IF EXISTS v_mig_diff;
@@ -84,7 +81,7 @@ WITH version_pairs AS (SELECT DISTINCT old_v.edifact_format_version AS old_forma
                                  JOIN mig_hierarchy_materialized old_tbl
                                       ON old_tbl.edifact_format_version = vp.old_format_version
                                           AND old_tbl.format = vp.old_format
-                                          AND old_tbl.path = new_tbl.path)
+                                          AND old_tbl.id_path = new_tbl.id_path)
 
 -- Modified and unchanged rows
 SELECT CASE WHEN changed_columns != '' THEN 'modified' ELSE 'unchanged' END AS diff_status,
@@ -148,7 +145,7 @@ WHERE NOT EXISTS (SELECT 1
                   FROM mig_hierarchy_materialized old_tbl
                   WHERE old_tbl.edifact_format_version = vp.old_format_version
                     AND old_tbl.format = vp.old_format
-                    AND old_tbl.path = new_tbl.path)
+                    AND old_tbl.id_path = new_tbl.id_path)
 
 UNION ALL
 
@@ -185,4 +182,4 @@ WHERE NOT EXISTS (SELECT 1
                   FROM mig_hierarchy_materialized new_tbl
                   WHERE new_tbl.edifact_format_version = vp.new_format_version
                     AND new_tbl.format = vp.new_format
-                    AND new_tbl.path = old_tbl.path);
+                    AND new_tbl.id_path = old_tbl.id_path);
