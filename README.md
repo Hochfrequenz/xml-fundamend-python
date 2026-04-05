@@ -308,9 +308,7 @@ Die View erwartet 4 Filter-Parameter beim Abfragen und liefert einen `diff_statu
 
 Alle Wert-Spalten existieren doppelt (`old_*` und `new_*`), um die Werte aus beiden Versionen nebeneinander anzuzeigen.
 
-**Matching-Strategie:** Anders als AHBs (die Prüfidentifikatoren als stabile semantische Anker haben) repräsentieren MIGs die vollständige Nachrichtenstruktur ohne solche Anker. Diese View matched Zeilen anhand ihrer lesbaren `path`-Spalte (z.B. "Nachrichten-Kopfsegment > Nachrichten-Kennung > ...") statt struktureller IDs. Das liefert semantisch sinnvollere Vergleiche, hat aber Einschränkungen:
-- Wenn ein Element zwischen Versionen umbenannt wird, erscheint es als added+deleted statt modified
-- Elemente mit identischen Namen an unterschiedlichen strukturellen Positionen könnten falsch gematcht werden
+**Matching-Strategie:** Diese View matched Zeilen anhand ihrer `id_path`-Spalte, die semantische Qualifier verwendet (z.B. `SG2>SG3>FTX+ACD>C_C107>D_4441>`), um Zeilen über Versionen hinweg zu identifizieren. Das ist konsistent mit der AHB-Diff-View.
 
 ```sql
 -- Alle Änderungen zwischen zwei MIG-Versionen anzeigen
