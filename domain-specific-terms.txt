@@ -18,3 +18,5 @@ rekursive
 finde
 contrl
 Elemente
+segmente
+hierarchie
