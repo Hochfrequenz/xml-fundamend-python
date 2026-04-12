@@ -5,7 +5,7 @@ helper module to create a table with a "Bedingung" column like the one in the PD
 import asyncio
 import logging
 import uuid
-from typing import Optional
+
 
 from efoli import EdifactFormat, EdifactFormatVersion
 from sqlalchemy import Index
