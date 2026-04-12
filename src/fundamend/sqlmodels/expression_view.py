@@ -5,8 +5,6 @@ helper module to create a table with a "Bedingung" column like the one in the PD
 import asyncio
 import logging
 import uuid
-from contextvars import ContextVar
-from typing import Optional
 
 from efoli import EdifactFormat, EdifactFormatVersion
 from sqlalchemy import Index
@@ -24,13 +22,8 @@ except ImportError as import_error:
 
 
 try:
-    import inject
-    from ahbicht.content_evaluation.evaluationdatatypes import EvaluatableData, EvaluatableDataProvider
-    from ahbicht.content_evaluation.evaluator_factory import create_content_evaluation_result_based_evaluators
     from ahbicht.content_evaluation.expression_check import is_valid_expression
-    from ahbicht.content_evaluation.token_logic_provider import SingletonTokenLogicProvider, TokenLogicProvider
     from ahbicht.expressions.condition_expression_parser import extract_categorized_keys
-    from ahbicht.models.content_evaluation_result import ContentEvaluationResult
     from lark.exceptions import VisitError
 except ImportError as import_error:
     import_error.msg += "; Did you install fundamend[sqlmodels,ahbicht]?"
@@ -38,39 +31,6 @@ except ImportError as import_error:
     raise
 
 _logger = logging.getLogger(__name__)
-
-_content_evaluation_result: ContextVar[Optional[ContentEvaluationResult]] = ContextVar(
-    "_content_evaluation_result", default=None
-)
-
-
-def _get_evaluatable_data() -> EvaluatableData[ContentEvaluationResult]:
-    """
-    returns the _content_evaluation_result context var value wrapped in a EvaluatableData container.
-    This is the kind of data that the ContentEvaluationResultBased RC/FC Evaluators, HintsProvider and Package Resolver
-    require.
-    :return:
-    """
-    cer = _content_evaluation_result.get()
-    assert cer is not None
-    return EvaluatableData(
-        body=cer,
-        edifact_format=EdifactFormat.UTILMD,  # not important, something has to be here
-        edifact_format_version=EdifactFormatVersion.FV2504,  # not important, something has to be here
-    )
-
-
-def _setup_weird_ahbicht_dependency_injection() -> None:
-    def configure(binder: inject.Binder) -> None:
-        binder.bind(
-            TokenLogicProvider,
-            SingletonTokenLogicProvider(
-                [*create_content_evaluation_result_based_evaluators(EdifactFormat.UTILMD, EdifactFormatVersion.FV2504)]
-            ),
-        )
-        binder.bind_to_provider(EvaluatableDataProvider, _get_evaluatable_data)
-
-    inject.configure_once(configure)
 
 
 def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -> str:
@@ -117,15 +77,22 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
 
 
 def _get_validity_node_texts_and_error_message_cpu_intensive(
-    expression: str, session: Session, anwendungshandbuch_pk: uuid.UUID
+    expression: str,
+    session: Session,
+    anwendungshandbuch_pk: uuid.UUID,
+    edifact_format: EdifactFormat,
+    edifact_format_version: EdifactFormatVersion,
 ) -> tuple[bool, str, str | None]:
+    is_valid = True  # default: assume valid unless proven otherwise
+    error_message: str | None = None
     try:
-        is_valid, error_message = asyncio.run(is_valid_expression(expression, _content_evaluation_result.set))
+        is_valid, error_message = asyncio.run(is_valid_expression(expression, edifact_format, edifact_format_version))
         if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
             node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
         else:
             node_texts = ""
     except NotImplementedError:  # ahbicht fault/missing feature -> act like it's valid
+        is_valid = True
         node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
         error_message = None
     return is_valid, node_texts, error_message
@@ -157,7 +124,6 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
     outcomes. This leads to only few additional expressions marked as invalid but is very slow.
     """
     rows: list[tuple[EdifactFormatVersion | None, str, str | None, uuid.UUID]] = []
-    _setup_weird_ahbicht_dependency_injection()
     for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
         AhbHierarchyMaterialized.segment_ahb_status,
@@ -192,7 +158,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         if use_cpu_intensive_validity_check:
             # as of 2025-04-15 I have no clue how long this actually takes for all expressions
             _, node_texts, error_message = _get_validity_node_texts_and_error_message_cpu_intensive(
-                expression, session, row[3]
+                expression, session, row[3], EdifactFormat(row[1]), row[0]
             )
         else:
             _, node_texts, error_message = _get_validity_node_texts_and_error_message_fast(expression, session, row[3])
