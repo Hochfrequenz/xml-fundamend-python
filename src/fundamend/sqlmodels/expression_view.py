@@ -6,7 +6,6 @@ import asyncio
 import logging
 import uuid
 
-
 from efoli import EdifactFormat, EdifactFormatVersion
 from sqlalchemy import Index
 
@@ -87,9 +86,7 @@ def _get_validity_node_texts_and_error_message_cpu_intensive(
     is_valid = True  # default: assume valid unless proven otherwise
     error_message: str | None = None
     try:
-        is_valid, error_message = asyncio.run(
-            is_valid_expression(expression, edifact_format, edifact_format_version)
-        )
+        is_valid, error_message = asyncio.run(is_valid_expression(expression, edifact_format, edifact_format_version))
         if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
             node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
         else:
