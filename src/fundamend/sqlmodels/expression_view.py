@@ -23,7 +23,6 @@ except ImportError as import_error:
 
 
 try:
-    from ahbicht.content_evaluation.ahb_context import AhbContext
     from ahbicht.content_evaluation.expression_check import is_valid_expression
     from ahbicht.expressions.condition_expression_parser import extract_categorized_keys
     from lark.exceptions import VisitError
@@ -79,17 +78,24 @@ def _generate_node_texts(session: Session, expression: str, ahb_pk: uuid.UUID) -
 
 
 def _get_validity_node_texts_and_error_message_cpu_intensive(
-    expression: str, session: Session, anwendungshandbuch_pk: uuid.UUID
+    expression: str,
+    session: Session,
+    anwendungshandbuch_pk: uuid.UUID,
+    edifact_format: EdifactFormat,
+    edifact_format_version: EdifactFormatVersion,
 ) -> tuple[bool, str, str | None]:
+    is_valid = True  # default: assume valid unless proven otherwise
+    error_message: str | None = None
     try:
         is_valid, error_message = asyncio.run(
-            is_valid_expression(expression, EdifactFormat.UTILMD, EdifactFormatVersion.FV2504)
+            is_valid_expression(expression, edifact_format, edifact_format_version)
         )
         if is_valid:  # we might actually get a meaningful node_texts even for invalid expressions, but I don't like it
             node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
         else:
             node_texts = ""
     except NotImplementedError:  # ahbicht fault/missing feature -> act like it's valid
+        is_valid = True
         node_texts = _generate_node_texts(session, expression, anwendungshandbuch_pk)
         error_message = None
     return is_valid, node_texts, error_message
@@ -155,7 +161,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         if use_cpu_intensive_validity_check:
             # as of 2025-04-15 I have no clue how long this actually takes for all expressions
             _, node_texts, error_message = _get_validity_node_texts_and_error_message_cpu_intensive(
-                expression, session, row[3]
+                expression, session, row[3], EdifactFormat(row[1]), row[0]
             )
         else:
             _, node_texts, error_message = _get_validity_node_texts_and_error_message_fast(expression, session, row[3])
