@@ -14,14 +14,16 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v6
+        if: github.actor != 'dependabot[bot]'
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          token: ${{ github.actor == 'dependabot[bot]' && secrets.REPO_AND_READ_PACKAGES_PAT || secrets.XML_SUBMODULE_PAT }}
-          # XML_SUBMODULE_PAT is a secret token on repository level with repo scope; expires in Jan2026
+          token: ${{ secrets.XML_SUBMODULE_PAT }}
+          # XML_SUBMODULE_PAT is a secret token on repository level with repo scope
           # https://github.com/Hochfrequenz/xml-fundamend-python/settings/secrets/actions/XML_AHB_MIG_Token
-          # REPO_AND_READ_PACKAGES_PAT is a secret token on organization level
-          # https://github.com/organizations/Hochfrequenz/settings/secrets/dependabot/REPO_AND_READ_PACKAGES_PAT
           submodules: "recursive"
+      - uses: actions/checkout@v6
+        if: github.actor == 'dependabot[bot]'
+        # Dependabot PRs only bump pip dependencies and don't need the private submodule.
+        # Tests that require the submodule will be skipped automatically (see conftest.py).
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
