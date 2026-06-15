@@ -40,7 +40,7 @@ formatting = [
     "isort==8.0.1"
 ]
 linting = [
-    "pylint==4.0.5"
+    "pylint==4.0.6"
 ]
 cli = [
     "typer" # if you install fundamend[cli], the cli commands are available via typer
