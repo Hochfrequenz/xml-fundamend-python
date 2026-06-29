@@ -54,7 +54,7 @@ test_packaging = [
 ]
 tests = [
     "pytest==9.1.0",
-    "syrupy==5.3.2"
+    "syrupy==5.3.4"
 ]
 type_check = [
     "mypy==2.1.0"
