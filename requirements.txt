@@ -14,7 +14,7 @@ pydantic-core==2.41.5
     # via pydantic
 pytz==2026.2
     # via efoli
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   pydantic
     #   pydantic-core
