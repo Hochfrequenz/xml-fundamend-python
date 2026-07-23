@@ -32,32 +32,42 @@ sqlmodels = [
 ahbicht = [
     "ahbicht>=2.0.0"
 ]
+cli = [
+    "typer" # if you install fundamend[cli], the cli commands are available via typer
+]
+
+[dependency-groups]
+tests = [
+    "pytest==9.1.1",
+    "syrupy==5.5.3"
+]
+linting = [
+    "pylint==4.0.6",
+    {include-group = "tests"}
+]
+type_check = [
+    "mypy==2.3.0",
+    {include-group = "tests"}
+]
+spell_check = [
+    "codespell==2.4.2"
+]
 coverage = [
-    "coverage==7.15.1"
+    "coverage==7.15.1",
+    {include-group = "tests"}
 ]
 formatting = [
     "black==26.5.1",
     "isort==8.0.1"
 ]
-linting = [
-    "pylint==4.0.6"
-]
-cli = [
-    "typer" # if you install fundamend[cli], the cli commands are available via typer
-]
-spellcheck = [
-    "codespell==2.4.2"
-]
-test_packaging = [
-    "build==1.5.0",
-    "twine==6.2.0"
-]
-tests = [
-    "pytest==9.1.1",
-    "syrupy==5.5.3"
-]
-type_check = [
-    "mypy==2.3.0"
+dev = [
+    {include-group = "tests"},
+    {include-group = "linting"},
+    {include-group = "type_check"},
+    {include-group = "coverage"},
+    {include-group = "spell_check"},
+    {include-group = "formatting"},
+    "pre-commit"
 ]
 
 
@@ -89,6 +99,9 @@ truethy-bool = true
 
 [tool.mypy]
 disable_error_code = []
+
+[tool.uv]
+default-groups = []
 
 [build-system]
 requires = ["hatchling>=1.8.0", "hatch-vcs", "hatch-fancy-pypi-readme"]
