@@ -53,7 +53,7 @@ spell_check = [
     "codespell==2.4.2"
 ]
 coverage = [
-    "coverage==7.15.1",
+    "coverage==7.15.2",
     {include-group = "tests"}
 ]
 formatting = [
