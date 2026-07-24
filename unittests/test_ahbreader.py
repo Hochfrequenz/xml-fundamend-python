@@ -216,7 +216,7 @@ def test_sanitizing_all_awf_beschreibungen(snapshot: SnapshotAssertion) -> None:
     # If you're unhappy with any specific entry in this list, better write a new unit test case in
     # test_utils.py / test_anwendungsfall_beschreibung_normalization (add more parametrization).
     # If the snapshot test fails because of updated data, just run
-    # tox -e snapshots
+    # uv run pytest -m snapshot --snapshot-update
     # and commit the updated .ambr file.
     distinct_beschreibungen_as_list = list(sorted(all_sanitized_awf_beschreibungen))
     snapshot.assert_match(distinct_beschreibungen_as_list)
