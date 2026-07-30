@@ -138,9 +138,9 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         )
         rows.extend(session.exec(stmt))  # type: ignore[arg-type]
     non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID]] = [
-        r
+        r  # type: ignore[misc]
         for r in rows
-        if r[2] is not None and r[0] is not None and r[2].strip()  # type: ignore[misc]
+        if r[2] is not None and r[0] is not None and r[2].strip()
     ]
     if not any(rows):
         raise ValueError(
