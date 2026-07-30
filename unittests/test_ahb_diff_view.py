@@ -5,10 +5,10 @@ from efoli import EdifactFormatVersion
 from sqlmodel import Session, create_engine, select, text
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import create_ahbtabellen_view
 from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
 
-from .conftest import is_private_submodule_checked_out, private_submodule_root
+from .conftest import cached_ahb_db, is_private_submodule_checked_out, private_submodule_root
 
 
 @pytest.mark.snapshot
@@ -23,7 +23,7 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
         (p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")
     ] + [(p, date(2025, 6, 6), None) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
 
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_paths, drop_raw_tables=False)
+    actual_sqlite_path = cached_ahb_db(ahb_paths, drop_raw_tables=False)
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     results: list[AhbDiffLine] = []

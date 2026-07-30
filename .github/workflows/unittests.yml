@@ -31,5 +31,19 @@ jobs:
       - name: install typer if requested
         if: matrix.cli == 'install_typer'
         run: uv sync --group tests --extra sqlmodels --extra ahbicht --extra cli
+      - name: Determine submodule revision for the DB cache key
+        id: submodule
+        run: echo "sha=$(git -C xml-migs-and-ahbs rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Cache built test databases
+        # The tests build deterministic SQLite DBs from the pinned submodule XML; cache them keyed
+        # on the submodule commit so unchanged data isn't re-parsed on every run. The cache content
+        # is additionally content-addressed (see unittests/_db_cache.py), so a stale restore is
+        # simply ignored rather than reused incorrectly.
+        uses: actions/cache@v4
+        with:
+          path: .pytest_db_cache
+          key: pytest-db-cache-v1-${{ steps.submodule.outputs.sha }}
+          restore-keys: |
+            pytest-db-cache-v1-
       - name: Run the Unit Tests
         run: uv run pytest -vv
