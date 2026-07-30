@@ -21,6 +21,8 @@ jobs:
         run: |
           if [ "${{ matrix.linter-env }}" = "spell_check" ]; then
             uv sync --group spell_check
+          elif [ "${{ matrix.linter-env }}" = "linting" ]; then
+            uv sync --group lint --extra sqlmodels --extra ahbicht --extra cli
           else
             uv sync --group ${{ matrix.linter-env }} --extra sqlmodels --extra ahbicht --extra cli
           fi
@@ -28,8 +30,8 @@ jobs:
         run: |
           case "${{ matrix.linter-env }}" in
             linting)
-              uv run pylint fundamend
-              uv run pylint unittests --rcfile=unittests/.pylintrc
+              uv run ruff check src/fundamend
+              uv run ruff check unittests
               ;;
             type_check)
               uv run mypy --show-error-codes src/fundamend --strict

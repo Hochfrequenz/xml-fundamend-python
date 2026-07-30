@@ -21,7 +21,7 @@ class MigStatus(StrEnum):
     R = "R"
     N = "N"
     D = "D"
-    O = "O"
+    O = "O"  # noqa: E741
 
 
 class Code(FundamendBaseModel):

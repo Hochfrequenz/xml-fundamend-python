@@ -8,7 +8,6 @@ The view allows comparing two MIG versions to find rows that were added, deleted
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import sqlalchemy
 from efoli import EdifactFormat, EdifactFormatVersion
@@ -76,39 +75,39 @@ class MigDiffLine(SQLModel, table=True):
 
     # Composite primary key
     id_path: str = Field(primary_key=True)
-    old_format_version: Optional[EdifactFormatVersion] = Field(primary_key=True, default=None)
-    new_format_version: Optional[EdifactFormatVersion] = Field(primary_key=True, default=None)
-    old_format: Optional[EdifactFormat] = Field(primary_key=True, default=None)
-    new_format: Optional[EdifactFormat] = Field(primary_key=True, default=None)
+    old_format_version: EdifactFormatVersion | None = Field(primary_key=True, default=None)
+    new_format_version: EdifactFormatVersion | None = Field(primary_key=True, default=None)
+    old_format: EdifactFormat | None = Field(primary_key=True, default=None)
+    new_format: EdifactFormat | None = Field(primary_key=True, default=None)
 
     # Common fields
     sort_path: str = Field()
     path: str = Field()
-    line_type: Optional[str] = Field(default=None)
+    line_type: str | None = Field(default=None)
 
     # Diff status: 'added', 'deleted', 'modified', 'unchanged'
     diff_status: str = Field()
 
     # Which columns changed (for modified rows only, NULL otherwise)
-    changed_columns: Optional[str] = Field(default=None)
+    changed_columns: str | None = Field(default=None)
 
     # Old version columns
-    old_segmentgroup_id: Optional[str] = Field(default=None)
-    old_segment_id: Optional[str] = Field(default=None)
-    old_dataelement_id: Optional[str] = Field(default=None)
-    old_code_value: Optional[str] = Field(default=None)
-    old_line_status_std: Optional[str] = Field(default=None)
-    old_line_status_specification: Optional[str] = Field(default=None)
-    old_line_name: Optional[str] = Field(default=None)
+    old_segmentgroup_id: str | None = Field(default=None)
+    old_segment_id: str | None = Field(default=None)
+    old_dataelement_id: str | None = Field(default=None)
+    old_code_value: str | None = Field(default=None)
+    old_line_status_std: str | None = Field(default=None)
+    old_line_status_specification: str | None = Field(default=None)
+    old_line_name: str | None = Field(default=None)
 
     # New version columns
-    new_segmentgroup_id: Optional[str] = Field(default=None)
-    new_segment_id: Optional[str] = Field(default=None)
-    new_dataelement_id: Optional[str] = Field(default=None)
-    new_code_value: Optional[str] = Field(default=None)
-    new_line_status_std: Optional[str] = Field(default=None)
-    new_line_status_specification: Optional[str] = Field(default=None)
-    new_line_name: Optional[str] = Field(default=None)
+    new_segmentgroup_id: str | None = Field(default=None)
+    new_segment_id: str | None = Field(default=None)
+    new_dataelement_id: str | None = Field(default=None)
+    new_code_value: str | None = Field(default=None)
+    new_line_status_std: str | None = Field(default=None)
+    new_line_status_specification: str | None = Field(default=None)
+    new_line_name: str | None = Field(default=None)
 
 
-__all__ = ["create_mig_diff_view", "MigDiffLine"]
+__all__ = ["MigDiffLine", "create_mig_diff_view"]

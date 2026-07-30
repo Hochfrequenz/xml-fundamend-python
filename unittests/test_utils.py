@@ -1,6 +1,6 @@
 import re
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 
@@ -163,20 +163,20 @@ def test_no_hashtag_prefix_leaks_through_ahb_reader() -> None:
     for ahb_file_path in private_submodule_root.rglob("**/*AHB*.xml"):
         ahb = AhbReader(ahb_file_path).read()
         for awf in ahb.anwendungsfaelle:
-            assert not _hashtag_prefix_pattern.match(
-                awf.pruefidentifikator
-            ), f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has a hashtag prefix"
-            assert not _hashtag_prefix_pattern.match(
-                awf.beschreibung
-            ), f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has a hashtag prefix"
+            assert not _hashtag_prefix_pattern.match(awf.pruefidentifikator), (
+                f"pruefidentifikator '{awf.pruefidentifikator}' in {ahb_file_path} still has a hashtag prefix"
+            )
+            assert not _hashtag_prefix_pattern.match(awf.beschreibung), (
+                f"beschreibung '{awf.beschreibung}' in {ahb_file_path} still has a hashtag prefix"
+            )
         for bedingung in ahb.bedingungen:
-            assert not _hashtag_prefix_pattern.match(
-                bedingung.text
-            ), f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
+            assert not _hashtag_prefix_pattern.match(bedingung.text), (
+                f"bedingung '{bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
+            )
         for ub_bedingung in ahb.ub_bedingungen:
-            assert not _hashtag_prefix_pattern.match(
-                ub_bedingung.text
-            ), f"ub_bedingung '{ub_bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
+            assert not _hashtag_prefix_pattern.match(ub_bedingung.text), (
+                f"ub_bedingung '{ub_bedingung.nummer}' text in {ahb_file_path} still has a hashtag prefix"
+            )
 
 
 @pytest.mark.parametrize(

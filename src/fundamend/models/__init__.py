@@ -3,4 +3,4 @@
 from .anwendungshandbuch import Anwendungshandbuch
 from .messageimplementationguide import MessageImplementationGuide
 
-__all__ = ["MessageImplementationGuide", "Anwendungshandbuch"]
+__all__ = ["Anwendungshandbuch", "MessageImplementationGuide"]

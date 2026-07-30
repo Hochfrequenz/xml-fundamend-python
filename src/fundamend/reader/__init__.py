@@ -3,4 +3,4 @@
 from .ahbreader import AhbReader
 from .migreader import MigReader
 
-__all__ = ["MigReader", "AhbReader"]
+__all__ = ["AhbReader", "MigReader"]

@@ -200,7 +200,8 @@ class AhbReader:
     def get_ub_bedingungen(self) -> list[UbBedingung]:
         """returns the UB Bedingungen"""
         return [
-            _to_ub_bedingung(x) for x in self._element_tree.getroot().find("UB_Bedingungen")  # type: ignore[union-attr]
+            _to_ub_bedingung(x)
+            for x in self._element_tree.getroot().find("UB_Bedingungen")  # type: ignore[union-attr]
         ]
 
     def get_pakete(self) -> list[Paket]:
@@ -255,7 +256,7 @@ class AhbReader:
         if _is_uebertragungsdatei(format_element):
             format_element = original_element[0][0]
         if not format_element.tag.startswith("M_"):
-            format_element = next((child for child in original_element[0] if child.tag.startswith("M_")))
+            format_element = next(child for child in original_element[0] if child.tag.startswith("M_"))
         return Anwendungsfall(
             pruefidentifikator=remove_hashtag_prefix(original_element.attrib["Pruefidentifikator"]).strip(),
             beschreibung=remove_unnecessary_hyphens(

@@ -16,7 +16,7 @@ def _execute_bare_sql(session: Session, path_to_sql_commands: Path) -> None:
     Execute bare SQL from the path_to_sqlcommands in the given SQLAlchemy session.
     """
 
-    with open(path_to_sql_commands, "r", encoding="utf-8") as sql_file:
+    with open(path_to_sql_commands, encoding="utf-8") as sql_file:
         bare_sql = sql_file.read()
 
     bare_statements = bare_sql.split(";")

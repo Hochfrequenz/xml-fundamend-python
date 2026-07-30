@@ -8,9 +8,10 @@ In SQLite this means: create and populate a plain table.
 
 import logging
 import tempfile
+from collections.abc import Iterable
 from datetime import date
 from pathlib import Path
-from typing import Iterable, Literal, Optional
+from typing import Literal
 from uuid import UUID
 
 import sqlalchemy
@@ -73,7 +74,7 @@ _after_bulk_insert_ops: list[TextClause] = [
 
 
 def create_db_and_populate_with_mig_view(
-    mig_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
+    mig_files: Iterable[Path | tuple[Path, date, date | None] | tuple[Path, Literal[None], Literal[None]]],
     drop_raw_tables: bool = False,
 ) -> Path:
     """
@@ -99,8 +100,8 @@ def create_db_and_populate_with_mig_view(
         sql_migs: list[SqlMessageImplementationGuide] = []
         for item in mig_files:
             mig: PydanticMessageImplementationGuide
-            gueltig_von: Optional[date]
-            gueltig_bis: Optional[date]
+            gueltig_von: date | None
+            gueltig_bis: date | None
             if isinstance(item, Path):
                 mig = MigReader(item).read()
                 gueltig_von = None
@@ -158,9 +159,9 @@ class MigHierarchyMaterialized(SQLModel, table=True):
     mig_pk: UUID = Field(index=True)
     current_id: UUID
     root_id: UUID
-    parent_id: Optional[UUID] = None
+    parent_id: UUID | None = None
     depth: int
-    position: Optional[int] = Field(default=None)
+    position: int | None = Field(default=None)
     path: str
     id_path: str = Field(index=True)
     parent_path: str
@@ -172,65 +173,65 @@ class MigHierarchyMaterialized(SQLModel, table=True):
     # Metadata
     format: EdifactFormat = Field(index=True)
     versionsnummer: str = Field(index=True)
-    gueltig_von: Optional[date] = Field(default=None, index=True)
-    gueltig_bis: Optional[date] = Field(default=None, index=True)
-    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
-    is_on_uebertragungsdatei_level: Optional[bool] = Field(default=None)
+    gueltig_von: date | None = Field(default=None, index=True)
+    gueltig_bis: date | None = Field(default=None, index=True)
+    edifact_format_version: EdifactFormatVersion | None = Field(default=None, index=True)
+    is_on_uebertragungsdatei_level: bool | None = Field(default=None)
 
     # Segment Group
-    segmentgroup_id: Optional[str] = Field(default=None, index=True)
-    segmentgroup_name: Optional[str] = Field(default=None, index=True)
-    segmentgroup_status_std: Optional[str] = Field(default=None)
-    segmentgroup_status_specification: Optional[str] = Field(default=None)
-    segmentgroup_counter: Optional[str] = Field(default=None)
-    segmentgroup_level: Optional[int] = Field(default=None)
-    segmentgroup_max_rep_std: Optional[int] = Field(default=None)
-    segmentgroup_max_rep_specification: Optional[int] = Field(default=None)
-    segmentgroup_position: Optional[int] = Field(default=None, index=True)
+    segmentgroup_id: str | None = Field(default=None, index=True)
+    segmentgroup_name: str | None = Field(default=None, index=True)
+    segmentgroup_status_std: str | None = Field(default=None)
+    segmentgroup_status_specification: str | None = Field(default=None)
+    segmentgroup_counter: str | None = Field(default=None)
+    segmentgroup_level: int | None = Field(default=None)
+    segmentgroup_max_rep_std: int | None = Field(default=None)
+    segmentgroup_max_rep_specification: int | None = Field(default=None)
+    segmentgroup_position: int | None = Field(default=None, index=True)
 
     # Segment
-    segment_id: Optional[str] = Field(default=None, index=True)
-    segment_name: Optional[str] = Field(default=None, index=True)
-    segment_status_std: Optional[str] = Field(default=None)
-    segment_status_specification: Optional[str] = Field(default=None)
-    segment_counter: Optional[str] = Field(default=None)
-    segment_level: Optional[int] = Field(default=None)
-    segment_number: Optional[str] = Field(default=None, index=True)
-    segment_max_rep_std: Optional[int] = Field(default=None)
-    segment_max_rep_specification: Optional[int] = Field(default=None)
-    segment_example: Optional[str] = Field(default=None)
-    segment_description: Optional[str] = Field(default=None)
-    segment_position: Optional[int] = Field(default=None, index=True)
+    segment_id: str | None = Field(default=None, index=True)
+    segment_name: str | None = Field(default=None, index=True)
+    segment_status_std: str | None = Field(default=None)
+    segment_status_specification: str | None = Field(default=None)
+    segment_counter: str | None = Field(default=None)
+    segment_level: int | None = Field(default=None)
+    segment_number: str | None = Field(default=None, index=True)
+    segment_max_rep_std: int | None = Field(default=None)
+    segment_max_rep_specification: int | None = Field(default=None)
+    segment_example: str | None = Field(default=None)
+    segment_description: str | None = Field(default=None)
+    segment_position: int | None = Field(default=None, index=True)
 
     # Data Element Group
-    dataelementgroup_id: Optional[str] = Field(default=None, index=True)
-    dataelementgroup_name: Optional[str] = Field(default=None, index=True)
-    dataelementgroup_description: Optional[str] = Field(default=None)
-    dataelementgroup_status_std: Optional[str] = Field(default=None)
-    dataelementgroup_status_specification: Optional[str] = Field(default=None)
-    dataelementgroup_position: Optional[int] = Field(default=None, index=True)
+    dataelementgroup_id: str | None = Field(default=None, index=True)
+    dataelementgroup_name: str | None = Field(default=None, index=True)
+    dataelementgroup_description: str | None = Field(default=None)
+    dataelementgroup_status_std: str | None = Field(default=None)
+    dataelementgroup_status_specification: str | None = Field(default=None)
+    dataelementgroup_position: int | None = Field(default=None, index=True)
 
     # Data Element
-    dataelement_id: Optional[str] = Field(default=None, index=True)
-    dataelement_name: Optional[str] = Field(default=None, index=True)
-    dataelement_description: Optional[str] = Field(default=None)
-    dataelement_status_std: Optional[str] = Field(default=None, index=True)
-    dataelement_status_specification: Optional[str] = Field(default=None, index=True)
-    dataelement_format_std: Optional[str] = Field(default=None)
-    dataelement_format_specification: Optional[str] = Field(default=None)
-    dataelement_position: Optional[int] = Field(default=None, index=True)
+    dataelement_id: str | None = Field(default=None, index=True)
+    dataelement_name: str | None = Field(default=None, index=True)
+    dataelement_description: str | None = Field(default=None)
+    dataelement_status_std: str | None = Field(default=None, index=True)
+    dataelement_status_specification: str | None = Field(default=None, index=True)
+    dataelement_format_std: str | None = Field(default=None)
+    dataelement_format_specification: str | None = Field(default=None)
+    dataelement_position: int | None = Field(default=None, index=True)
 
     # Code
-    code_id: Optional[UUID] = Field(default=None, index=True)
-    code_name: Optional[str] = Field(default=None, index=True)
-    code_description: Optional[str] = Field(default=None, index=True)
-    code_value: Optional[str] = Field(default=None, index=True)
-    code_position: Optional[int] = Field(default=None, index=True)
+    code_id: UUID | None = Field(default=None, index=True)
+    code_name: str | None = Field(default=None, index=True)
+    code_description: str | None = Field(default=None, index=True)
+    code_value: str | None = Field(default=None, index=True)
+    code_position: int | None = Field(default=None, index=True)
 
     # Computed columns
-    line_name: Optional[str] = Field(default=None, index=True)
-    line_status_std: Optional[str] = Field(default=None, index=True)
-    line_status_specification: Optional[str] = Field(default=None, index=True)
+    line_name: str | None = Field(default=None, index=True)
+    line_status_std: str | None = Field(default=None, index=True)
+    line_status_specification: str | None = Field(default=None, index=True)
 
 
 __all__ = ["MigHierarchyMaterialized", "create_db_and_populate_with_mig_view", "create_mig_view"]

@@ -3,12 +3,12 @@ Contains the command to convert XML files to JSON files.
 """
 
 import re
+from collections.abc import Iterator
 from itertools import groupby
 from pathlib import Path
-from typing import Iterator, Literal
+from typing import Annotated, Literal
 
 import typer
-from typing_extensions import Annotated
 
 from fundamend import AhbReader, Anwendungshandbuch, MessageImplementationGuide, MigReader
 from fundamend.commands.app import app
@@ -106,9 +106,9 @@ def xml2json_dir_mode(
             "Expected exactly two XML files (AHB + MIG) for each format and powert type, but found: "
             f"{_xmls_and_matches_list}"
         )
-        assert (
-            _xmls_and_matches_list[0][1].group(2) == "AHB" and _xmls_and_matches_list[1][1].group(2) == "MIG"
-        ), f"Expected AHB on first and a MIG on second position, but found: {_xmls_and_matches_list}"
+        assert _xmls_and_matches_list[0][1].group(2) == "AHB" and _xmls_and_matches_list[1][1].group(2) == "MIG", (
+            f"Expected AHB on first and a MIG on second position, but found: {_xmls_and_matches_list}"
+        )
         ahb_path = _xmls_and_matches_list[0][0]
         mig_path = _xmls_and_matches_list[1][0]
         mig, ahb = _convert_to_json_files(mig_path, ahb_path, sanitize=sanitize)

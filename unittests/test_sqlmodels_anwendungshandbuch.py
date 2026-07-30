@@ -2,9 +2,9 @@
 we try to fill a database using kohlrahbi[sqlmodels] and the data from the machine-readable AHB submodule
 """
 
+from collections.abc import Generator
 from datetime import date
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from efoli import EdifactFormatVersion
@@ -16,9 +16,8 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.sqlmodels import AhbHierarchyMaterialized
+from fundamend.sqlmodels import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
-from fundamend.sqlmodels import create_ahb_view, create_db_and_populate_with_ahb_view
 
 from .conftest import is_private_submodule_checked_out
 
@@ -108,6 +107,7 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
             # this is because outdated AWF are not included in the SQL model;
             # see the SqlAnwendungshandbuch.from_model implementation.
             sorted(sql_ahb.anwendungsfaelle, key=lambda _awf: _awf.position or 0),
+            strict=False,
         ):
             # this is for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173
             if awf.kommunikationsrichtungen is not None and any(awf.kommunikationsrichtungen):
@@ -350,7 +350,8 @@ def test_id_path_stable_across_versions_utilmd() -> None:
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
         # Count how many id_paths are shared between versions for UTILMD/44001
-        shared_count = session.execute(text("""
+        shared_count = session.execute(
+            text("""
                 SELECT COUNT(*) FROM (
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
@@ -358,11 +359,14 @@ def test_id_path_stable_across_versions_utilmd() -> None:
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2604' AND pruefidentifikator = '44001'
                 )
-            """)).scalar()
-        old_count = session.execute(text("""
+            """)
+        ).scalar()
+        old_count = session.execute(
+            text("""
                 SELECT COUNT(*) FROM ahb_hierarchy_materialized
                 WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
-            """)).scalar()
+            """)
+        ).scalar()
         if old_count is None or old_count == 0:
             pytest.skip("UTILMD/44001 not found in FV2510 — data may not include this pruefidentifikator")
         assert shared_count is not None
