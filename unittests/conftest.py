@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Generator
 from datetime import date
 from pathlib import Path
@@ -8,6 +9,12 @@ from sqlmodel import Session, create_engine
 from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels.ahb_diff_view import create_ahb_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
+
+# The ahbicht condition-expression parser (and its lark backend) can emit large volumes of
+# DEBUG/INFO log lines while the expensive DB fixtures parse every AHB expression. Formatting
+# those lines during pytest's log capture is pure overhead, so pin these loggers to WARNING.
+logging.getLogger("ahbicht").setLevel(logging.WARNING)
+logging.getLogger("lark").setLevel(logging.WARNING)
 
 private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
 example_files_root = Path(__file__).parent / "example_files"

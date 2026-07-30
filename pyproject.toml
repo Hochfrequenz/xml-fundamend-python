@@ -39,6 +39,7 @@ cli = [
 [dependency-groups]
 tests = [
     "pytest==9.1.1",
+    "pytest-xdist==3.8.0",
     "syrupy==5.5.3"
 ]
 lint = [
@@ -53,6 +54,7 @@ spell_check = [
 ]
 coverage = [
     "coverage==7.15.2",
+    "pytest-cov==7.1.0",
     {include-group = "tests"}
 ]
 dev = [
@@ -94,6 +96,11 @@ ignore = [
 
 [tool.pytest.ini_options]
 markers = ["snapshot: mark a test as a snapshot test"]
+# -n auto runs the suite across all CPU cores; --dist loadfile keeps every test in a
+# module on the same worker so module-scoped DB fixtures are built once per module.
+addopts = "-n auto --dist loadfile"
+# keep the noisy ahbicht/lark expression parser from formatting DEBUG/INFO log lines during test capture
+log_level = "WARNING"
 
 [project.scripts]
 xml2json = "fundamend.__main__:main"

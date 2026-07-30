@@ -24,8 +24,6 @@ jobs:
       - name: Install dependencies
         run: uv sync --group coverage --extra sqlmodels --extra ahbicht --extra cli
       - name: Run Tests and Record Coverage
-        run: |
-          cd unittests
-          uv run coverage run -m pytest -vv
-          uv run coverage html --omit .venv/*,unittests/*
-          uv run coverage report --fail-under 94 --omit .venv/*,unittests/*
+        # pytest-cov aggregates coverage across the pytest-xdist worker subprocesses
+        # (plain `coverage run` would miss them once the suite runs with `-n auto`).
+        run: uv run pytest -vv --cov=fundamend --cov-report=html --cov-report=term --cov-fail-under=94
