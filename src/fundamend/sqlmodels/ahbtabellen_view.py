@@ -61,4 +61,4 @@ class AhbTabellenLine(SQLModel, table=True):
     sort_path: str = Field()
 
 
-__all__ = ["create_ahbtabellen_view", "AhbTabellenLine"]
+__all__ = ["AhbTabellenLine", "create_ahbtabellen_view"]

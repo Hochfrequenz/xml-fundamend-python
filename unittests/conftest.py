@@ -1,6 +1,6 @@
+from collections.abc import Generator
 from datetime import date
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from sqlmodel import Session, create_engine

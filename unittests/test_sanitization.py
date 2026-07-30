@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 
 from fundamend.utils import remove_unnecessary_hyphens
@@ -331,6 +329,6 @@ from fundamend.utils import remove_unnecessary_hyphens
         pytest.param("", "", id="empty string"),
     ],
 )
-def test_sanitization_hyphens(argument: Optional[str], expected: Optional[str]) -> None:
+def test_sanitization_hyphens(argument: str | None, expected: str | None) -> None:
     actual = remove_unnecessary_hyphens(argument)
     assert actual == expected

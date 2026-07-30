@@ -2,8 +2,8 @@
 Tests for MIG SQLModels - we try to fill a database and roundtrip the data
 """
 
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from sqlmodel import Session, SQLModel, create_engine

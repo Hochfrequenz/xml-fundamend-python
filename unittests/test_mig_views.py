@@ -2,9 +2,9 @@
 Tests for MIG hierarchy and diff views
 """
 
+from collections.abc import Generator
 from datetime import date
 from pathlib import Path
-from typing import Generator
 
 import pytest
 import sqlalchemy.exc

@@ -9,8 +9,9 @@ the sub elements from the MIG. Except for the leading segment of a segment group
 for segment groups by using the leading segment's number.
 """
 
+from collections.abc import Iterator
 from types import MethodType
-from typing import Any, Iterator, overload
+from typing import Any, overload
 
 from pydantic import BaseModel
 
@@ -153,7 +154,7 @@ def parallel_iter_segment_or_data_element_group(
     mig_elements = iter(mig_segment_or_group.data_elements)
     ahb_elements = iter(ahb_segment_or_group.data_elements)
 
-    cur_mig_element = next(mig_elements)  # pylint: disable=stop-iteration-return
+    cur_mig_element = next(mig_elements)
     # This statement actually cannot raise a StopIteration, because we already checked that the MIG segment
     # or data element group has at least one element.
     cur_ahb_element = next(ahb_elements, None)
@@ -205,8 +206,8 @@ def parallel_iter_segment_group_or_root(
     mig_elements = iter(mig_segment_group_or_root.elements)
     ahb_elements = iter(ahb_segment_group_or_root.elements)
 
-    cur_mig_element = next(mig_elements)  # pylint: disable=stop-iteration-return
-    cur_ahb_element = next(ahb_elements)  # pylint: disable=stop-iteration-return
+    cur_mig_element = next(mig_elements)
+    cur_ahb_element = next(ahb_elements)
     # This statement actually cannot raise a StopIteration, because we already checked that the MIG segment
     # or data element group has at least one element.
 
@@ -214,11 +215,8 @@ def parallel_iter_segment_group_or_root(
         mig_number = get_number(cur_mig_element)
         ahb_number = cur_ahb_element and get_number(cur_ahb_element)
         if mig_number == ahb_number:
-            assert (
-                isinstance(cur_mig_element, mig.Segment)
-                and isinstance(cur_ahb_element, ahb.Segment)
-                or isinstance(cur_mig_element, mig.SegmentGroup)
-                and isinstance(cur_ahb_element, ahb.SegmentGroup)
+            assert (isinstance(cur_mig_element, mig.Segment) and isinstance(cur_ahb_element, ahb.Segment)) or (
+                isinstance(cur_mig_element, mig.SegmentGroup) and isinstance(cur_ahb_element, ahb.SegmentGroup)
             )
             yield cur_mig_element, cur_ahb_element  # type: ignore[misc]
             # mypy is not smart enough to understand the union construction here
@@ -404,13 +402,12 @@ def add_unused_segment_or_groups_to_ahb(
             else:
                 assert isinstance(mig_element, mig.SegmentGroup)
                 edited_ahb_elements.insert(index, create_ahb_segment_group_from_mig(mig_element))
-        else:
-            if isinstance(mig_element, mig.Segment):
-                assert isinstance(ahb_element, ahb.Segment)
-                add_unused_data_elements_or_groups_to_ahb(mig_element, ahb_element)
-            elif isinstance(mig_element, mig.SegmentGroup):
-                assert isinstance(ahb_element, ahb.SegmentGroup)
-                add_unused_segment_or_groups_to_ahb(mig_element, ahb_element)
+        elif isinstance(mig_element, mig.Segment):
+            assert isinstance(ahb_element, ahb.Segment)
+            add_unused_data_elements_or_groups_to_ahb(mig_element, ahb_element)
+        elif isinstance(mig_element, mig.SegmentGroup):
+            assert isinstance(ahb_element, ahb.SegmentGroup)
+            add_unused_segment_or_groups_to_ahb(mig_element, ahb_element)
         index += 1
     _set(ahb_root, "elements", tuple(edited_ahb_elements))
     assert len(ahb_root.elements) == len(mig_root.elements)
@@ -429,17 +426,14 @@ def add_must_not_pattern_to_ahb_conditions(ahb_root: ahb.Anwendungshandbuch) -> 
                 "Condition 2499 is used as a must-not pattern after sanitization of the AHB. "
                 "Please check the AHB for correctness."
             )
+    must_not_pattern_text = (
+        'Ist immer falsch, um ein "Darf nicht" pattern umzusetzen: "X [2499]". '
+        'Diese Expression wird für u.a. für Elemente genutzt, die laut MIG "unused" sind.'
+    )
     _set(
         ahb_root,
         "bedingungen",
-        ahb_root.bedingungen
-        + (
-            ahb.Bedingung(
-                nummer="2499",
-                text='Ist immer falsch, um ein "Darf nicht" pattern umzusetzen: "X [2499]". '
-                'Diese Expression wird für u.a. für Elemente genutzt, die laut MIG "unused" sind.',
-            ),
-        ),
+        (*ahb_root.bedingungen, ahb.Bedingung(nummer="2499", text=must_not_pattern_text)),
     )
 
 
