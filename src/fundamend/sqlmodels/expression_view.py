@@ -197,8 +197,8 @@ class AhbExpression(SQLModel, table=True):
             name="idx_ahb_expressions_metadata_expression",
         ),
         Index(
-            # this is to speed up the v_ahb_diff joins
-            "idx_ahb_expressions_covering_v_ahb_diff",
+            # this is to speed up the v_ahb_formatversion_diff and v_ahb_pruefi_diff joins
+            "idx_ahb_expressions_covering_ahb_diff_views",
             "edifact_format_version",
             "format",
             "expression",

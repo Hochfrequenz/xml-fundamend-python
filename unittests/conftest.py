@@ -6,7 +6,8 @@ import pytest
 from sqlmodel import Session, create_engine
 
 from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
-from fundamend.sqlmodels.ahb_diff_view import create_ahb_diff_view
+from fundamend.sqlmodels.ahb_formatversion_diff_view import create_ahb_formatversion_diff_view
+from fundamend.sqlmodels.ahb_pruefi_diff_view import create_ahb_pruefi_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
 private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
@@ -29,7 +30,8 @@ def is_private_submodule_checked_out() -> bool:
 def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
     """
     Module-scoped fixture providing a database session with FV2410 and FV2504 data.
-    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen, v_ahb_diff.
+    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen,
+    v_ahb_formatversion_diff, v_ahb_pruefi_diff.
 
     This fixture is expensive to create (~30s), so it's shared across all tests that need
     to compare FV2410 and FV2504.
@@ -46,7 +48,8 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
         create_ahbtabellen_view(session)
-        create_ahb_diff_view(session)
+        create_ahb_formatversion_diff_view(session)
+        create_ahb_pruefi_diff_view(session)
         yield session
 
 
@@ -54,7 +57,8 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
 def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, None]:
     """
     Module-scoped fixture providing a database session with FV510 and FV2604 MSCONS (only) data.
-    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen, v_ahb_diff.
+    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen,
+    v_ahb_formatversion_diff, v_ahb_pruefi_diff.
 
     """
     if not is_private_submodule_checked_out():
@@ -70,5 +74,6 @@ def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, No
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
         create_ahbtabellen_view(session)
-        create_ahb_diff_view(session)
+        create_ahb_formatversion_diff_view(session)
+        create_ahb_pruefi_diff_view(session)
         yield session
