@@ -6,9 +6,8 @@ For comparing two DIFFERENT Pruefidentifikatoren within the SAME format version,
 """
 
 import logging
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
-from typing import Optional
 
 import sqlalchemy
 from efoli import EdifactFormatVersion
@@ -19,8 +18,8 @@ from fundamend.sqlmodels.internals import _execute_bare_sql
 _logger = logging.getLogger(__name__)
 
 
-class DiffStatus(str, Enum):
-    """Status of a row in a diff view."""
+class DiffStatus(StrEnum):
+    """Status of a row in the diff view."""
 
     ADDED = "added"
     DELETED = "deleted"
@@ -86,42 +85,42 @@ class AhbFormatversionDiffLine(SQLModel, table=True):
     # When building a frontend that compares 2 AWFs in different versions, just make sure that the left and right
     # side of the comparison share the same id_path.
     id_path: str = Field(primary_key=True)
-    old_format_version: Optional[EdifactFormatVersion] = Field(primary_key=True, default=None)
-    new_format_version: Optional[EdifactFormatVersion] = Field(primary_key=True, default=None)
-    old_pruefidentifikator: Optional[str] = Field(primary_key=True, default=None)
-    new_pruefidentifikator: Optional[str] = Field(primary_key=True, default=None)
+    old_format_version: EdifactFormatVersion | None = Field(primary_key=True, default=None)
+    new_format_version: EdifactFormatVersion | None = Field(primary_key=True, default=None)
+    old_pruefidentifikator: str | None = Field(primary_key=True, default=None)
+    new_pruefidentifikator: str | None = Field(primary_key=True, default=None)
 
     # Common fields
     sort_path: str = Field()
     path: str = Field()
-    line_type: Optional[str] = Field(default=None)
+    line_type: str | None = Field(default=None)
 
     # Diff status: 'added', 'deleted', 'modified', 'unchanged'
     diff_status: str = Field()
 
     # Which columns changed (for modified rows only, NULL otherwise)
     # Comma-separated list, e.g. 'line_ahb_status, bedingung'
-    changed_columns: Optional[str] = Field(default=None)
+    changed_columns: str | None = Field(default=None)
 
     # Old version columns (from v_ahbtabellen)
-    old_segmentgroup_key: Optional[str] = Field(default=None)
-    old_segment_code: Optional[str] = Field(default=None)
-    old_data_element: Optional[str] = Field(default=None)
-    old_qualifier: Optional[str] = Field(default=None)
-    old_line_ahb_status: Optional[str] = Field(default=None)
-    old_line_name: Optional[str] = Field(default=None)
-    old_bedingung: Optional[str] = Field(default=None)
-    old_bedingungsfehler: Optional[str] = Field(default=None)
+    old_segmentgroup_key: str | None = Field(default=None)
+    old_segment_code: str | None = Field(default=None)
+    old_data_element: str | None = Field(default=None)
+    old_qualifier: str | None = Field(default=None)
+    old_line_ahb_status: str | None = Field(default=None)
+    old_line_name: str | None = Field(default=None)
+    old_bedingung: str | None = Field(default=None)
+    old_bedingungsfehler: str | None = Field(default=None)
 
     # New version columns (from v_ahbtabellen)
-    new_segmentgroup_key: Optional[str] = Field(default=None)
-    new_segment_code: Optional[str] = Field(default=None)
-    new_data_element: Optional[str] = Field(default=None)
-    new_qualifier: Optional[str] = Field(default=None)
-    new_line_ahb_status: Optional[str] = Field(default=None)
-    new_line_name: Optional[str] = Field(default=None)
-    new_bedingung: Optional[str] = Field(default=None)
-    new_bedingungsfehler: Optional[str] = Field(default=None)
+    new_segmentgroup_key: str | None = Field(default=None)
+    new_segment_code: str | None = Field(default=None)
+    new_data_element: str | None = Field(default=None)
+    new_qualifier: str | None = Field(default=None)
+    new_line_ahb_status: str | None = Field(default=None)
+    new_line_name: str | None = Field(default=None)
+    new_bedingung: str | None = Field(default=None)
+    new_bedingungsfehler: str | None = Field(default=None)
 
 
-__all__ = ["create_ahb_formatversion_diff_view", "AhbFormatversionDiffLine", "DiffStatus"]
+__all__ = ["AhbFormatversionDiffLine", "DiffStatus", "create_ahb_formatversion_diff_view"]

@@ -2,9 +2,9 @@
 Tests for MIG hierarchy and diff views
 """
 
+from collections.abc import Generator
 from datetime import date
 from pathlib import Path
-from typing import Generator
 
 import pytest
 import sqlalchemy.exc
@@ -22,7 +22,7 @@ from fundamend.sqlmodels import (
     create_mig_view,
 )
 
-from .conftest import is_private_submodule_checked_out, private_submodule_root
+from .conftest import cached_mig_db, is_private_submodule_checked_out, private_submodule_root
 
 
 @pytest.fixture()
@@ -147,7 +147,7 @@ def test_mig_diff_view_with_two_versions() -> None:
         (fv2504_migs[0], date(2025, 6, 6), None),
     ]
 
-    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    actual_sqlite_path = cached_mig_db(mig_files=mig_paths, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
 
     with Session(bind=engine) as session:
@@ -205,7 +205,7 @@ def test_mig_hierarchy_all_from_submodule() -> None:
     # Use just the first few MIGs to keep test reasonable
     mig_paths = mig_paths[:5]
 
-    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths)
+    actual_sqlite_path = cached_mig_db(mig_files=mig_paths)
     assert actual_sqlite_path.exists()
 
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
@@ -233,7 +233,7 @@ def test_mig_diff_snapshot_comdis(snapshot: SnapshotAssertion) -> None:
         (fv2504_comdis, date(2025, 6, 6), None),
     ]
 
-    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    actual_sqlite_path = cached_mig_db(mig_files=mig_paths, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
 
     with Session(bind=engine) as session:
@@ -271,7 +271,7 @@ def test_mig_diff_snapshot_pricat(snapshot: SnapshotAssertion) -> None:
         (fv2504_pricat, date(2025, 6, 6), None),
     ]
 
-    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    actual_sqlite_path = cached_mig_db(mig_files=mig_paths, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
 
     with Session(bind=engine) as session:
@@ -309,7 +309,7 @@ def test_mig_diff_snapshot_iftsta(snapshot: SnapshotAssertion) -> None:
         (fv2510_iftsta, date(2025, 10, 1), None),
     ]
 
-    actual_sqlite_path = create_db_and_populate_with_mig_view(mig_files=mig_paths, drop_raw_tables=False)
+    actual_sqlite_path = cached_mig_db(mig_files=mig_paths, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
 
     with Session(bind=engine) as session:

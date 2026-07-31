@@ -2,9 +2,9 @@
 we try to fill a database using kohlrahbi[sqlmodels] and the data from the machine-readable AHB submodule
 """
 
+from collections.abc import Generator
 from datetime import date
 from pathlib import Path
-from typing import Generator
 
 import pytest
 from efoli import EdifactFormatVersion
@@ -16,17 +16,17 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.sqlmodels import AhbHierarchyMaterialized
+from fundamend.sqlmodels import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
-from fundamend.sqlmodels import create_ahb_view, create_db_and_populate_with_ahb_view
 
-from .conftest import is_private_submodule_checked_out
+from .conftest import apply_throwaway_sqlite_pragmas, cached_ahb_db, is_private_submodule_checked_out
 
 
 @pytest.fixture()
 def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
     database_path = tmp_path / "test.db"
     engine = create_engine(f"sqlite:///{database_path}")
+    apply_throwaway_sqlite_pragmas(engine)
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     with Session(bind=engine) as session:
@@ -95,7 +95,11 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
 _Kommunikationsrichtungen = RootModel[list[Kommunikationsrichtung]]
 
 
-def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session) -> None:
+def test_sqlmodels_all_kommunikationsrichtungen_from_submodule() -> None:
+    # Regression test for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173:
+    # every AWF's kommunikationsrichtungen must survive SqlAnwendungshandbuch.from_model unchanged.
+    # This only needs the in-memory conversion; we deliberately do NOT persist the whole corpus to a
+    # database (a single ORM commit of every AHB took ~75 min in CI and asserted nothing extra).
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
@@ -108,8 +112,8 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
             # this is because outdated AWF are not included in the SQL model;
             # see the SqlAnwendungshandbuch.from_model implementation.
             sorted(sql_ahb.anwendungsfaelle, key=lambda _awf: _awf.position or 0),
+            strict=False,
         ):
-            # this is for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173
             if awf.kommunikationsrichtungen is not None and any(awf.kommunikationsrichtungen):
                 sql_kommunikationsrichtungen = _Kommunikationsrichtungen.model_validate(
                     sql_awf.kommunikationsrichtungen
@@ -117,9 +121,6 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
                 assert sql_kommunikationsrichtungen == awf.kommunikationsrichtungen
             else:
                 assert sql_awf.kommunikationsrichtungen is None or not any(sql_awf.kommunikationsrichtungen)
-        sqlite_session.add(sql_ahb)
-    sqlite_session.commit()
-    create_ahb_view(session=sqlite_session)
 
 
 @pytest.mark.snapshot
@@ -184,7 +185,7 @@ def test_create_sqlite_from_submodule() -> None:
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
     assert private_submodule_root.exists() and private_submodule_root.is_dir()
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(list(private_submodule_root.rglob("**/*AHB*.xml")))
+    actual_sqlite_path = cached_ahb_db(list(private_submodule_root.rglob("**/*AHB*.xml")))
     assert actual_sqlite_path.exists()
 
 
@@ -195,7 +196,7 @@ def test_create_sqlite_from_submodule_with_validity() -> None:
     relevant_files = [
         (p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")
     ] + [(p, date(2025, 6, 6), None) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=True)
+    actual_sqlite_path = cached_ahb_db(relevant_files, drop_raw_tables=True)
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
@@ -286,7 +287,7 @@ def test_sqlmodels_all_id_path_uniqueness(format_version: str, gueltig_von: date
     if not format_version_path.exists():
         pytest.skip(f"Format version {format_version} not found in submodule")
     relevant_files = [(p, gueltig_von, gueltig_bis) for p in format_version_path.rglob("**/*AHB*.xml")]
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    actual_sqlite_path = cached_ahb_db(relevant_files, drop_raw_tables=False)
     _check_uniqueness_of_id_paths(actual_sqlite_path)
 
 
@@ -321,7 +322,7 @@ def test_id_path_uniqueness_per_message_type(message_type: str) -> None:
     ]
     if not relevant_files:
         pytest.skip(f"No AHB files found for {message_type}")
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    actual_sqlite_path = cached_ahb_db(relevant_files, drop_raw_tables=False)
     _check_uniqueness_of_id_paths(actual_sqlite_path)
     _check_id_paths_use_qualifiers_not_sort_path(actual_sqlite_path)
 
@@ -343,14 +344,15 @@ def test_id_path_stable_across_versions_utilmd() -> None:
     ] + [(p, date(2026, 4, 1), None) for p in fv2604_path.rglob("**/UTILMD_AHB*Strom*.xml")]
     if not relevant_files:
         pytest.skip("No UTILMD Strom AHB files found")
-    actual_sqlite_path = create_db_and_populate_with_ahb_view(relevant_files, drop_raw_tables=False)
+    actual_sqlite_path = cached_ahb_db(relevant_files, drop_raw_tables=False)
     _check_uniqueness_of_id_paths(actual_sqlite_path)
 
     # Verify cross-version id_path overlap: most id_paths from FV2510 should also exist in FV2604
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
     with Session(bind=engine) as session:
         # Count how many id_paths are shared between versions for UTILMD/44001
-        shared_count = session.execute(text("""
+        shared_count = session.execute(
+            text("""
                 SELECT COUNT(*) FROM (
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
@@ -358,11 +360,14 @@ def test_id_path_stable_across_versions_utilmd() -> None:
                     SELECT id_path FROM ahb_hierarchy_materialized
                     WHERE edifact_format_version = 'FV2604' AND pruefidentifikator = '44001'
                 )
-            """)).scalar()
-        old_count = session.execute(text("""
+            """)
+        ).scalar()
+        old_count = session.execute(
+            text("""
                 SELECT COUNT(*) FROM ahb_hierarchy_materialized
                 WHERE edifact_format_version = 'FV2510' AND pruefidentifikator = '44001'
-            """)).scalar()
+            """)
+        ).scalar()
         if old_count is None or old_count == 0:
             pytest.skip("UTILMD/44001 not found in FV2510 — data may not include this pruefidentifikator")
         assert shared_count is not None

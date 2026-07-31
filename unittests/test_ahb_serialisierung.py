@@ -66,12 +66,12 @@ def test_uebertragungsdatei_level_flag_is_set_ahb() -> None:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     reader = AhbReader(data_path / "FV2504" / "MSCONS_AHB_3_1f_Fehlerkorrektur_20250623.xml")
-    ahb13012 = [awf for awf in reader.read().anwendungsfaelle if awf.pruefidentifikator == "13012"][0]
+    ahb13012 = next(awf for awf in reader.read().anwendungsfaelle if awf.pruefidentifikator == "13012")
     unb_segment = ahb13012.elements[0]
     assert isinstance(unb_segment, AhbSegment) and unb_segment.id == "UNB"
     unz_segment = ahb13012.elements[-1]
     assert isinstance(unz_segment, AhbSegment) and unz_segment.id == "UNZ"
-    unh_segment = [s for s in ahb13012.elements if isinstance(s, AhbSegment) and s.id == "UNH"][0]
+    unh_segment = next(s for s in ahb13012.elements if isinstance(s, AhbSegment) and s.id == "UNH")
     assert unb_segment.is_on_uebertragungsdatei_level
     assert unz_segment.is_on_uebertragungsdatei_level
     assert not unh_segment.is_on_uebertragungsdatei_level
@@ -83,11 +83,11 @@ def test_uebertragungsdatei_flag_is_set_mig() -> None:
     mig_file_path = data_path / "FV2504" / "UTILMD_MIG_Strom_S2_1_Fehlerkorrektur_20250320.xml"
     reader = MigReader(mig_file_path)
     mig = reader.read()
-    una_segment = [s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNA"][0]
+    una_segment = next(s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNA")
     assert una_segment.is_on_uebertragungsdatei_level is True
-    unh_segment = [s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNH"][0]
+    unh_segment = next(s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNH")
     assert unh_segment.is_on_uebertragungsdatei_level is False
-    unz_segment = [s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNZ"][0]
+    unz_segment = next(s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNZ")
     assert unz_segment.is_on_uebertragungsdatei_level is True
 
 
@@ -97,5 +97,5 @@ def test_uebertragungsdatei_flag_is_not_set_outside_uebertragungsdatei() -> None
     mig_file_path = data_path / "FV2504" / "UTILTS_MIG_1_1e_Fehlerkorrektur_20241018.xml"  # has no uebertragungsdatei
     reader = MigReader(mig_file_path)
     mig = reader.read()
-    unh_segment = [s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNH"][0]
+    unh_segment = next(s for s in mig.elements if isinstance(s, MigSegment) and s.id == "UNH")
     assert unh_segment.is_on_uebertragungsdatei_level is False

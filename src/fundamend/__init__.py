@@ -6,4 +6,4 @@ pip install xml-fundamend
 from .models import Anwendungshandbuch, MessageImplementationGuide
 from .reader import AhbReader, MigReader
 
-__all__ = ["MigReader", "MessageImplementationGuide", "AhbReader", "Anwendungshandbuch"]
+__all__ = ["AhbReader", "Anwendungshandbuch", "MessageImplementationGuide", "MigReader"]

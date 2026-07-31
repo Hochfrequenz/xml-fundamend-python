@@ -3,7 +3,7 @@ Contains some utility functions that are used in the project.
 """
 
 import re
-from typing import Optional, overload
+from typing import overload
 
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
 
@@ -124,7 +124,7 @@ def _parse_kommunikation_von_line(kommunikation_von_line: str) -> list[Kommunika
     return result
 
 
-def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikationsrichtung] | None:
+def parse_kommunikation_von(kommunikation_von: str | None) -> list[Kommunikationsrichtung] | None:
     """Splits the kommunikation_von string into something strongly typed
 
     Args:
@@ -140,9 +140,9 @@ def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikat
         return None
     result: list[Kommunikationsrichtung] = []
     for line in (kommunikation_von or "").splitlines():
-        line = line.strip()
-        if line:
-            result += _parse_kommunikation_von_line(line)
+        stripped_line = line.strip()
+        if stripped_line:
+            result += _parse_kommunikation_von_line(stripped_line)
     return result
 
 
@@ -150,7 +150,7 @@ def parse_kommunikation_von(kommunikation_von: Optional[str]) -> list[Kommunikat
 def remove_unnecessary_hyphens(candidate: str) -> str: ...
 @overload
 def remove_unnecessary_hyphens(candidate: None) -> None: ...
-def remove_unnecessary_hyphens(candidate: Optional[str]) -> Optional[str]:
+def remove_unnecessary_hyphens(candidate: str | None) -> str | None:
     """
     removes hyphens from the middle of words that are likely unnecessary
     Example: "Ausfallarbeits-summenzeitreihe" returns "Ausfallarbeitssummenzeitreihe"
@@ -177,10 +177,10 @@ def remove_hashtag_prefix(text: str) -> str:
 
 __all__ = [
     "lstrip",
-    "rstrip",
-    "strip",
     "parse_kommunikation_von",
     "remove_hashtag_prefix",
     "remove_linebreaks_and_hyphens",
     "remove_unnecessary_hyphens",
+    "rstrip",
+    "strip",
 ]

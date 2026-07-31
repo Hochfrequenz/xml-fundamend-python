@@ -5,10 +5,11 @@ helper module to create a "materialized view" (in sqlite this means: create and 
 import logging
 import tempfile
 import uuid
+from collections.abc import Iterable
 from datetime import date
-from itertools import groupby
+from itertools import groupby, pairwise
 from pathlib import Path
-from typing import Iterable, Literal, Optional
+from typing import Literal
 from uuid import UUID
 
 import sqlalchemy
@@ -29,9 +30,6 @@ from fundamend import AhbReader
 from fundamend import Anwendungshandbuch as PydanticAnwendungshandbuch
 from fundamend.sqlmodels.anwendungshandbuch import (
     Anwendungsfall,
-)
-from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
-from fundamend.sqlmodels.anwendungshandbuch import (
     Code,
     DataElement,
     DataElementGroup,
@@ -39,6 +37,7 @@ from fundamend.sqlmodels.anwendungshandbuch import (
     SegmentGroup,
     SegmentGroupLink,
 )
+from fundamend.sqlmodels.anwendungshandbuch import Anwendungshandbuch as SqlAnwendungshandbuch
 from fundamend.sqlmodels.internals import _execute_bare_sql
 
 _logger = logging.getLogger(__name__)
@@ -66,8 +65,8 @@ class _PruefiValidity(BaseModel):
     models how long a model, associated with a pruefidentifikator is valid
     """
 
-    gueltig_von: Optional[date]  # inclusive start
-    gueltig_bis: Optional[date]  # exclusive end
+    gueltig_von: date | None  # inclusive start
+    gueltig_bis: date | None  # exclusive end
     pruefidentifikator: str
 
     def overlaps(self, other: "_PruefiValidity") -> bool:
@@ -75,8 +74,10 @@ class _PruefiValidity(BaseModel):
         returns true if the two validity periods overlap
         """
         return (
-            (self.gueltig_bis is None or other.gueltig_von is None or self.gueltig_bis > other.gueltig_von)
-            and (self.gueltig_von is None or other.gueltig_bis is None or self.gueltig_von < other.gueltig_bis)
+            (
+                (self.gueltig_bis is None or other.gueltig_von is None or self.gueltig_bis > other.gueltig_von)
+                and (self.gueltig_von is None or other.gueltig_bis is None or self.gueltig_von < other.gueltig_bis)
+            )
             or (self.gueltig_bis is None and other.gueltig_bis is None)
             or (self.gueltig_von is None and other.gueltig_von is None)
         )
@@ -90,7 +91,7 @@ def _check_for_no_overlaps(pruefi_validities: list[_PruefiValidity]) -> None:
         sorted(pruefi_validities, key=lambda x: x.pruefidentifikator), key=lambda x: x.pruefidentifikator
     ):
         group_list = list(group)
-        if any(a.overlaps(b) for a, b in zip(group_list, group_list[1:])):
+        if any(a.overlaps(b) for a, b in pairwise(group_list)):
             duplicate_pruefis_for_same_gueltigkeitszeitraum.append(duplicate_pruefi)
     if any(duplicate_pruefis_for_same_gueltigkeitszeitraum):
         raise ValueError(
@@ -114,9 +115,8 @@ _after_bulk_insert_ops: list[TextClause] = [
 ]
 
 
-# pylint:disable= too-many-locals
 def create_db_and_populate_with_ahb_view(
-    ahb_files: Iterable[Path | tuple[Path, date, Optional[date]] | tuple[Path, Literal[None], Literal[None]]],
+    ahb_files: Iterable[Path | tuple[Path, date, date | None] | tuple[Path, Literal[None], Literal[None]]],
     drop_raw_tables: bool = False,
 ) -> Path:
     """
@@ -142,8 +142,8 @@ def create_db_and_populate_with_ahb_view(
         sql_ahbs: list[SqlAnwendungshandbuch] = []
         for item in ahb_files:
             ahb: PydanticAnwendungshandbuch
-            gueltig_von: Optional[date]
-            gueltig_bis: Optional[date]
+            gueltig_von: date | None
+            gueltig_bis: date | None
             if isinstance(item, Path):
                 ahb = AhbReader(item).read()
                 gueltig_von = None
@@ -219,9 +219,9 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     anwendungshandbuch_primary_key: UUID = Field(index=True)
     current_id: UUID
     root_id: UUID
-    parent_id: Optional[UUID] = None
+    parent_id: UUID | None = None
     depth: int
-    position: Optional[int] = Field(default=None)
+    position: int | None = Field(default=None)
     path: str
     id_path: str = Field(index=True)
     parent_path: str
@@ -234,47 +234,47 @@ class AhbHierarchyMaterialized(SQLModel, table=True):
     pruefidentifikator: str = Field(index=True)
     format: str = Field(index=True)
     versionsnummer: str = Field(index=True)
-    gueltig_von: Optional[date] = Field(default=None, index=True)
-    gueltig_bis: Optional[date] = Field(default=None, index=True)
-    kommunikationsrichtungen: Optional[list[dict[Literal["empfaenger", "sender"], str]]] = Field(
+    gueltig_von: date | None = Field(default=None, index=True)
+    gueltig_bis: date | None = Field(default=None, index=True)
+    kommunikationsrichtungen: list[dict[Literal["empfaenger", "sender"], str]] | None = Field(
         default=None, sa_column=Column(JSON)
     )
-    beschreibung: Optional[str] = Field(default=None, index=True)
-    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+    beschreibung: str | None = Field(default=None, index=True)
+    edifact_format_version: EdifactFormatVersion | None = Field(default=None, index=True)
 
     # Segment Group
-    segmentgroup_id: Optional[str] = Field(default=None, index=True)
-    segmentgroup_name: Optional[str] = Field(default=None, index=True)
-    segmentgroup_ahb_status: Optional[str] = Field(default=None)
-    segmentgroup_position: Optional[int] = Field(default=None, index=True)
-    segmentgroup_anwendungsfall_primary_key: Optional[UUID] = Field(default=None)
+    segmentgroup_id: str | None = Field(default=None, index=True)
+    segmentgroup_name: str | None = Field(default=None, index=True)
+    segmentgroup_ahb_status: str | None = Field(default=None)
+    segmentgroup_position: int | None = Field(default=None, index=True)
+    segmentgroup_anwendungsfall_primary_key: UUID | None = Field(default=None)
 
     # Segment
-    segment_id: Optional[str] = Field(default=None, index=True)
-    segment_name: Optional[str] = Field(default=None, index=True)
-    segment_number: Optional[str] = Field(default=None, index=True)
-    segment_ahb_status: Optional[str] = Field(default=None)
-    segment_position: Optional[int] = Field(default=None, index=True)
-    is_on_uebertragungsdatei_level: Optional[bool] = Field(default=None, index=False)  #: null for SG only (no segment)
+    segment_id: str | None = Field(default=None, index=True)
+    segment_name: str | None = Field(default=None, index=True)
+    segment_number: str | None = Field(default=None, index=True)
+    segment_ahb_status: str | None = Field(default=None)
+    segment_position: int | None = Field(default=None, index=True)
+    is_on_uebertragungsdatei_level: bool | None = Field(default=None, index=False)  #: null for SG only (no segment)
 
     # Data Element Group
-    dataelementgroup_id: Optional[str] = Field(default=None, index=True)
-    dataelementgroup_name: Optional[str] = Field(default=None, index=True)
-    dataelementgroup_position: Optional[int] = Field(default=None, index=True)
+    dataelementgroup_id: str | None = Field(default=None, index=True)
+    dataelementgroup_name: str | None = Field(default=None, index=True)
+    dataelementgroup_position: int | None = Field(default=None, index=True)
 
     # Data Element
-    dataelement_id: Optional[str] = Field(default=None, index=True)
-    dataelement_name: Optional[str] = Field(default=None, index=True)
-    dataelement_position: Optional[int] = Field(default=None, index=True)
-    dataelement_ahb_status: Optional[str] = Field(default=None, index=True)
+    dataelement_id: str | None = Field(default=None, index=True)
+    dataelement_name: str | None = Field(default=None, index=True)
+    dataelement_position: int | None = Field(default=None, index=True)
+    dataelement_ahb_status: str | None = Field(default=None, index=True)
 
     # Code
-    code_id: Optional[UUID] = Field(default=None, index=True)
-    code_name: Optional[str] = Field(default=None, index=True)
-    code_description: Optional[str] = Field(default=None, index=True)
-    code_value: Optional[str] = Field(default=None, index=True)
-    code_ahb_status: Optional[str] = Field(default=None, index=True)
-    code_position: Optional[int] = Field(default=None, index=True)
+    code_id: UUID | None = Field(default=None, index=True)
+    code_name: str | None = Field(default=None, index=True)
+    code_description: str | None = Field(default=None, index=True)
+    code_value: str | None = Field(default=None, index=True)
+    code_ahb_status: str | None = Field(default=None, index=True)
+    code_position: int | None = Field(default=None, index=True)
 
 
-__all__ = ["AhbHierarchyMaterialized", "create_db_and_populate_with_ahb_view", "create_ahb_view"]
+__all__ = ["AhbHierarchyMaterialized", "create_ahb_view", "create_db_and_populate_with_ahb_view"]

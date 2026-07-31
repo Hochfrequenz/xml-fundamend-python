@@ -5,11 +5,20 @@ on:
     branches: [main]
   pull_request: {}
 jobs:
+  # Both matrix entries now run ruff under the hood (black/isort were replaced by ruff), but the "tool" values
+  # and the job name are kept unchanged on purpose: they map to required status checks ("black (black)",
+  # "black (isort)") in this repo's branch protection, and renaming them requires a separate, admin-level
+  # update to that ruleset.
   black:
+    name: "black (${{ matrix.tool }})"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tool: ["black", "isort"]
+        include:
+          - tool: black
+            command: "ruff format --check ."
+          - tool: isort
+            command: "ruff check --select I ."
     steps:
       - uses: actions/checkout@v7
       - name: Install uv
@@ -17,6 +26,6 @@ jobs:
         with:
           python-version: "3.14"
       - name: Install dependencies
-        run: uv sync --group formatting
+        run: uv sync --group lint
       - name: ${{ matrix.tool }} Code Formatter
-        run: uv run ${{ matrix.tool }} . --check
+        run: uv run ${{ matrix.command }}

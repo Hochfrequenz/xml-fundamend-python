@@ -498,8 +498,8 @@
         [127] wenn ein Korrekturgrund anzugeben ist
         [152] Wenn BGM+7 (Prozessdatenbericht) vorhanden.
         [559] Hinweis: Ein Korrekturgrund ist anzugeben, wenn:
-        1. ein bereits an den MP übermittelter vorläufiger Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
-        2. ein bereits an den MP übermittelter Ersatzwert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
+        1. ein bereits an den MP übermittelter vorläufiger Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder 
+        2. ein bereits an den MP übermittelter Ersatzwert nach Stornierung durch einen Ersatzwert ersetzt wird, oder 
         3. ein bereits an den MP übermittelter wahrer Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
         4. ein bereits an den MP übermittelter wahrer Wert nach Stornierung durch einen wahren Wert ersetzt wird.
       ''',
@@ -512,8 +512,8 @@
       'old_bedingung': '''
         [127] wenn ein Korrekturgrund anzugeben ist
         [559] Hinweis: Ein Korrekturgrund ist anzugeben, wenn:
-        1. ein bereits an den MP übermittelter vorläufiger Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
-        2. ein bereits an den MP übermittelter Ersatzwert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
+        1. ein bereits an den MP übermittelter vorläufiger Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder 
+        2. ein bereits an den MP übermittelter Ersatzwert nach Stornierung durch einen Ersatzwert ersetzt wird, oder 
         3. ein bereits an den MP übermittelter wahrer Wert nach Stornierung durch einen Ersatzwert ersetzt wird, oder
         4. ein bereits an den MP übermittelter wahrer Wert nach Stornierung durch einen wahren Wert ersetzt wird.
       ''',
@@ -4046,7 +4046,7 @@
       'old_data_element': 'D_6063',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': '''
-        X ([32] ∧ ([33] ∨ [36]))
+        X ([32] ∧ ([33] ∨ [36])) 
         X ([35] ∧ [36])
       ''',
       'old_line_name': 'Vorschlagswert',
@@ -4073,7 +4073,7 @@
       'old_data_element': 'D_6063',
       'old_format_version': 'FV2410',
       'old_line_ahb_status': '''
-        X ([32] ∧ [33])
+        X ([32] ∧ [33]) 
         X ([35] ∧ [36])
       ''',
       'old_line_name': 'Nicht verwendbarer Wert',

@@ -42,13 +42,13 @@ class MigCode(SQLModel, table=True):
     name: str = Field(index=True)  # e.g. 'Netznutzungszeiten-Nachricht'
     description: str | None = Field(default=None, index=True)  # e.g. ''
     value: str | None = Field(default=None, index=True)  # e.g. 'UTILTS'
-    position: Optional[int] = Field(default=None, index=True)
+    position: int | None = Field(default=None, index=True)
 
     dataelement: Union["MigDataElement", None] = Relationship(back_populates="codes")
     data_element_primary_key: UUID | None = Field(default=None, foreign_key="migdataelement.primary_key")
 
     @classmethod
-    def from_model(cls, model: PydanticCode, position: Optional[int] = None) -> "MigCode":
+    def from_model(cls, model: PydanticCode, position: int | None = None) -> "MigCode":
         return MigCode(
             name=model.name,
             description=model.description,
@@ -86,7 +86,7 @@ class MigDataElement(SQLModel, table=True):
     format_std: str  # e.g. 'an..6'
     format_specification: str  # e.g. 'an..6'
     codes: list[MigCode] = Relationship(back_populates="dataelement")
-    position: Optional[int] = Field(default=None, index=True)
+    position: int | None = Field(default=None, index=True)
 
     dataelementgroup: Union["MigDataElementGroup", None] = Relationship(back_populates="data_elements")
     data_element_group_primary_key: UUID | None = Field(default=None, foreign_key="migdataelementgroup.primary_key")
@@ -95,7 +95,7 @@ class MigDataElement(SQLModel, table=True):
     segment_primary_key: UUID | None = Field(default=None, foreign_key="migsegment.primary_key")
 
     @classmethod
-    def from_model(cls, model: PydanticDataElement, position: Optional[int] = None) -> "MigDataElement":
+    def from_model(cls, model: PydanticDataElement, position: int | None = None) -> "MigDataElement":
         result = MigDataElement(
             id=model.id,
             name=model.name,
@@ -139,13 +139,13 @@ class MigDataElementGroup(SQLModel, table=True):
     status_std: str  # MigStatus stored as string
     status_specification: str  # MigStatus stored as string
     data_elements: list[MigDataElement] = Relationship(back_populates="dataelementgroup")
-    position: Optional[int] = Field(default=None, index=True)
+    position: int | None = Field(default=None, index=True)
 
     segment: Union["MigSegment", None] = Relationship(back_populates="data_element_groups")
-    segment_primary_key: Union[UUID, None] = Field(default=None, foreign_key="migsegment.primary_key")
+    segment_primary_key: UUID | None = Field(default=None, foreign_key="migsegment.primary_key")
 
     @classmethod
-    def from_model(cls, model: PydanticDataElementGroup, position: Optional[int] = None) -> "MigDataElementGroup":
+    def from_model(cls, model: PydanticDataElementGroup, position: int | None = None) -> "MigDataElementGroup":
         result = MigDataElementGroup(
             id=model.id,
             name=model.name,
@@ -195,16 +195,16 @@ class MigSegment(SQLModel, table=True):
     is_on_uebertragungsdatei_level: bool
     data_elements: list[MigDataElement] = Relationship(back_populates="segment")
     data_element_groups: list[MigDataElementGroup] = Relationship(back_populates="segment")
-    position: Optional[int] = Field(default=None, index=True)
+    position: int | None = Field(default=None, index=True)
 
     segmentgroup: Union["MigSegmentGroup", None] = Relationship(back_populates="segments")
-    segmentgroup_primary_key: Union[UUID, None] = Field(default=None, foreign_key="migsegmentgroup.primary_key")
+    segmentgroup_primary_key: UUID | None = Field(default=None, foreign_key="migsegmentgroup.primary_key")
 
     mig: Union["MessageImplementationGuide", None] = Relationship(back_populates="segments")
-    mig_primary_key: Union[UUID, None] = Field(default=None, foreign_key="messageimplementationguide.primary_key")
+    mig_primary_key: UUID | None = Field(default=None, foreign_key="messageimplementationguide.primary_key")
 
     @classmethod
-    def from_model(cls, model: PydanticSegment, position: Optional[int] = None) -> "MigSegment":
+    def from_model(cls, model: PydanticSegment, position: int | None = None) -> "MigSegment":
         result = MigSegment(
             id=model.id,
             name=model.name,
@@ -277,7 +277,7 @@ class MigSegmentGroup(SQLModel, table=True):
     status_std: str  # MigStatus stored as string
     status_specification: str  # MigStatus stored as string
     segments: list[MigSegment] = Relationship(back_populates="segmentgroup")
-    position: Optional[int] = Field(default=None, index=True)
+    position: int | None = Field(default=None, index=True)
 
     # Self-referential relationship for nested segment groups
     segment_groups: list["MigSegmentGroup"] = Relationship(
@@ -301,10 +301,10 @@ class MigSegmentGroup(SQLModel, table=True):
     )
 
     mig: Union["MessageImplementationGuide", None] = Relationship(back_populates="segment_groups")
-    mig_primary_key: Union[UUID, None] = Field(default=None, foreign_key="messageimplementationguide.primary_key")
+    mig_primary_key: UUID | None = Field(default=None, foreign_key="messageimplementationguide.primary_key")
 
     @classmethod
-    def from_model(cls, model: PydanticSegmentGroup, position: Optional[int] = None) -> "MigSegmentGroup":
+    def from_model(cls, model: PydanticSegmentGroup, position: int | None = None) -> "MigSegmentGroup":
         result = MigSegmentGroup(
             id=model.id,
             name=model.name,
@@ -374,16 +374,16 @@ class MessageImplementationGuide(SQLModel, table=True):
     segment_groups: list[MigSegmentGroup] = Relationship(back_populates="mig")
 
     # SQL-only fields (not in Pydantic model)
-    gueltig_von: Optional[date] = Field(default=None, index=True)
+    gueltig_von: date | None = Field(default=None, index=True)
     """
     inklusives Startdatum der Gültigkeit dieser MIG (Deutsche Zeitzone)
     """
-    gueltig_bis: Optional[date] = Field(default=None, index=True)
+    gueltig_bis: date | None = Field(default=None, index=True)
     """
     Ggf. exklusives Enddatum der Gültigkeit dieser MIG (Deutsche Zeitzone).
     Wir verwenden None für ein offenes Ende, nicht 9999-12-31.
     """
-    edifact_format_version: Optional[EdifactFormatVersion] = Field(default=None, index=True)
+    edifact_format_version: EdifactFormatVersion | None = Field(default=None, index=True)
     """
     efoli format version (note that this is not derived from the gueltig von/bis dates but has to be set explicitly).
     It's also not a computed column although technically this might have been possible.
@@ -424,11 +424,11 @@ class MessageImplementationGuide(SQLModel, table=True):
 
 
 __all__ = [
+    "MessageImplementationGuide",
     "MigCode",
     "MigDataElement",
     "MigDataElementGroup",
     "MigSegment",
     "MigSegmentGroup",
     "MigSegmentGroupLink",
-    "MessageImplementationGuide",
 ]

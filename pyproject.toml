@@ -38,12 +38,13 @@ cli = [
 
 [dependency-groups]
 tests = [
+    "filelock==3.32.2",
     "pytest==9.1.1",
+    "pytest-xdist==3.8.0",
     "syrupy==5.5.3"
 ]
-linting = [
-    "pylint==4.0.6",
-    {include-group = "tests"}
+lint = [
+    "ruff==0.16.0"
 ]
 type_check = [
     "mypy==2.3.0",
@@ -54,19 +55,15 @@ spell_check = [
 ]
 coverage = [
     "coverage==7.15.2",
+    "pytest-cov==7.1.0",
     {include-group = "tests"}
-]
-formatting = [
-    "black==26.5.1",
-    "isort==8.0.1"
 ]
 dev = [
     {include-group = "tests"},
-    {include-group = "linting"},
+    {include-group = "lint"},
     {include-group = "type_check"},
     {include-group = "coverage"},
     {include-group = "spell_check"},
-    {include-group = "formatting"},
     "pre-commit"
 ]
 
@@ -75,19 +72,36 @@ dev = [
 Changelog = "https://github.com/Hochfrequenz/xml-fundamend-python/releases"
 Homepage = "https://github.com/Hochfrequenz/xml-fundamend-python"
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-target_version = ["py311", "py312", "py313", "py314"]
+target-version = "py311"
+extend-exclude = ["*.md"]
 
-[tool.isort]
-line_length = 120
-profile = "black"
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "N", "PL", "RUF"]
+ignore = [
+    "PLR0913", # too-many-arguments
+    "PLR0917", # too-many-positional-arguments
+    "PLR0912", # too-many-branches
+    "PLR0915", # too-many-statements
+    "PLR2004", # magic-value-comparison
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "RUF003", # ambiguous-unicode-character-comment
+]
 
-[tool.pylint."MESSAGES CONTROL"]
-max-line-length = 120
+[tool.ruff.lint.per-file-ignores]
+# these files contain long XML example comments that were also exempted from pylint's line-too-long check
+"src/fundamend/models/messageimplementationguide.py" = ["E501"]
+"src/fundamend/sqlmodels/ahbview.py" = ["E501"]
 
 [tool.pytest.ini_options]
 markers = ["snapshot: mark a test as a snapshot test"]
+# -n auto runs the suite across all CPU cores; --dist loadfile keeps every test in a
+# module on the same worker so module-scoped DB fixtures are built once per module.
+addopts = "-n auto --dist loadfile"
+# keep the noisy ahbicht/lark expression parser from formatting DEBUG/INFO log lines during test capture
+log_level = "WARNING"
 
 [project.scripts]
 xml2json = "fundamend.__main__:main"
