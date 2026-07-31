@@ -12,13 +12,14 @@ from fundamend import MigReader
 from fundamend.models.messageimplementationguide import MessageImplementationGuide as PydanticMessageImplementationGuide
 from fundamend.sqlmodels import MessageImplementationGuide as SqlMessageImplementationGuide
 
-from .conftest import is_private_submodule_checked_out
+from .conftest import apply_throwaway_sqlite_pragmas, is_private_submodule_checked_out
 
 
 @pytest.fixture()
 def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
     database_path = tmp_path / "test_mig.db"
     engine = create_engine(f"sqlite:///{database_path}")
+    apply_throwaway_sqlite_pragmas(engine)
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     with Session(bind=engine) as session:

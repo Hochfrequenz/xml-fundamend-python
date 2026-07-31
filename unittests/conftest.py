@@ -2,8 +2,11 @@ import logging
 from collections.abc import Generator, Iterable, Sequence
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import pytest
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from sqlmodel import Session, create_engine
 
 from fundamend.sqlmodels import (
@@ -28,6 +31,28 @@ example_files_root = Path(__file__).parent / "example_files"
 
 def is_private_submodule_checked_out() -> bool:
     return any(private_submodule_root.iterdir())
+
+
+def apply_throwaway_sqlite_pragmas(engine: Engine) -> None:
+    """
+    Register non-durable SQLite PRAGMAs on ``engine`` for throwaway test databases.
+
+    Tests that round-trip many MIGs/AHBs commit repeatedly into a temporary SQLite file; with the
+    default ``synchronous=FULL`` every commit fsyncs, which dominated the runtime of the
+    "all from submodule" tests. Since these databases are discarded at the end of the test, we can
+    safely turn durability off.
+    """
+
+    def _set_sqlite_pragmas(dbapi_connection: Any, _connection_record: Any) -> None:
+        cursor = dbapi_connection.cursor()
+        try:
+            cursor.execute("PRAGMA synchronous=OFF")
+            cursor.execute("PRAGMA journal_mode=MEMORY")
+            cursor.execute("PRAGMA temp_store=MEMORY")
+        finally:
+            cursor.close()
+
+    event.listen(engine, "connect", _set_sqlite_pragmas)
 
 
 # =============================================================================

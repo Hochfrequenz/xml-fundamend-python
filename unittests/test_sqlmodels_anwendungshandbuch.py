@@ -19,13 +19,14 @@ from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
 from fundamend.sqlmodels import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
 
-from .conftest import cached_ahb_db, is_private_submodule_checked_out
+from .conftest import apply_throwaway_sqlite_pragmas, cached_ahb_db, is_private_submodule_checked_out
 
 
 @pytest.fixture()
 def sqlite_session(tmp_path: Path) -> Generator[Session, None, None]:
     database_path = tmp_path / "test.db"
     engine = create_engine(f"sqlite:///{database_path}")
+    apply_throwaway_sqlite_pragmas(engine)
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     with Session(bind=engine) as session:
@@ -94,7 +95,11 @@ def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
 _Kommunikationsrichtungen = RootModel[list[Kommunikationsrichtung]]
 
 
-def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session) -> None:
+def test_sqlmodels_all_kommunikationsrichtungen_from_submodule() -> None:
+    # Regression test for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173:
+    # every AWF's kommunikationsrichtungen must survive SqlAnwendungshandbuch.from_model unchanged.
+    # This only needs the in-memory conversion; we deliberately do NOT persist the whole corpus to a
+    # database (a single ORM commit of every AHB took ~75 min in CI and asserted nothing extra).
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
     private_submodule_root = Path(__file__).parent.parent / "xml-migs-and-ahbs"
@@ -109,7 +114,6 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
             sorted(sql_ahb.anwendungsfaelle, key=lambda _awf: _awf.position or 0),
             strict=False,
         ):
-            # this is for https://github.com/Hochfrequenz/xml-fundamend-python/issues/173
             if awf.kommunikationsrichtungen is not None and any(awf.kommunikationsrichtungen):
                 sql_kommunikationsrichtungen = _Kommunikationsrichtungen.model_validate(
                     sql_awf.kommunikationsrichtungen
@@ -117,9 +121,6 @@ def test_sqlmodels_all_anwendungshandbuch_with_ahb_view(sqlite_session: Session)
                 assert sql_kommunikationsrichtungen == awf.kommunikationsrichtungen
             else:
                 assert sql_awf.kommunikationsrichtungen is None or not any(sql_awf.kommunikationsrichtungen)
-        sqlite_session.add(sql_ahb)
-    sqlite_session.commit()
-    create_ahb_view(session=sqlite_session)
 
 
 @pytest.mark.snapshot
