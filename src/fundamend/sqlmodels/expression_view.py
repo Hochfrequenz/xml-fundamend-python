@@ -123,21 +123,23 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
     If the CPU intensive validity check is enabled, not only expression alone is checked but also all its possible
     outcomes. This leads to only few additional expressions marked as invalid but is very slow.
     """
-    rows: list[tuple[EdifactFormatVersion | None, str, str | None, uuid.UUID]] = []
+    rows: list[tuple[EdifactFormatVersion | None, str, str | None, uuid.UUID, str, str | None]] = []
     for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
         AhbHierarchyMaterialized.segment_ahb_status,
         AhbHierarchyMaterialized.dataelement_ahb_status,
         AhbHierarchyMaterialized.code_ahb_status,
     ]:
-        stmt = select(
+        stmt = select(  # type: ignore[call-overload]
             AhbHierarchyMaterialized.edifact_format_version,
             AhbHierarchyMaterialized.format,
             ahb_status_col,
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
+            AhbHierarchyMaterialized.versionsnummer,
+            AhbHierarchyMaterialized.beschreibung,
         )
         rows.extend(session.exec(stmt))  # type: ignore[arg-type]
-    non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID]] = [
+    non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID, str, str | None]] = [
         r  # type: ignore[misc]
         for r in rows
         if r[2] is not None and r[0] is not None and r[2].strip()
@@ -146,7 +148,15 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         raise ValueError(
             "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
         )
-    non_empty_rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    # Several AHBs that share the same (format_version, format) -- e.g. UTILMD Strom and UTILMD Gas -- can
+    # define the same condition number (e.g. [106]) with *different* text, while ahb_expressions is keyed
+    # only by (format_version, format, expression). Whichever AHB survives the de-duplication below therefore
+    # decides the resulting node_texts. Sorting only by (format_version, format, expression) left that winner
+    # to the DB's unordered row order, which depends on the file-glob/insert order and so differs across
+    # platforms (macOS vs Linux) -- making node_texts (and the snapshot tests that read it) non-deterministic.
+    # The AHB primary key is a random uuid4 and cannot be used as a stable tie-breaker, so we sort by the AHB's
+    # stable (versionsnummer, beschreibung) instead to make the winner deterministic and reproducible.
+    non_empty_rows.sort(key=lambda x: (x[0], x[1], x[2].strip(), x[4], x[5] or ""))
     seen: set[tuple[str, str, str]] = set()
     unique_rows = [
         row

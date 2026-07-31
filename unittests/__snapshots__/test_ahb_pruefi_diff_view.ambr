@@ -3624,7 +3624,7 @@
       'diff_status': 'modified',
       'id_path': 'SG4>SG8+Z01>SG9+31>',
       'line_type': 'segment_group',
-      'new_bedingung': '[106] Wenn in dieser SG8 SEQ+Z01 SG10 CCI+++ZA6 (Prognosegrundlage der Marktlokation: Prognose auf Basis von Profilen) CAV+E02 (SLP/SEP) vorhanden',
+      'new_bedingung': '[106] Wenn in dieser SG8 SEQ+Z01 SG10 CCI+++ZA6 (Prognosegrundlage der Marktlokation: Prognose auf Basis von Profilen) vorhanden',
       'new_format_version': 'FV2410',
       'new_line_ahb_status': 'Muss [106]',
       'new_line_name': 'Veranschlagte Jahresmenge gesamt',

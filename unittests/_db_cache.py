@@ -26,7 +26,9 @@ from filelock import FileLock
 # Bump when the *way* a cached database is built changes (new views, different columns, ...), so
 # that stale cache entries from an older builder are ignored instead of silently reused.
 # v2: renamed v_ahb_diff -> v_ahb_formatversion_diff and added v_ahb_pruefi_diff to the diff-view builds.
-_CACHE_VERSION = "v2"
+# v3: made ahb_expressions.node_texts de-duplication deterministic across platforms (see expression_view.py),
+#     which changes the stored bedingung text for expressions shared by multiple AHBs of the same format.
+_CACHE_VERSION = "v3"
 
 _CACHE_DIR = Path(__file__).parent.parent / ".pytest_db_cache"
 
