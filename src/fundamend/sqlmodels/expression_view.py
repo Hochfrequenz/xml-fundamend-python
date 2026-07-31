@@ -138,7 +138,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
             AhbHierarchyMaterialized.versionsnummer,
             AhbHierarchyMaterialized.beschreibung,
         )
-        rows.extend(session.exec(stmt))  # type: ignore[arg-type]
+        rows.extend(session.exec(stmt))
     non_empty_rows: list[tuple[EdifactFormatVersion, str, str, uuid.UUID, str, str | None]] = [
         r  # type: ignore[misc]
         for r in rows
