@@ -1,10 +1,13 @@
 -- Assume that materialize_ahb_view.sql and create_ahbtabellen_view.sql have been executed already.
--- This view allows comparing two AHB versions (using v_ahbtabellen) to find added, deleted, and modified rows.
+-- This view allows comparing the SAME Pruefidentifikator between two AHB format versions
+-- (using v_ahbtabellen) to find added, deleted, and modified rows.
+-- For comparing two DIFFERENT Pruefidentifikatoren within the SAME format version, see v_ahb_pruefi_diff
+-- (create_ahb_pruefi_diff_view.sql) instead.
 --
 -- IMPORTANT: This view produces a cross-product of all version pairs. You MUST filter by version and pruefidentifikator.
 --
 -- Usage for comparing FV2410 -> FV2504 for pruefidentifikator 55014:
---   SELECT * FROM v_ahb_diff
+--   SELECT * FROM v_ahb_formatversion_diff
 --   WHERE old_format_version = 'FV2410'
 --     AND old_pruefidentifikator = '55014'
 --     AND new_format_version = 'FV2504'
@@ -18,10 +21,10 @@
 -- For deleted rows, old_ columns are populated and new_ columns are NULL.
 -- For added rows, new_ columns are populated and old_ columns are NULL.
 
-DROP TABLE IF EXISTS v_ahb_diff;
-DROP VIEW IF EXISTS v_ahb_diff;
+DROP TABLE IF EXISTS v_ahb_formatversion_diff;
+DROP VIEW IF EXISTS v_ahb_formatversion_diff;
 
-CREATE VIEW v_ahb_diff AS
+CREATE VIEW v_ahb_formatversion_diff AS
 WITH version_pairs AS (SELECT DISTINCT old_v.format_version     AS old_format_version,
                                        old_v.pruefidentifikator AS old_pruefidentifikator,
                                        new_v.format_version     AS new_format_version,

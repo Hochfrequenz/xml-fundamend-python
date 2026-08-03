@@ -6,13 +6,13 @@ from sqlmodel import Session, create_engine, select, text
 from syrupy.assertion import SnapshotAssertion
 
 from fundamend.sqlmodels import create_ahbtabellen_view
-from fundamend.sqlmodels.ahb_diff_view import AhbDiffLine, create_ahb_diff_view
+from fundamend.sqlmodels.ahb_formatversion_diff_view import AhbFormatversionDiffLine, create_ahb_formatversion_diff_view
 
 from .conftest import cached_ahb_db, is_private_submodule_checked_out, private_submodule_root
 
 
 @pytest.mark.snapshot
-def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
+def test_ahb_formatversion_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     """
     Test the diff view by comparing between FV2410 and FV2504.
     """
@@ -26,10 +26,10 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     actual_sqlite_path = cached_ahb_db(ahb_paths, drop_raw_tables=False)
     assert actual_sqlite_path.exists()
     engine = create_engine(f"sqlite:///{actual_sqlite_path}")
-    results: list[AhbDiffLine] = []
+    results: list[AhbFormatversionDiffLine] = []
     with Session(bind=engine) as session:
         create_ahbtabellen_view(session)
-        create_ahb_diff_view(session)
+        create_ahb_formatversion_diff_view(session)
         for pruefidentifikator in [
             # Existing prüfis
             "55109",
@@ -54,13 +54,13 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
         ]:
             # the pruefis chosen are arbitrary. they should just cover some common EdifactFormats.
             stmt = (
-                select(AhbDiffLine)
-                .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2504)
-                .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2410)
-                .where(AhbDiffLine.new_pruefidentifikator == pruefidentifikator)
-                .where(AhbDiffLine.old_pruefidentifikator == pruefidentifikator)
-                .where(AhbDiffLine.diff_status != "unchanged")
-                .order_by(AhbDiffLine.sort_path)
+                select(AhbFormatversionDiffLine)
+                .where(AhbFormatversionDiffLine.new_format_version == EdifactFormatVersion.FV2504)
+                .where(AhbFormatversionDiffLine.old_format_version == EdifactFormatVersion.FV2410)
+                .where(AhbFormatversionDiffLine.new_pruefidentifikator == pruefidentifikator)
+                .where(AhbFormatversionDiffLine.old_pruefidentifikator == pruefidentifikator)
+                .where(AhbFormatversionDiffLine.diff_status != "unchanged")
+                .order_by(AhbFormatversionDiffLine.sort_path)
             )
             sub_results = session.exec(stmt).all()
             results.extend(sub_results)
@@ -68,8 +68,9 @@ def test_ahb_diff_view_various_pruefis(snapshot: SnapshotAssertion) -> None:
     snapshot.assert_match(raw_results)
 
 
-# Comparing inside the same format version (or old>=new) is no longer possible with the v_ahb_diff in version >=v0.31.0.
-# We restricted a CTE such that only same prüfi old < new format version comparisons are possible.
+# Comparing inside the same format version (or old>=new) is no longer possible with v_ahb_formatversion_diff
+# in version >=v0.31.0. We restricted a CTE such that only same prüfi old < new format version comparisons
+# are possible.
 # This makes the view less general purpose but way faster, because somehow the WHERE claudes by the client in the end
 # haven't been pushed down to the CTE level to reduce the number of entries there.
 
@@ -82,7 +83,7 @@ def test_diff_view_no_duplicate_id_paths(session_fv2410_fv2504_with_diff_view: S
     result = session_fv2410_fv2504_with_diff_view.execute(
         text("""
         SELECT id_path, COUNT(*) as cnt
-        FROM v_ahb_diff
+        FROM v_ahb_formatversion_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
         GROUP BY id_path
@@ -104,7 +105,7 @@ def test_diff_view_added_rows_have_null_old_columns(session_fv2410_fv2504_with_d
             SUM(CASE WHEN old_segment_code IS NOT NULL THEN 1 ELSE 0 END) as old_segment_not_null,
             SUM(CASE WHEN old_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as old_status_not_null,
             SUM(CASE WHEN new_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as new_status_not_null
-        FROM v_ahb_diff
+        FROM v_ahb_formatversion_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'added'
@@ -127,7 +128,7 @@ def test_diff_view_deleted_rows_have_null_new_columns(session_fv2410_fv2504_with
             SUM(CASE WHEN new_segment_code IS NOT NULL THEN 1 ELSE 0 END) as new_segment_not_null,
             SUM(CASE WHEN new_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as new_status_not_null,
             SUM(CASE WHEN old_line_ahb_status IS NOT NULL THEN 1 ELSE 0 END) as old_status_not_null
-        FROM v_ahb_diff
+        FROM v_ahb_formatversion_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'deleted'
@@ -148,7 +149,7 @@ def test_diff_view_modified_rows_have_actual_differences(session_fv2410_fv2504_w
         text("""
         SELECT id_path, old_line_ahb_status, new_line_ahb_status,
                old_line_name, new_line_name, old_bedingung, new_bedingung
-        FROM v_ahb_diff
+        FROM v_ahb_formatversion_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '55109' AND new_pruefidentifikator = '55109'
           AND diff_status = 'modified'
@@ -169,7 +170,7 @@ def test_diff_view_nonexistent_pruefi_returns_empty(session_fv2410_fv2504_with_d
     """
     result = session_fv2410_fv2504_with_diff_view.execute(
         text("""
-        SELECT COUNT(*) FROM v_ahb_diff
+        SELECT COUNT(*) FROM v_ahb_formatversion_diff
         WHERE old_format_version = 'FV2410' AND new_format_version = 'FV2504'
           AND old_pruefidentifikator = '99999' AND new_pruefidentifikator = '99999'
     """)
@@ -179,20 +180,20 @@ def test_diff_view_nonexistent_pruefi_returns_empty(session_fv2410_fv2504_with_d
 
 
 @pytest.mark.snapshot
-def test_ahb_diff_view_mscons_13009(
+def test_ahb_formatversion_diff_view_mscons_13009(
     session_fv2510_fv2604_mscons_with_diff_view: Session, snapshot: SnapshotAssertion
 ) -> None:
     """
     Test the diff view by comparing MSCONS between versions
     """
     stmt = (
-        select(AhbDiffLine)
-        .where(AhbDiffLine.new_format_version == EdifactFormatVersion.FV2604)
-        .where(AhbDiffLine.old_format_version == EdifactFormatVersion.FV2510)
-        .where(AhbDiffLine.new_pruefidentifikator == "13009")
-        .where(AhbDiffLine.old_pruefidentifikator == "13009")
-        .where(AhbDiffLine.diff_status != "unchanged")
-        .order_by(AhbDiffLine.sort_path)
+        select(AhbFormatversionDiffLine)
+        .where(AhbFormatversionDiffLine.new_format_version == EdifactFormatVersion.FV2604)
+        .where(AhbFormatversionDiffLine.old_format_version == EdifactFormatVersion.FV2510)
+        .where(AhbFormatversionDiffLine.new_pruefidentifikator == "13009")
+        .where(AhbFormatversionDiffLine.old_pruefidentifikator == "13009")
+        .where(AhbFormatversionDiffLine.diff_status != "unchanged")
+        .order_by(AhbFormatversionDiffLine.sort_path)
     )
     results = session_fv2510_fv2604_mscons_with_diff_view.exec(stmt).all()
     raw_results = [r.model_dump(mode="json", exclude_none=True) for r in results]

@@ -4,7 +4,7 @@ The view allows comparing two MIG versions to find rows that were added, deleted
 """
 
 # pylint: disable=duplicate-code
-# This module intentionally follows the same patterns as ahb_diff_view.py
+# This module intentionally follows the same patterns as ahb_formatversion_diff_view.py
 
 import logging
 from pathlib import Path

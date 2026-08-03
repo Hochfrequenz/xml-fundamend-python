@@ -14,7 +14,8 @@ from fundamend.sqlmodels import (
     create_db_and_populate_with_ahb_view,
     create_db_and_populate_with_mig_view,
 )
-from fundamend.sqlmodels.ahb_diff_view import create_ahb_diff_view
+from fundamend.sqlmodels.ahb_formatversion_diff_view import create_ahb_formatversion_diff_view
+from fundamend.sqlmodels.ahb_pruefi_diff_view import create_ahb_pruefi_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
 from ._db_cache import _AhbFile, cached_db, fingerprint
@@ -91,13 +92,14 @@ def cached_mig_db(mig_files: Iterable[_AhbFile], drop_raw_tables: bool = False) 
 
 
 def _build_ahb_db_with_diff_view(ahb_files: Sequence[_AhbFile]) -> Path:
-    """Build a complete AHB database file: raw tables + expression table + ahbtabellen + diff view."""
+    """Build a complete AHB database file: raw tables + expression table + ahbtabellen + diff views."""
     db_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_files, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{db_path}")
     with Session(bind=engine) as session:
         create_and_fill_ahb_expression_table(session)
         create_ahbtabellen_view(session)
-        create_ahb_diff_view(session)
+        create_ahb_formatversion_diff_view(session)
+        create_ahb_pruefi_diff_view(session)
         session.commit()
     engine.dispose()
     return db_path
@@ -115,7 +117,8 @@ def _build_ahb_db_with_diff_view(ahb_files: Sequence[_AhbFile]) -> Path:
 def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
     """
     Module-scoped fixture providing a database session with FV2410 and FV2504 data.
-    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen, v_ahb_diff.
+    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen,
+    v_ahb_formatversion_diff, v_ahb_pruefi_diff.
 
     This fixture is expensive to create, so the fully-built database is served from the on-disk
     cache and shared across all tests (and CI runs) that need to compare FV2410 and FV2504.
@@ -139,7 +142,8 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
 def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, None]:
     """
     Module-scoped fixture providing a database session with FV510 and FV2604 MSCONS (only) data.
-    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen, v_ahb_diff.
+    Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen,
+    v_ahb_formatversion_diff, v_ahb_pruefi_diff.
 
     """
     if not is_private_submodule_checked_out():

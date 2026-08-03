@@ -15,7 +15,8 @@ you need to install fundamend[sqlmodels] to use this sub-package
 # E   ValueError: <class 'fundamend.models.anwendungshandbuch.Anwendungshandbuch'> has no matching SQLAlchemy type
 # => you need to keep the models in sync manually by now
 
-from .ahb_diff_view import AhbDiffLine, DiffStatus, create_ahb_diff_view
+from .ahb_formatversion_diff_view import AhbFormatversionDiffLine, DiffStatus, create_ahb_formatversion_diff_view
+from .ahb_pruefi_diff_view import AhbPruefiDiffLine, create_ahb_pruefi_diff_view
 from .ahbtabellen_view import AhbTabellenLine, create_ahbtabellen_view
 from .ahbview import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
 from .anwendungshandbuch import (
@@ -41,8 +42,9 @@ from .mig_diff_view import MigDiffLine, create_mig_diff_view
 from .migview import MigHierarchyMaterialized, create_db_and_populate_with_mig_view, create_mig_view
 
 __all__ = [
-    "AhbDiffLine",
+    "AhbFormatversionDiffLine",
     "AhbHierarchyMaterialized",
+    "AhbPruefiDiffLine",
     "AhbTabellenLine",
     "Anwendungsfall",
     "Anwendungshandbuch",
@@ -62,7 +64,8 @@ __all__ = [
     "MigSegmentGroupLink",
     "Segment",
     "SegmentGroup",
-    "create_ahb_diff_view",
+    "create_ahb_formatversion_diff_view",
+    "create_ahb_pruefi_diff_view",
     "create_ahb_view",
     "create_ahbtabellen_view",
     "create_db_and_populate_with_ahb_view",

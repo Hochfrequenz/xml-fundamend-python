@@ -218,10 +218,10 @@ ORDER BY sort_path;
 <summary>Finde heraus, welche Zeilen in einem Prüfidentifikator zwischen zwei Versionen hinzukommen, gelöscht oder geändert wurden</summary>
 <br>
 
-Dafür gibt es die View `v_ahb_diff`, die mit `create_ahb_diff_view(session)` erstellt werden kann:
+Dafür gibt es die View `v_ahb_formatversion_diff`, die mit `create_ahb_formatversion_diff_view(session)` erstellt werden kann:
 ```python
-from fundamend.sqlmodels import create_ahb_diff_view
-create_ahb_diff_view(session)
+from fundamend.sqlmodels import create_ahb_formatversion_diff_view
+create_ahb_formatversion_diff_view(session)
 ```
 
 Die View erwartet 4 Filter-Parameter beim Abfragen und liefert einen `diff_status`:
@@ -238,11 +238,40 @@ SELECT path, diff_status, changed_columns,
        old_line_ahb_status, new_line_ahb_status,
        old_bedingung, new_bedingung,
        old_line_name, new_line_name
-FROM v_ahb_diff
+FROM v_ahb_formatversion_diff
 WHERE old_format_version = 'FV2410'
   AND new_format_version = 'FV2504'
   AND old_pruefidentifikator = '55014'
   AND new_pruefidentifikator = '55014'
+  AND diff_status != 'unchanged'
+ORDER BY sort_path;
+```
+
+</details>
+
+<details>
+<summary>Finde heraus, welche Zeilen sich zwischen zwei Prüfidentifikatoren innerhalb derselben Formatversion unterscheiden</summary>
+<br>
+
+Dafür gibt es die View `v_ahb_pruefi_diff`, die mit `create_ahb_pruefi_diff_view(session)` erstellt werden kann:
+```python
+from fundamend.sqlmodels import create_ahb_pruefi_diff_view
+create_ahb_pruefi_diff_view(session)
+```
+
+Die View funktioniert analog zu `v_ahb_formatversion_diff`, vergleicht aber zwei unterschiedliche Prüfidentifikatoren innerhalb derselben Formatversion, statt denselben Prüfidentifikator über zwei Formatversionen hinweg:
+
+```sql
+-- Alle Änderungen zwischen zwei Prüfidentifikatoren anzeigen
+SELECT path, diff_status, changed_columns,
+       old_line_ahb_status, new_line_ahb_status,
+       old_bedingung, new_bedingung,
+       old_line_name, new_line_name
+FROM v_ahb_pruefi_diff
+WHERE old_format_version = 'FV2504'
+  AND new_format_version = 'FV2504'
+  AND old_pruefidentifikator = '55014'
+  AND new_pruefidentifikator = '55024'
   AND diff_status != 'unchanged'
 ORDER BY sort_path;
 ```

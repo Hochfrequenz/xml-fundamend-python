@@ -730,8 +730,7 @@ DROP TABLE IF EXISTS _de_qual;
 DROP TABLE IF EXISTS _de_needs_qual;
 
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
--- column order optimized for v_ahb_diff queries: filter by (version, pruefi) first, then lookup by id_path/path
+-- column order optimized for v_ahb_formatversion_diff/v_ahb_pruefi_diff queries: filter by (version, pruefi) first, then lookup by id_path/path
 CREATE UNIQUE INDEX idx_hierarchy_id_path_per_ahb ON ahb_hierarchy_materialized (edifact_format_version, pruefidentifikator, id_path);
 
 CREATE UNIQUE INDEX idx_hierarchy_path_per_ahb ON ahb_hierarchy_materialized (edifact_format_version, pruefidentifikator, path);
-

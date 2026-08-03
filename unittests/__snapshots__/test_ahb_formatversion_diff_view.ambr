@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_ahb_diff_view_mscons_13009
+# name: test_ahb_formatversion_diff_view_mscons_13009
   list([
     dict({
       'diff_status': 'added',
@@ -578,7 +578,7 @@
     }),
   ])
 # ---
-# name: test_ahb_diff_view_various_pruefis
+# name: test_ahb_formatversion_diff_view_various_pruefis
   list([
     dict({
       'changed_columns': 'line_ahb_status',
