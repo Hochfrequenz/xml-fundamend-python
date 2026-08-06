@@ -54,7 +54,7 @@ spell_check = [
     "codespell==2.4.3"
 ]
 coverage = [
-    "coverage==7.15.2",
+    "coverage==7.15.3",
     "pytest-cov==7.1.0",
     {include-group = "tests"}
 ]
