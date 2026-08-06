@@ -29,7 +29,7 @@ jobs:
       - name: Cache built test databases
         # Shares the deterministic, content-addressed SQLite DB cache across runs (see
         # unittests/_db_cache.py) keyed on the pinned submodule commit.
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .pytest_db_cache
           key: pytest-db-cache-v1-${{ steps.submodule.outputs.sha }}
