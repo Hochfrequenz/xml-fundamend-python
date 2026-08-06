@@ -39,7 +39,7 @@ jobs:
         # on the submodule commit so unchanged data isn't re-parsed on every run. The cache content
         # is additionally content-addressed (see unittests/_db_cache.py), so a stale restore is
         # simply ignored rather than reused incorrectly.
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .pytest_db_cache
           key: pytest-db-cache-v1-${{ steps.submodule.outputs.sha }}
