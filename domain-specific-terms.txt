@@ -20,7 +20,3 @@ contrl
 Elemente
 segmente
 hierarchie
-lokal
-unter
-passt
-separater
