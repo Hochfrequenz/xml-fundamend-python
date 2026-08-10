@@ -59,7 +59,15 @@ uv run pytest
 1. the recipe name. This must continue to encode the builder flags as it did before removal —
    `cached_ahb_db` used `f"ahb_raw_drop{int(drop_raw_tables)}"` — because `drop_raw_tables` changes
    the resulting schema for otherwise identical inputs
-2. for each input file, sorted: its path, `gueltig_von`, `gueltig_bis` and its contents
+2. for each input file, sorted: its path, `gueltig_von`, `gueltig_bis` and its contents. The path is
+   normalised to a **repo-relative POSIX path** (`PurePath.relative_to(repo_root).as_posix()`) before
+   hashing. The pre-removal implementation hashed `str(path)`, i.e. an absolute, OS-flavoured path,
+   which makes the fingerprint depend on where the checkout happens to live and on the path
+   separator. Normalising means moving or re-cloning a checkout does not throw away the whole cache,
+   and two developers on different platforms compute the same key for the same file. The relative
+   path is still part of the identity, so two distinct files with identical contents remain
+   distinguishable. An input outside the repository root (not something the suite does today) falls
+   back to the absolute POSIX path.
 3. the **code fingerprint** (below)
 
 The code fingerprint is a hash over everything that determines what a built database contains:
@@ -126,8 +134,12 @@ Cache entries live in `.pytest_db_cache/` (gitignored again), one `<key>.sqlite`
 `FileLock` guards cold population so concurrent pytest-xdist workers build an entry exactly once;
 `filelock` returns as a `tests` dependency. Each caller receives its own copy of the cached file, so
 no two sessions share a database file. Those per-caller copies are `NamedTemporaryFile(delete=False)`
-as before and are left for the OS to reap — the tests already treat the returned path as a throwaway
-file, and adding lifecycle management would be unrequested complexity.
+as before. Cleanup of them is **best-effort at most**: nothing deletes them, and on Windows in
+particular the system temp directory is not reliably swept, so they accumulate until the OS or the
+developer clears it. That is the pre-existing behaviour and this design does not change it, but it
+should not be described as the OS reaping them. Each copy is roughly the size of one built database,
+so a developer running the suite repeatedly with the cache on will want to clear their temp directory
+occasionally. Adding lifecycle management is possible but out of scope here.
 
 **The cache directory is part of the injectable paths object**, as a fourth field alongside the
 source root, lock path and unittests root, defaulting to `<repo>/.pytest_db_cache`. Four of the
@@ -206,7 +218,7 @@ same branch once the design is signed off.
 The branch was originally stacked on `remove-test-db-cache`. That branch has since been squash-merged
 as `bab5b4f`, and because the repository is squash-merge-only the pre-merge commits never became
 ancestors of `main`; the branch was therefore rebased with
-`git rebase --onto origin/main remove-test-db-cache local-db-cache-opt-in` and force-pushed with
-lease. It now shows a clean single-file diff against `main`. This is recorded because the same
+`git rebase --onto origin/main remove-test-db-cache local-db-cache-opt-in` followed by
+`git push --force-with-lease origin local-db-cache-opt-in`. It now shows a clean single-file diff against `main`. This is recorded because the same
 manoeuvre will be needed for any future branch stacked on an unmerged PR in this repository —
 GitHub's automatic retarget on its own produces a doubled diff.
