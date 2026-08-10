@@ -38,7 +38,8 @@ code under test, with no reuse of anything built by earlier code.
 
 `unittests/_db_cache.py` reads the environment variable `FUNDAMEND_TEST_DB_CACHE`. The cache is
 enabled only when its value is one of `1`, `true`, `yes` (case-insensitive); anything else,
-including unset, empty, `0` and `false`, disables it. When disabled, `cached_db(key, builder)` calls
+including unset, empty, `0` and `false`, disables it. The variable is **evaluated on each
+`cached_db()` call, not once at import**, so tests can flip it with `monkeypatch.setenv`. When disabled, `cached_db(key, builder)` calls
 `builder()` and returns its result: no cache directory is created, no lock is taken, no file is
 copied. The cache is not merely "off" — the code path does not execute.
 
@@ -72,14 +73,17 @@ The code fingerprint is a hash over everything that determines what a built data
 - `uv.lock` — pins `ahbicht` and `lark`, which fill `ahb_expressions`. It also pins `ruff`, `mypy`
   and `pytest`, so a lint-tool bump invalidates every entry too. That is wasteful but never wrong,
   and it is the price of a rule that needs no exceptions list.
-- **every `unittests/*.py`** (top level, `__pycache__` excluded), not only `conftest.py`.
+- **every `unittests/**/*.py`** (recursive; `__pycache__`, `__snapshots__` and `example_files`
+  excluded), not only `conftest.py`.
   `_build_ahb_db_with_diff_view` lives in `conftest.py` today, but hashing the directory removes a
-  silent failure mode: the day builder logic moves into a `unittests/_helpers.py`, a
-  `conftest.py`-only rule would stop covering it and no test would fail. The cost is a chattier
-  cache — editing any test file invalidates local entries — which is cheap for a local-only cache
-  and is the same one-sentence rule as the `src/fundamend/` one.
+  silent failure mode: the day builder logic moves into a `unittests/_helpers.py` — or a
+  `unittests/helpers/build.py` — a `conftest.py`-only or top-level-only rule would stop covering it
+  and no test would fail. Recursing keeps the rule as airtight as the `src/fundamend/` one. The cost
+  is a chattier cache — editing any test file invalidates local entries — which is cheap for a
+  local-only cache.
 
-The result is memoized **keyed on the paths object** (source root, lock path, unittests root), not
+The result is memoized **keyed on the paths object** (source root, lock path, unittests root, cache
+directory), which is therefore a frozen dataclass so it can serve as a dict key. It is not memoized
 once per process. A plain process-level memo would break the invalidation tests, which compute
 fingerprints from several different stubbed roots within a single pytest process. In a normal run
 the object is constant, so the hash is still computed only once: one pass over a few dozen small
@@ -150,10 +154,10 @@ New tests in `unittests/test_db_cache.py`. All are fast and require no submodule
 | `0`/`false` also disable | the documented disabling values behave like unset |
 | enabled, cold then warm | with the env var set, two requests for the same key call `builder` once and return equal database contents |
 | fingerprint is stable | identical inputs produce an identical fingerprint |
-| `.py` change invalidates | modifying a Python file under a stubbed source root changes the fingerprint |
-| **`.sql` change invalidates** | modifying a `.sql` file under a stubbed source root changes the fingerprint |
-| lock file change invalidates | modifying the stubbed `uv.lock` changes the fingerprint |
-| unittests change invalidates | modifying a file under the stubbed unittests root changes the fingerprint |
+| `.py` change invalidates | two stubbed source roots differing only in a `.py` file produce different fingerprints |
+| **`.sql` change invalidates** | two stubbed source roots differing only in a `.sql` file produce different fingerprints |
+| lock file change invalidates | two stubbed `uv.lock` files differing in content produce different fingerprints |
+| unittests change invalidates | two stubbed unittests roots differing only in one file produce different fingerprints |
 | input change invalidates | changing an input file's contents, path or validity dates changes the fingerprint |
 | recipe change invalidates | the same inputs under a different recipe (e.g. `drop_raw_tables`) produce a different fingerprint |
 | unusable cache falls back | when the cache directory cannot be created, the call still returns a working database |
