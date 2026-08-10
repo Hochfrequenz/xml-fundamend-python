@@ -388,37 +388,15 @@ uv run pytest
 
 Ein einzelner Worker lässt sich mit `uv run pytest -n0` erzwingen (z.B. zum Debuggen).
 
-### Datenbank-Cache der Tests
 Viele Tests bauen SQLite-Datenbanken aus den XML-Dateien des privaten Submoduls `xml-migs-and-ahbs`.
-Das ist teuer (XML-Parsing + `ahbicht`-Ausdrucksauswertung), weshalb die fertig gebauten Datenbanken
-zwischengespeichert werden:
+Das ist teuer (XML-Parsing + `ahbicht`-Ausdrucksauswertung), und die Testlaufzeit wird davon dominiert.
 
-- **Lokal:** unter `.pytest_db_cache/` (gitignored), gemeinsam genutzt von allen xdist-Workern.
-- **In der CI:** ein `actions/cache`-Schritt speichert `.pytest_db_cache/` unter einem Schlüssel, der auf
-  den ausgecheckten Commit des Submoduls `xml-migs-and-ahbs` zeigt. So werden unveränderte Daten nicht
-  bei jedem Lauf neu geparst.
-
-Jeder Cache-Eintrag ist inhaltsadressiert (siehe `unittests/_db_cache.py`). Der Fingerprint umfasst
-`_CACHE_VERSION`, die Bauvariante sowie Pfad, Gültigkeitsdaten **und Inhalt** aller Eingabe-XML-Dateien.
-Ein Eintrag wird nur wiederverwendet, wenn der Fingerprint exakt passt – andernfalls wird die Datenbank
-neu gebaut.
-
-**Automatische Aktualisierung (kein Eingriff nötig):** Ändert sich der Inhalt der AHB/MIG-XML-Dateien –
-insbesondere wenn das Submodul auf einen neuen Commit gesetzt wird –, ändert sich der Fingerprint und die
-betroffene Datenbank wird beim nächsten Testlauf einmalig neu gebaut. In der CI wird dann unter dem neuen
-Submodul-Commit automatisch ein neuer Cache abgelegt.
-
-**Manuelle Aktualisierung nötig:** Der Fingerprint hasht die *Eingaben*, nicht den *Baucode*. Wenn sich
-die **Art und Weise ändert, wie eine Datenbank gebaut wird** (SQL-Views, Materialisierung, Spalten oder
-die `ahbicht`-Logik in `create_db_and_populate_with_ahb_view`, `create_and_fill_ahb_expression_table`,
-den View-Erzeugern usw.), bleiben Eingaben und damit Fingerprint gleich – eine veraltete Datenbank würde
-weiterverwendet. In diesem Fall muss `_CACHE_VERSION` in `unittests/_db_cache.py` erhöht werden
-(z.B. `"v1"` → `"v2"`), um alle Fingerprints auf einmal zu invalidieren.
-
-Hinweise: GitHub entfernt Caches nach 7 Tagen ohne Zugriff oder beim Überschreiten des Cache-Limits (10 GB);
-ein Cache kann also gelegentlich verschwinden und wird dann einmalig neu gebaut. Das `v1` im
-*Workflow*-Schlüssel (`.github/workflows/unittests.yml` bzw. `coverage.yml`) ist ein separater Hebel, um
-den gesamten CI-Cache zu verwerfen.
+Diese Datenbanken werden bewusst **nicht** zwischengespeichert. Ein Cache müsste nicht nur die
+Eingabedaten (Submodul-XML), sondern auch den Code, der die Datenbank baut, und die Versionen der
+Abhängigkeiten (z.B. `ahbicht`) im Schlüssel abbilden. Tut er das nicht, liefert er nach einer
+Code-Änderung eine Datenbank aus, die noch mit dem *alten* Code gebaut wurde – die Tests sind dann grün,
+obwohl sie die Änderung nie gesehen haben. Wir zahlen lieber die Rechenzeit als dieses Risiko.
+Wer die Tests beschleunigen will, sollte sie schneller machen, nicht ihr Ergebnis konservieren.
 
 ## Hochfrequenz
 Die [Hochfrequenz Unternehmensberatung GmbH](https://www.hochfrequenz.de) ist eine Beratung für Energieversorger im deutschsprachigen Raum.
