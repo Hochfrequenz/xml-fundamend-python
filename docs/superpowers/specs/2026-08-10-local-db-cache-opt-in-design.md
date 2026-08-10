@@ -36,10 +36,11 @@ code under test, with no reuse of anything built by earlier code.
 
 ### Enabling
 
-`unittests/_db_cache.py` reads the environment variable `FUNDAMEND_TEST_DB_CACHE`. If it is unset or
-empty, `cached_db(key, builder)` calls `builder()` and returns its result: no cache directory is
-created, no lock is taken, no file is copied. The cache is not merely "off" — the code path does not
-execute.
+`unittests/_db_cache.py` reads the environment variable `FUNDAMEND_TEST_DB_CACHE`. The cache is
+enabled only when its value is one of `1`, `true`, `yes` (case-insensitive); anything else,
+including unset, empty, `0` and `false`, disables it. When disabled, `cached_db(key, builder)` calls
+`builder()` and returns its result: no cache directory is created, no lock is taken, no file is
+copied. The cache is not merely "off" — the code path does not execute.
 
 CI workflows are not changed and set nothing. A cached run therefore cannot produce a green CI
 result. Enabling is a deliberate local act:
@@ -53,19 +54,29 @@ uv run pytest
 
 `fingerprint(recipe, files)` hashes, in this order:
 
-1. the recipe name (which build variant: raw tables only, with diff views, ...)
+1. the recipe name. This must continue to encode the builder flags as it did before removal —
+   `cached_ahb_db` used `f"ahb_raw_drop{int(drop_raw_tables)}"` — because `drop_raw_tables` changes
+   the resulting schema for otherwise identical inputs
 2. for each input file, sorted: its path, `gueltig_von`, `gueltig_bis` and its contents
 3. the **code fingerprint** (below)
 
 The code fingerprint is a hash over everything that determines what a built database contains:
 
-- every `src/fundamend/**/*.py` file — builders, readers, view definitions
+- **every file under `src/fundamend/`**, not just `*.py`. The package ships six `.sql` files
+  (`materialize_ahb_view.sql`, `materialize_mig_view.sql`, `create_ahbtabellen_view.sql`,
+  `create_ahb_formatversion_diff_view.sql`, `create_ahb_pruefi_diff_view.sql`,
+  `create_mig_diff_view.sql`) which are read at runtime and executed straight into the database.
+  Editing a view's SQL is the most likely way to change what a database contains, so a `*.py`-only
+  glob would reproduce exactly the defect this design exists to prevent. `__pycache__` and `*.pyc`
+  are excluded; everything else under the package directory is hashed by relative path and content.
 - `uv.lock` — pins `ahbicht` and `lark`, which fill `ahb_expressions`
 - `unittests/conftest.py` — `_build_ahb_db_with_diff_view` decides which views a fixture's database
   receives
 
-It is computed once per process and memoized; the cost is one hash over a few dozen small files per
-test run.
+The result is memoized **keyed on the (source root, lock path, conftest path) triple**, not once per
+process. A plain process-level memo would break the invalidation tests, which compute fingerprints
+from several different stubbed roots within a single pytest process. In a normal run the triple is
+constant, so the hash is still computed only once: one pass over a few dozen small files.
 
 `_CACHE_VERSION` is deliberately **not** reintroduced. The code fingerprint subsumes it: any change
 to how a database is built already changes the key. There is no manual bump to remember and no
@@ -110,20 +121,29 @@ New tests in `unittests/test_db_cache.py`. All are fast and require no submodule
 | Test | Asserts |
 |------|---------|
 | disabled by default | with the env var unset, `builder` runs on every call and no cache directory is created |
+| `0`/`false` also disable | the documented disabling values behave like unset |
 | enabled, cold then warm | with the env var set, two requests for the same key call `builder` once and return equal database contents |
 | fingerprint is stable | identical inputs produce an identical fingerprint |
-| source change invalidates | modifying a file under a stubbed source root changes the fingerprint |
+| `.py` change invalidates | modifying a Python file under a stubbed source root changes the fingerprint |
+| **`.sql` change invalidates** | modifying a `.sql` file under a stubbed source root changes the fingerprint |
 | lock file change invalidates | modifying the stubbed `uv.lock` changes the fingerprint |
 | conftest change invalidates | modifying the stubbed `conftest.py` changes the fingerprint |
 | input change invalidates | changing an input file's contents, path or validity dates changes the fingerprint |
-| unwritable cache falls back | with the cache directory made unusable, the call still returns a working database |
+| recipe change invalidates | the same inputs under a different recipe (e.g. `drop_raw_tables`) produce a different fingerprint |
+| unusable cache falls back | when the cache directory cannot be created, the call still returns a working database |
 
 The invalidation tests are the regression tests for the defect that motivated PR #321: they fail if
 someone later narrows the key back to the input data.
 
-To keep them fast and hermetic, the paths that feed the code fingerprint are injectable — the
-production default points at the real `src/fundamend`, `uv.lock` and `unittests/conftest.py`, and the
-tests pass temporary directories instead.
+To keep them fast and hermetic, the paths that feed the code fingerprint are injectable as an
+explicit parameter object (source root, lock path, conftest path) with a module-level production
+default pointing at the real `src/fundamend`, `uv.lock` and `unittests/conftest.py`. Tests pass
+temporary directories instead. `fingerprint()` and `cached_db()` take it as an optional keyword
+argument, so the 13 call sites and both fixtures are unaffected.
+
+The "unusable cache" test must be cross-platform: read-only directories do not reliably block writes
+on Windows, which is a primary development platform here. The test therefore points the cache
+directory at a path where a *file* already exists, so directory creation fails on every OS.
 
 ## Documentation
 
@@ -135,6 +155,10 @@ would leave the repository contradicting itself.
 
 If the passage cannot be kept short, the design is wrong and should be reconsidered rather than
 documented at length.
+
+CI runs `codespell --ignore-words=domain-specific-terms.txt` over `README.md`. PR #321 removed four
+German words from that list along with the old cache chapter; the new passage may need some of them
+back. Check before pushing rather than spending a CI round-trip on it.
 
 ## Delivery
 
