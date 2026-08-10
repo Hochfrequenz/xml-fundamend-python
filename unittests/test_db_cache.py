@@ -12,13 +12,16 @@ contents, since the cache does not care what is inside them.
 
 from __future__ import annotations
 
+import shutil
 import sqlite3
+from collections.abc import Callable
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
 import pytest
 
-from ._db_cache import CachePaths, cached_db, fingerprint, is_enabled
+from ._db_cache import DEFAULT_PATHS, CachePaths, cached_db, fingerprint, is_enabled
 
 _ENV_VAR = "FUNDAMEND_TEST_DB_CACHE"
 
@@ -52,7 +55,7 @@ def _make_input(paths: CachePaths, name: str, content: str = "<AHB/>") -> Path:
     return path
 
 
-def _counting_builder(tmp_path: Path, calls: list[int], content: str = "payload") -> object:
+def _counting_builder(tmp_path: Path, calls: list[int], content: str = "payload") -> Callable[[], Path]:
     """Return a builder that records every invocation and writes a real (tiny) SQLite file."""
 
     def build() -> Path:
@@ -83,8 +86,8 @@ def test_disabled_by_default_builds_every_time(
     calls: list[int] = []
     builder = _counting_builder(tmp_path, calls)
 
-    first = cached_db("some-key", builder, paths=paths)  # type: ignore[arg-type]
-    second = cached_db("some-key", builder, paths=paths)  # type: ignore[arg-type]
+    first = cached_db("some-key", builder, paths=paths)
+    second = cached_db("some-key", builder, paths=paths)
 
     assert len(calls) == 2, "with the cache disabled every call must build"
     assert _read_back(first) == ["payload"]
@@ -99,8 +102,8 @@ def test_non_enabling_values_keep_the_cache_off(
     monkeypatch.setenv(_ENV_VAR, value)
     calls: list[int] = []
 
-    cached_db("some-key", _counting_builder(tmp_path, calls), paths=paths)  # type: ignore[arg-type]
-    cached_db("some-key", _counting_builder(tmp_path, calls), paths=paths)  # type: ignore[arg-type]
+    cached_db("some-key", _counting_builder(tmp_path, calls), paths=paths)
+    cached_db("some-key", _counting_builder(tmp_path, calls), paths=paths)
 
     assert not is_enabled()
     assert len(calls) == 2
@@ -120,8 +123,8 @@ def test_enabled_builds_once_and_serves_copies(
     calls: list[int] = []
     builder = _counting_builder(tmp_path, calls)
 
-    first = cached_db("some-key", builder, paths=paths)  # type: ignore[arg-type]
-    second = cached_db("some-key", builder, paths=paths)  # type: ignore[arg-type]
+    first = cached_db("some-key", builder, paths=paths)
+    second = cached_db("some-key", builder, paths=paths)
 
     assert len(calls) == 1, "the second request must be served from the cache"
     assert _read_back(first) == _read_back(second) == ["payload"]
@@ -134,8 +137,8 @@ def test_different_keys_do_not_share_an_entry(
     monkeypatch.setenv(_ENV_VAR, "1")
     calls: list[int] = []
 
-    cached_db("key-a", _counting_builder(tmp_path, calls, "a"), paths=paths)  # type: ignore[arg-type]
-    second = cached_db("key-b", _counting_builder(tmp_path, calls, "b"), paths=paths)  # type: ignore[arg-type]
+    cached_db("key-a", _counting_builder(tmp_path, calls, "a"), paths=paths)
+    second = cached_db("key-b", _counting_builder(tmp_path, calls, "b"), paths=paths)
 
     assert len(calls) == 2
     assert _read_back(second) == ["b"]
@@ -159,7 +162,7 @@ def test_unusable_cache_directory_falls_back_to_building(
     calls: list[int] = []
 
     with pytest.warns(UserWarning, match="cache unusable"):
-        built = cached_db("some-key", _counting_builder(tmp_path, calls), paths=unusable)  # type: ignore[arg-type]
+        built = cached_db("some-key", _counting_builder(tmp_path, calls), paths=unusable)
 
     assert len(calls) == 1
     assert _read_back(built) == ["payload"], "a broken cache must never break the run"
@@ -193,6 +196,40 @@ def test_input_content_change_invalidates(paths: CachePaths) -> None:
     assert fingerprint("recipe", [file], paths=paths) != before
 
 
+def test_input_path_change_invalidates(paths: CachePaths) -> None:
+    """Two files with identical contents at different paths must not share a cache entry."""
+    here = _make_input(paths, "FV2410/MSCONS_AHB.xml", "<AHB/>")
+    there = _make_input(paths, "FV2504/MSCONS_AHB.xml", "<AHB/>")
+    assert here.read_bytes() == there.read_bytes(), "the point of this test is identical contents"
+    assert fingerprint("recipe", [here], paths=paths) != fingerprint("recipe", [there], paths=paths)
+
+
+def test_fingerprint_survives_moving_the_checkout(paths: CachePaths, tmp_path: Path) -> None:
+    """
+    Paths enter the key repo-relative, so relocating a checkout must not discard the cache.
+
+    The pre-removal implementation hashed ``str(path)``, i.e. an absolute, OS-flavoured path; this
+    test fails if that ever comes back.
+    """
+    original_input = _make_input(paths, "FV2410/MSCONS_AHB.xml")
+    before = fingerprint("recipe", [original_input], paths=paths)
+
+    moved_root = tmp_path / "somewhere" / "else" / "repo"
+    moved_root.parent.mkdir(parents=True)
+    shutil.copytree(paths.repo_root, moved_root)
+    moved = replace(
+        paths,
+        repo_root=moved_root,
+        source_root=moved_root / "src" / "fundamend",
+        lock_path=moved_root / "uv.lock",
+        unittests_root=moved_root / "unittests",
+        cache_dir=moved_root / "cache",
+    )
+
+    after = fingerprint("recipe", [moved_root / "xml-migs-and-ahbs" / "FV2410" / "MSCONS_AHB.xml"], paths=moved)
+    assert after == before, "an identical tree at a different absolute location must hash the same"
+
+
 def test_input_validity_dates_change_invalidates(paths: CachePaths) -> None:
     file = _make_input(paths, "MSCONS_AHB.xml")
     early = fingerprint("recipe", [(file, date(2024, 10, 1), None)], paths=paths)
@@ -200,7 +237,7 @@ def test_input_validity_dates_change_invalidates(paths: CachePaths) -> None:
     assert early != late
 
 
-def _fingerprint_of_variant(paths: CachePaths, mutate: object) -> str:
+def _fingerprint_of_variant(paths: CachePaths, mutate: Callable[[CachePaths], object]) -> str:
     """Build a second, independent stub tree that differs only as ``mutate`` says, and hash it."""
     variant_root = paths.repo_root.parent / "repo-variant"
     if variant_root.exists():
@@ -227,7 +264,7 @@ def _fingerprint_of_variant(paths: CachePaths, mutate: object) -> str:
         unittests_root=variant_unittests,
         cache_dir=variant_root / "cache",
     )
-    mutate(variant)  # type: ignore[operator]
+    mutate(variant)
     # the same input file, at the same repo-relative path, so only the code differs
     input_file = variant_root / "xml-migs-and-ahbs" / "MSCONS_AHB.xml"
     input_file.parent.mkdir(parents=True, exist_ok=True)
@@ -287,13 +324,76 @@ def test_ignored_directories_do_not_invalidate(paths: CachePaths) -> None:
     before = fingerprint("recipe", [baseline], paths=paths)
 
     def add_ignored_files(variant: CachePaths) -> None:
+        # These must land under the *source* root, which is walked without the only_python filter.
+        # Putting them under the unittests root would prove nothing: everything here lacks a .py
+        # suffix, so the only_python filter would drop them before the exclusion rules were consulted
+        # and the test would pass even with _IGNORED_DIRECTORIES emptied.
+        bytecode = variant.source_root / "__pycache__"
+        bytecode.mkdir()
+        (bytecode / "ahbview.cpython-312.pyc").write_bytes(b"\x00compiled")
+        nested = variant.source_root / "sqlmodels" / "__pycache__"
+        nested.mkdir(parents=True)
+        (nested / "internals.cpython-312.pyc").write_bytes(b"\x00compiled")
+        (variant.source_root / "ahbview.pyc").write_bytes(b"\x00loose bytecode")
+
+    after = _fingerprint_of_variant(paths, add_ignored_files)
+    assert after == before, (
+        "bytecode does not change how a database is built; if it did, ordinary recompilation "
+        "would invalidate every cache entry and the cache would silently stop caching"
+    )
+
+
+def test_snapshots_and_example_files_do_not_invalidate(paths: CachePaths) -> None:
+    baseline = _make_input(paths, "MSCONS_AHB.xml")
+    before = fingerprint("recipe", [baseline], paths=paths)
+
+    def add_test_data(variant: CachePaths) -> None:
         snapshots = variant.unittests_root / "__snapshots__"
         snapshots.mkdir()
+        # a .py inside an ignored directory: only _IGNORED_DIRECTORIES can keep this out
+        (snapshots / "helper.py").write_text("# not a builder\n", encoding="utf-8")
         (snapshots / "test_something.ambr").write_text("# serializer version: 1\n", encoding="utf-8")
         examples = variant.unittests_root / "example_files"
         examples.mkdir()
-        (examples / "UTILTS_AHB.xml").write_text("<AHB/>\n", encoding="utf-8")
-        (variant.unittests_root / "conftest.pyc").write_bytes(b"\x00compiled")
+        (examples / "conftest.py").write_text("# not a builder either\n", encoding="utf-8")
 
-    after = _fingerprint_of_variant(paths, add_ignored_files)
-    assert after == before, "snapshots, example files and bytecode do not change how a database is built"
+    after = _fingerprint_of_variant(paths, add_test_data)
+    assert after == before, "snapshots and example files do not influence how a database is built"
+
+
+def test_missing_source_root_changes_the_key(paths: CachePaths) -> None:
+    """A vanished root must invalidate, not silently shrink the fingerprint to 'everything else'."""
+    baseline = _make_input(paths, "MSCONS_AHB.xml")
+    with_root = fingerprint("recipe", [baseline], paths=paths)
+    without_root = fingerprint("recipe", [baseline], paths=replace(paths, source_root=paths.repo_root / "src" / "gone"))
+    other_missing_root = fingerprint(
+        "recipe", [baseline], paths=replace(paths, source_root=paths.repo_root / "src" / "also-gone")
+    )
+
+    assert without_root != with_root, "losing the source root must change the key"
+    assert without_root != other_missing_root, (
+        "two different missing roots must not collapse to the same key -- otherwise a renamed "
+        "package directory would leave every pre-rename entry looking valid forever"
+    )
+
+
+def test_missing_lock_file_changes_the_key(paths: CachePaths) -> None:
+    baseline = _make_input(paths, "MSCONS_AHB.xml")
+    with_lock = fingerprint("recipe", [baseline], paths=paths)
+    without_lock = fingerprint("recipe", [baseline], paths=replace(paths, lock_path=paths.repo_root / "gone.lock"))
+    assert with_lock != without_lock
+
+
+def test_default_paths_describe_the_real_repository() -> None:
+    """
+    Guards the failure mode that no other test can see: DEFAULT_PATHS pointing at nothing.
+
+    If the package or test directory is ever moved and these constants are not updated, the code
+    fingerprint silently stops covering the moved tree. That is PR #321's defect via a path mistake.
+    """
+    assert DEFAULT_PATHS.source_root.is_dir(), f"{DEFAULT_PATHS.source_root} does not exist"
+    assert DEFAULT_PATHS.unittests_root.is_dir(), f"{DEFAULT_PATHS.unittests_root} does not exist"
+    assert DEFAULT_PATHS.lock_path.is_file(), f"{DEFAULT_PATHS.lock_path} does not exist"
+    assert (DEFAULT_PATHS.repo_root / ".git").exists(), "repo_root should be the repository root"
+    # the .sql view definitions are the reason the source root is hashed in full rather than by *.py
+    assert list(DEFAULT_PATHS.source_root.rglob("*.sql")), "expected .sql view definitions under src/fundamend"

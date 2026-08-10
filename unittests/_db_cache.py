@@ -113,12 +113,28 @@ def _code_fingerprint(paths: CachePaths) -> str:
         ("unittests", paths.unittests_root, True),
     ):
         hasher.update(f"\0root:{label}\0".encode())
+        if not root.is_dir():
+            # A root that does not exist must *change* the key, never silently shrink it. Without
+            # this, renaming the package directory (or a typo in DEFAULT_PATHS) would reduce the
+            # fingerprint to "everything else" and quietly stop invalidating on builder changes --
+            # the PR #321 defect, reached through a path mistake instead of a narrow glob.
+            hasher.update(b"\0MISSING\0")
+            hasher.update(str(root).encode())
+            continue
         for path in _relevant_files(root, only_python=only_python):
-            hasher.update(path.relative_to(root).as_posix().encode())
-            hasher.update(path.read_bytes())
+            contents = path.read_bytes()
+            # Frame each entry with its length so that name and contents cannot run together:
+            # "a.py" + b"bX" must not hash like "a.pyb" + b"X".
+            hasher.update(f"\0{path.relative_to(root).as_posix()}\0{len(contents)}\0".encode())
+            hasher.update(contents)
     hasher.update(b"\0lock\0")
     if paths.lock_path.is_file():
-        hasher.update(paths.lock_path.read_bytes())
+        lock_contents = paths.lock_path.read_bytes()
+        hasher.update(f"\0{len(lock_contents)}\0".encode())
+        hasher.update(lock_contents)
+    else:
+        hasher.update(b"\0MISSING\0")
+        hasher.update(str(paths.lock_path).encode())
     fingerprint_of_code = hasher.hexdigest()
     _CODE_FINGERPRINTS[paths] = fingerprint_of_code
     return fingerprint_of_code
@@ -160,11 +176,40 @@ def fingerprint(recipe: str, files: Iterable[_AhbFile], *, paths: CachePaths = D
             bis = "" if item[2] is None else item[2].isoformat()
         normalized.append((_normalized_path(path, paths.repo_root), von, bis, path))
     for relative_path, von, bis, path in sorted(normalized, key=lambda entry: entry[:3]):
-        hasher.update(relative_path.encode())
-        hasher.update(von.encode())
-        hasher.update(bis.encode())
-        hasher.update(path.read_bytes())
+        contents = path.read_bytes()
+        # Length-framed for the same reason as in _code_fingerprint: von/bis are variable length
+        # (empty or a 10-character ISO date), so unframed concatenation would be ambiguous.
+        hasher.update(f"\0{relative_path}\0{von}\0{bis}\0{len(contents)}\0".encode())
+        hasher.update(contents)
     return hasher.hexdigest()[:32]
+
+
+def _warn_unusable(error: OSError) -> None:
+    warnings.warn(f"test database cache unusable ({error}); building directly", stacklevel=3)
+
+
+def _publish(built: Path, cached: Path) -> bool:
+    """Copy ``built`` into the cache atomically; return whether that worked."""
+    try:
+        being_written = cached.with_suffix(".sqlite.building")
+        shutil.copyfile(built, being_written)
+        being_written.replace(cached)  # atomic publish; readers never see a partial file
+        return True
+    except OSError as error:
+        _warn_unusable(error)
+        return False
+
+
+def _private_copy(cached: Path) -> Path | None:
+    """Return the caller its own copy of a cached database, or ``None`` if that is not possible."""
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as handle:
+            consumer_copy = Path(handle.name)
+        shutil.copyfile(cached, consumer_copy)
+        return consumer_copy
+    except OSError as error:
+        _warn_unusable(error)
+        return None
 
 
 def cached_db(key: str, builder: Callable[[], Path], *, paths: CachePaths = DEFAULT_PATHS) -> Path:
@@ -178,22 +223,29 @@ def cached_db(key: str, builder: Callable[[], Path], *, paths: CachePaths = DEFA
     on one database file.
 
     The cache never gets a vote on whether the suite can run: any filesystem problem degrades to a
-    direct build with a warning.
+    direct build with a warning. Failures raised by ``builder`` itself are *not* caught -- they are
+    bugs in the code under test, and dressing them up as cache problems would send whoever is
+    debugging them in the wrong direction.
     """
     if not is_enabled():
         return builder()
+    cached = paths.cache_dir / f"{key}.sqlite"
     try:
         paths.cache_dir.mkdir(parents=True, exist_ok=True)
-        cached = paths.cache_dir / f"{key}.sqlite"
-        with FileLock(f"{cached}.lock"):
-            if not cached.exists():
-                built = builder()
-                being_written = cached.with_suffix(".sqlite.building")
-                shutil.copyfile(built, being_written)
-                being_written.replace(cached)  # atomic publish; readers never see a partial file
-        consumer_copy = Path(tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False).name)
-        shutil.copyfile(cached, consumer_copy)
-        return consumer_copy
+        file_lock = FileLock(f"{cached}.lock")
+        file_lock.acquire()
     except OSError as error:
-        warnings.warn(f"test database cache unusable ({error}); building directly", stacklevel=2)
+        _warn_unusable(error)
         return builder()
+    built: Path | None = None
+    try:
+        if not cached.exists():
+            built = builder()  # outside every OSError handler: builder failures must propagate
+            if not _publish(built, cached):
+                return built
+        private_copy = _private_copy(cached)
+    finally:
+        file_lock.release()
+    if private_copy is not None:
+        return private_copy
+    return built if built is not None else builder()

@@ -60,7 +60,8 @@ uv run pytest
    `cached_ahb_db` used `f"ahb_raw_drop{int(drop_raw_tables)}"` — because `drop_raw_tables` changes
    the resulting schema for otherwise identical inputs
 2. for each input file, sorted: its path, `gueltig_von`, `gueltig_bis` and its contents. The path is
-   normalised to a **repo-relative POSIX path** (`PurePath.relative_to(repo_root).as_posix()`) before
+   normalised to a **repo-relative POSIX path** (`path.resolve().relative_to(repo_root.resolve())
+   .as_posix()`; resolving both sides so a mixed-case or short-name Windows path still matches) before
    hashing. The pre-removal implementation hashed `str(path)`, i.e. an absolute, OS-flavoured path,
    which makes the fingerprint depend on where the checkout happens to live and on the path
    separator. Normalising means moving or re-cloning a checkout does not throw away the whole cache,
@@ -141,8 +142,9 @@ should not be described as the OS reaping them. Each copy is roughly the size of
 so a developer running the suite repeatedly with the cache on will want to clear their temp directory
 occasionally. Adding lifecycle management is possible but out of scope here.
 
-**The cache directory is part of the injectable paths object**, as a fourth field alongside the
-source root, lock path and unittests root, defaulting to `<repo>/.pytest_db_cache`. Four of the
+**The cache directory is part of the injectable paths object**, alongside the source root, lock path,
+unittests root and (as implemented) the repo root that path normalisation needs — five fields in all,
+with the cache directory defaulting to `<repo>/.pytest_db_cache`. Four of the
 tests below need to control it — "no directory is created", the disabling values, the cold/warm
 sequence, and the fallback case. Without injection those tests would read and write the developer's
 real cache: the cold/warm test would pollute it, and "no directory is created" would fail on any
@@ -211,9 +213,10 @@ back. Check before pushing rather than spending a CI round-trip on it.
 
 ## Delivery
 
-This work lives on branch `local-db-cache-opt-in`, opened as PR #323 with this document as its only
-content so the design can be argued with before it is built. Implementation commits follow on the
-same branch once the design is signed off.
+This document went out as PR #323 on branch `local-db-cache-opt-in`, on its own so the design could be
+argued with before it was built, and was merged as `1ef1765`. The implementation follows in PR #324 on
+branch `local-db-cache-impl` — a separate branch rather than further commits on the design branch,
+because #323 auto-merged (and its branch was deleted) while the implementation was being written.
 
 The branch was originally stacked on `remove-test-db-cache`. That branch has since been squash-merged
 as `bab5b4f`, and because the repository is squash-merge-only the pre-merge commits never became
