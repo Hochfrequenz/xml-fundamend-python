@@ -394,6 +394,8 @@ def test_default_paths_describe_the_real_repository() -> None:
     assert DEFAULT_PATHS.source_root.is_dir(), f"{DEFAULT_PATHS.source_root} does not exist"
     assert DEFAULT_PATHS.unittests_root.is_dir(), f"{DEFAULT_PATHS.unittests_root} does not exist"
     assert DEFAULT_PATHS.lock_path.is_file(), f"{DEFAULT_PATHS.lock_path} does not exist"
-    assert (DEFAULT_PATHS.repo_root / ".git").exists(), "repo_root should be the repository root"
+    # pyproject.toml rather than .git: the suite must also pass from a source archive (a GitHub
+    # "Download ZIP" checkout has no .git), where these paths are still perfectly correct.
+    assert (DEFAULT_PATHS.repo_root / "pyproject.toml").is_file(), "repo_root should be the repository root"
     # the .sql view definitions are the reason the source root is hashed in full rather than by *.py
     assert list(DEFAULT_PATHS.source_root.rglob("*.sql")), "expected .sql view definitions under src/fundamend"

@@ -43,8 +43,8 @@ _REPO_ROOT = Path(__file__).parent.parent
 # invalidate entries for no reason.
 _IGNORED_DIRECTORIES = frozenset({"__pycache__", "__snapshots__", "example_files"})
 
-# Type of the file lists accepted by fundamend's DB builders.
-_AhbFile = Path | tuple[Path, date, date | None] | tuple[Path, None, None]
+# Type of the file lists accepted by fundamend's DB builders (AHB and MIG alike).
+_XmlInputFile = Path | tuple[Path, date, date | None] | tuple[Path, None, None]
 
 
 @dataclass(frozen=True)
@@ -154,7 +154,7 @@ def _normalized_path(path: Path, repo_root: Path) -> str:
         return path.resolve().as_posix()
 
 
-def fingerprint(recipe: str, files: Iterable[_AhbFile], *, paths: CachePaths = DEFAULT_PATHS) -> str:
+def fingerprint(recipe: str, files: Iterable[_XmlInputFile], *, paths: CachePaths = DEFAULT_PATHS) -> str:
     """
     Return a short, stable hash identifying a database build.
 
@@ -237,15 +237,15 @@ def cached_db(key: str, builder: Callable[[], Path], *, paths: CachePaths = DEFA
     except OSError as error:
         _warn_unusable(error)
         return builder()
-    built: Path | None = None
     try:
         if not cached.exists():
             built = builder()  # outside every OSError handler: builder failures must propagate
-            if not _publish(built, cached):
-                return built
+            _publish(built, cached)  # warns on failure; either way the freshly built file is good
+            # Return the build itself rather than copying it back out of the cache: it is already a
+            # private throwaway file, so copying would double the I/O on the slowest path and leave
+            # the original behind in the temp directory for nothing.
+            return built
         private_copy = _private_copy(cached)
     finally:
         file_lock.release()
-    if private_copy is not None:
-        return private_copy
-    return built if built is not None else builder()
+    return private_copy if private_copy is not None else builder()

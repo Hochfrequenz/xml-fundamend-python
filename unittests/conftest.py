@@ -18,7 +18,7 @@ from fundamend.sqlmodels.ahb_formatversion_diff_view import create_ahb_formatver
 from fundamend.sqlmodels.ahb_pruefi_diff_view import create_ahb_pruefi_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
-from ._db_cache import _AhbFile, cached_db, fingerprint
+from ._db_cache import _XmlInputFile, cached_db, fingerprint
 
 # The ahbicht condition-expression parser (and its lark backend) can emit large volumes of
 # DEBUG/INFO log lines while the expensive DB fixtures parse every AHB expression. Formatting
@@ -66,7 +66,7 @@ def apply_throwaway_sqlite_pragmas(engine: Engine) -> None:
 # =============================================================================
 
 
-def cached_ahb_db(ahb_files: Iterable[_AhbFile], drop_raw_tables: bool = False) -> Path:
+def cached_ahb_db(ahb_files: Iterable[_XmlInputFile], drop_raw_tables: bool = False) -> Path:
     """
     Like :func:`create_db_and_populate_with_ahb_view`, but served from the opt-in local cache.
 
@@ -83,7 +83,7 @@ def cached_ahb_db(ahb_files: Iterable[_AhbFile], drop_raw_tables: bool = False) 
     )
 
 
-def cached_mig_db(mig_files: Iterable[_AhbFile], drop_raw_tables: bool = False) -> Path:
+def cached_mig_db(mig_files: Iterable[_XmlInputFile], drop_raw_tables: bool = False) -> Path:
     """MIG counterpart of :func:`cached_ahb_db`."""
     mig_files = list(mig_files)
     recipe = f"mig_raw_drop{int(drop_raw_tables)}"
@@ -93,7 +93,7 @@ def cached_mig_db(mig_files: Iterable[_AhbFile], drop_raw_tables: bool = False) 
     )
 
 
-def _build_ahb_db_with_diff_view(ahb_files: Sequence[_AhbFile]) -> Path:
+def _build_ahb_db_with_diff_view(ahb_files: Sequence[_XmlInputFile]) -> Path:
     """Build a complete AHB database file: raw tables + expression table + ahbtabellen + diff views."""
     db_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_files, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{db_path}")
@@ -128,7 +128,7 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    ahb_files: Sequence[_AhbFile] = [
+    ahb_files: Sequence[_XmlInputFile] = [
         (p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")
     ] + [(p, date(2025, 6, 6), None) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
 
@@ -151,7 +151,7 @@ def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, No
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    ahb_files: Sequence[_AhbFile] = [
+    ahb_files: Sequence[_XmlInputFile] = [
         (p, date(2025, 10, 1), date(2026, 4, 1))
         for p in (private_submodule_root / "FV2510").rglob("**/MSCONS_AHB*.xml")
     ] + [(p, date(2026, 4, 1), None) for p in (private_submodule_root / "FV2604").rglob("**/MSCONS_AHB*.xml")]
