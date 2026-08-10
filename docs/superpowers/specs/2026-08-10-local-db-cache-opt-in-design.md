@@ -69,14 +69,21 @@ The code fingerprint is a hash over everything that determines what a built data
   Editing a view's SQL is the most likely way to change what a database contains, so a `*.py`-only
   glob would reproduce exactly the defect this design exists to prevent. `__pycache__` and `*.pyc`
   are excluded; everything else under the package directory is hashed by relative path and content.
-- `uv.lock` — pins `ahbicht` and `lark`, which fill `ahb_expressions`
-- `unittests/conftest.py` — `_build_ahb_db_with_diff_view` decides which views a fixture's database
-  receives
+- `uv.lock` — pins `ahbicht` and `lark`, which fill `ahb_expressions`. It also pins `ruff`, `mypy`
+  and `pytest`, so a lint-tool bump invalidates every entry too. That is wasteful but never wrong,
+  and it is the price of a rule that needs no exceptions list.
+- **every `unittests/*.py`** (top level, `__pycache__` excluded), not only `conftest.py`.
+  `_build_ahb_db_with_diff_view` lives in `conftest.py` today, but hashing the directory removes a
+  silent failure mode: the day builder logic moves into a `unittests/_helpers.py`, a
+  `conftest.py`-only rule would stop covering it and no test would fail. The cost is a chattier
+  cache — editing any test file invalidates local entries — which is cheap for a local-only cache
+  and is the same one-sentence rule as the `src/fundamend/` one.
 
-The result is memoized **keyed on the (source root, lock path, conftest path) triple**, not once per
-process. A plain process-level memo would break the invalidation tests, which compute fingerprints
-from several different stubbed roots within a single pytest process. In a normal run the triple is
-constant, so the hash is still computed only once: one pass over a few dozen small files.
+The result is memoized **keyed on the paths object** (source root, lock path, unittests root), not
+once per process. A plain process-level memo would break the invalidation tests, which compute
+fingerprints from several different stubbed roots within a single pytest process. In a normal run
+the object is constant, so the hash is still computed only once: one pass over a few dozen small
+files.
 
 `_CACHE_VERSION` is deliberately **not** reintroduced. The code fingerprint subsumes it: any change
 to how a database is built already changes the key. There is no manual bump to remember and no
@@ -87,6 +94,12 @@ environment, not the realised one. A different Python patch version or a differe
 wheel with an identical `uv.lock` produces the same key. This is acceptable because the cache is
 local-only and a developer's environment is stable between runs; it would not be acceptable for a
 cache shared across machines, which is why this design does not have one.
+
+A cached database is **equivalent to** a fresh build, not byte-identical with one: primary keys come
+from `uuid.uuid4()` in the SQLModel tables and from `hex(randomblob(16))` in
+`materialize_ahb_view.sql` and `materialize_mig_view.sql`. "Deterministic builders" holds only up to
+those ids. No test may assert on freshly generated id values, and none does today — the existing
+snapshot tests strip the guid columns before comparing.
 
 ### Scope of caching
 
@@ -107,7 +120,20 @@ Cheap example-file tests and builder-error-path tests continue to build directly
 Cache entries live in `.pytest_db_cache/` (gitignored again), one `<key>.sqlite` per entry. A
 `FileLock` guards cold population so concurrent pytest-xdist workers build an entry exactly once;
 `filelock` returns as a `tests` dependency. Each caller receives its own copy of the cached file, so
-no two sessions share a database file.
+no two sessions share a database file. Those per-caller copies are `NamedTemporaryFile(delete=False)`
+as before and are left for the OS to reap — the tests already treat the returned path as a throwaway
+file, and adding lifecycle management would be unrequested complexity.
+
+**The cache directory is part of the injectable paths object**, as a fourth field alongside the
+source root, lock path and unittests root, defaulting to `<repo>/.pytest_db_cache`. Four of the
+tests below need to control it — "no directory is created", the disabling values, the cold/warm
+sequence, and the fallback case. Without injection those tests would read and write the developer's
+real cache: the cold/warm test would pollute it, and "no directory is created" would fail on any
+machine where an earlier opt-in run had left the directory behind.
+
+For the same reason `cached_db()` takes the paths object as an optional keyword argument even though
+it receives an already-computed key and never fingerprints anything: it needs the cache directory
+from it. Callers that do not pass one get the production default.
 
 The cache must never be able to break a test run. If the cache directory cannot be created or
 written, or a cached file cannot be read, `cached_db` emits a warning and falls back to calling
@@ -127,7 +153,7 @@ New tests in `unittests/test_db_cache.py`. All are fast and require no submodule
 | `.py` change invalidates | modifying a Python file under a stubbed source root changes the fingerprint |
 | **`.sql` change invalidates** | modifying a `.sql` file under a stubbed source root changes the fingerprint |
 | lock file change invalidates | modifying the stubbed `uv.lock` changes the fingerprint |
-| conftest change invalidates | modifying the stubbed `conftest.py` changes the fingerprint |
+| unittests change invalidates | modifying a file under the stubbed unittests root changes the fingerprint |
 | input change invalidates | changing an input file's contents, path or validity dates changes the fingerprint |
 | recipe change invalidates | the same inputs under a different recipe (e.g. `drop_raw_tables`) produce a different fingerprint |
 | unusable cache falls back | when the cache directory cannot be created, the call still returns a working database |
@@ -135,11 +161,11 @@ New tests in `unittests/test_db_cache.py`. All are fast and require no submodule
 The invalidation tests are the regression tests for the defect that motivated PR #321: they fail if
 someone later narrows the key back to the input data.
 
-To keep them fast and hermetic, the paths that feed the code fingerprint are injectable as an
-explicit parameter object (source root, lock path, conftest path) with a module-level production
-default pointing at the real `src/fundamend`, `uv.lock` and `unittests/conftest.py`. Tests pass
-temporary directories instead. `fingerprint()` and `cached_db()` take it as an optional keyword
-argument, so the 13 call sites and both fixtures are unaffected.
+To keep them fast and hermetic, every path the module touches is injectable as one explicit
+parameter object — source root, lock path, unittests root, cache directory — with a module-level
+production default pointing at the real `src/fundamend`, `uv.lock`, `unittests/` and
+`.pytest_db_cache/`. Tests pass temporary directories instead. `fingerprint()` and `cached_db()`
+take it as an optional keyword argument, so the 13 call sites and both fixtures are unaffected.
 
 The "unusable cache" test must be cross-platform: read-only directories do not reliably block writes
 on Windows, which is a primary development platform here. The test therefore points the cache
