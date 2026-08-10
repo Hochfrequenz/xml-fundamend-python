@@ -23,18 +23,6 @@ jobs:
           python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group coverage --extra sqlmodels --extra ahbicht --extra cli
-      - name: Determine submodule revision for the DB cache key
-        id: submodule
-        run: echo "sha=$(git -C xml-migs-and-ahbs rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - name: Cache built test databases
-        # Shares the deterministic, content-addressed SQLite DB cache across runs (see
-        # unittests/_db_cache.py) keyed on the pinned submodule commit.
-        uses: actions/cache@v4
-        with:
-          path: .pytest_db_cache
-          key: pytest-db-cache-v1-${{ steps.submodule.outputs.sha }}
-          restore-keys: |
-            pytest-db-cache-v1-
       - name: Run Tests and Record Coverage
         # pytest-cov aggregates coverage across the pytest-xdist worker subprocesses
         # (plain `coverage run` would miss them once the suite runs with `-n auto`).
