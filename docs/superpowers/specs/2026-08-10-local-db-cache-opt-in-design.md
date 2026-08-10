@@ -1,8 +1,9 @@
 # Opt-in local test database cache
 
 **Date:** 2026-08-10
-**Status:** Approved (design), pending implementation
-**Depends on:** PR #321 (`refactor(tests): remove the SQLite database cache, keep xdist`)
+**Status:** Design reviewed (three rounds); awaiting sign-off before implementation
+**Builds on:** PR #321 (`refactor(tests): remove the SQLite database cache, keep xdist`), merged as
+`bab5b4f`
 
 ## Problem
 
@@ -139,6 +140,12 @@ For the same reason `cached_db()` takes the paths object as an optional keyword 
 it receives an already-computed key and never fingerprints anything: it needs the cache directory
 from it. Callers that do not pass one get the production default.
 
+Publication into the cache stays **atomic**, as it was before removal: the built database is copied
+to a temporary name inside the cache directory and then `Path.replace()`d into place. A reader must
+never be able to observe a half-written entry. This matters more than the lock does — the lock only
+serialises concurrent xdist workers within one run, whereas an interrupted run (Ctrl-C, OOM kill)
+would otherwise leave a truncated `.sqlite` behind that every later run happily reuses.
+
 The cache must never be able to break a test run. If the cache directory cannot be created or
 written, or a cached file cannot be read, `cached_db` emits a warning and falls back to calling
 `builder()`. Entries are never evicted automatically; reclaiming space means deleting the directory,
@@ -192,10 +199,14 @@ back. Check before pushing rather than spending a CI round-trip on it.
 
 ## Delivery
 
-A stacked pull request: branch `local-db-cache-opt-in` off `remove-test-db-cache`, with the PR based
-on `remove-test-db-cache` so reviewers see only the incremental diff.
+This work lives on branch `local-db-cache-opt-in`, opened as PR #323 with this document as its only
+content so the design can be argued with before it is built. Implementation commits follow on the
+same branch once the design is signed off.
 
-Because the repository is squash-merge-only, `a952c6e` will not become an ancestor of `main` when
-#321 merges. After that merge the stacked branch needs
-`git rebase --onto main remove-test-db-cache local-db-cache-opt-in` and a force-push with lease;
-GitHub's automatic retarget alone would show a doubled diff.
+The branch was originally stacked on `remove-test-db-cache`. That branch has since been squash-merged
+as `bab5b4f`, and because the repository is squash-merge-only the pre-merge commits never became
+ancestors of `main`; the branch was therefore rebased with
+`git rebase --onto origin/main remove-test-db-cache local-db-cache-opt-in` and force-pushed with
+lease. It now shows a clean single-file diff against `main`. This is recorded because the same
+manoeuvre will be needed for any future branch stacked on an unmerged PR in this repository —
+GitHub's automatic retarget on its own produces a doubled diff.
