@@ -391,12 +391,19 @@ Ein einzelner Worker lässt sich mit `uv run pytest -n0` erzwingen (z.B. zum Deb
 Viele Tests bauen SQLite-Datenbanken aus den XML-Dateien des privaten Submoduls `xml-migs-and-ahbs`.
 Das ist teuer (XML-Parsing + `ahbicht`-Ausdrucksauswertung), und die Testlaufzeit wird davon dominiert.
 
-Diese Datenbanken werden bewusst **nicht** zwischengespeichert. Ein Cache müsste nicht nur die
-Eingabedaten (Submodul-XML), sondern auch den Code, der die Datenbank baut, und die Versionen der
-Abhängigkeiten (z.B. `ahbicht`) im Schlüssel abbilden. Tut er das nicht, liefert er nach einer
-Code-Änderung eine Datenbank aus, die noch mit dem *alten* Code gebaut wurde – die Tests sind dann grün,
-obwohl sie die Änderung nie gesehen haben. Wir zahlen lieber die Rechenzeit als dieses Risiko.
-Wer die Tests beschleunigen will, sollte sie schneller machen, nicht ihr Ergebnis konservieren.
+In der CI werden sie bewusst **nie** zwischengespeichert; lokal kann man den Cache mit
+`FUNDAMEND_TEST_DB_CACHE=1` (nur `1`/`true`/`yes` aktivieren ihn) einschalten:
+
+```bash
+FUNDAMEND_TEST_DB_CACHE=1 uv run pytest
+```
+
+Der Schlüssel umfasst neben der Eingabe-XML alles, was bestimmt, *wie* gebaut wird: alle Dateien unter
+`src/fundamend` (inklusive der `.sql`-View-Definitionen), `uv.lock` und die Testquellen – eine
+Code-Änderung invalidiert den Cache also selbst, eine Versionsnummer zum Hochzählen gibt es nicht.
+Erfasst wird allerdings `uv.lock`, nicht die tatsächlich installierten Pakete: nach einem Eingriff in
+die Umgebung (oder einem Wechsel der Python-Version) sollte man `.pytest_db_cache/` löschen – das ist
+jederzeit unbedenklich. Nebenbei sammeln sich Kopien im Temp-Verzeichnis, die niemand aufräumt.
 
 ## Hochfrequenz
 Die [Hochfrequenz Unternehmensberatung GmbH](https://www.hochfrequenz.de) ist eine Beratung für Energieversorger im deutschsprachigen Raum.

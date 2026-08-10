@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Generator, Sequence
+from collections.abc import Generator, Iterable, Sequence
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -9,13 +9,16 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, create_engine
 
-from fundamend.sqlmodels import create_ahbtabellen_view, create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import (
+    create_ahbtabellen_view,
+    create_db_and_populate_with_ahb_view,
+    create_db_and_populate_with_mig_view,
+)
 from fundamend.sqlmodels.ahb_formatversion_diff_view import create_ahb_formatversion_diff_view
 from fundamend.sqlmodels.ahb_pruefi_diff_view import create_ahb_pruefi_diff_view
 from fundamend.sqlmodels.expression_view import create_and_fill_ahb_expression_table
 
-# Type of the file lists accepted by fundamend's DB builders.
-_AhbFile = Path | tuple[Path, date, date | None] | tuple[Path, None, None]
+from ._db_cache import _XmlInputFile, cached_db, fingerprint
 
 # The ahbicht condition-expression parser (and its lark backend) can emit large volumes of
 # DEBUG/INFO log lines while the expensive DB fixtures parse every AHB expression. Formatting
@@ -53,7 +56,44 @@ def apply_throwaway_sqlite_pragmas(engine: Engine) -> None:
     event.listen(engine, "connect", _set_sqlite_pragmas)
 
 
-def _build_ahb_db_with_diff_view(ahb_files: Sequence[_AhbFile]) -> Path:
+# =============================================================================
+# Cached database builders
+# =============================================================================
+# The DB builders in fundamend.sqlmodels are deterministic up to generated ids, so identical inputs
+# always yield an equivalent database. Building one is slow (XML parsing + ahbicht), so these helpers
+# can serve the result from an on-disk cache -- but only for developers who opted in locally with
+# FUNDAMEND_TEST_DB_CACHE=1. Unset (as in CI) they build directly. See unittests/_db_cache.py.
+# =============================================================================
+
+
+def cached_ahb_db(ahb_files: Iterable[_XmlInputFile], drop_raw_tables: bool = False) -> Path:
+    """
+    Like :func:`create_db_and_populate_with_ahb_view`, but served from the opt-in local cache.
+
+    The returned database is equivalent to a fresh build (same inserts and view; only generated ids
+    differ), so callers -- including snapshot tests -- observe identical query results while the
+    underlying XML parsing/materialization happens only once per unique input set. With the cache
+    disabled, which is the default and always the case in CI, this is a plain build.
+    """
+    ahb_files = list(ahb_files)
+    recipe = f"ahb_raw_drop{int(drop_raw_tables)}"
+    key = f"{recipe}_{fingerprint(recipe, ahb_files)}"
+    return cached_db(
+        key, lambda: create_db_and_populate_with_ahb_view(ahb_files=ahb_files, drop_raw_tables=drop_raw_tables)
+    )
+
+
+def cached_mig_db(mig_files: Iterable[_XmlInputFile], drop_raw_tables: bool = False) -> Path:
+    """MIG counterpart of :func:`cached_ahb_db`."""
+    mig_files = list(mig_files)
+    recipe = f"mig_raw_drop{int(drop_raw_tables)}"
+    key = f"{recipe}_{fingerprint(recipe, mig_files)}"
+    return cached_db(
+        key, lambda: create_db_and_populate_with_mig_view(mig_files=mig_files, drop_raw_tables=drop_raw_tables)
+    )
+
+
+def _build_ahb_db_with_diff_view(ahb_files: Sequence[_XmlInputFile]) -> Path:
     """Build a complete AHB database file: raw tables + expression table + ahbtabellen + diff views."""
     db_path = create_db_and_populate_with_ahb_view(ahb_files=ahb_files, drop_raw_tables=False)
     engine = create_engine(f"sqlite:///{db_path}")
@@ -82,17 +122,18 @@ def session_fv2410_fv2504_with_diff_view() -> Generator[Session, None, None]:
     Includes: ahb_hierarchy_materialized, ahb_expressions, v_ahbtabellen,
     v_ahb_formatversion_diff, v_ahb_pruefi_diff.
 
-    This fixture is expensive to create, so it is module-scoped: every test in a module shares one
-    build.
+    This fixture is expensive to create: it is module-scoped, and for developers who opted into the
+    local cache the fully-built database is reused across modules and runs as well.
     """
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    ahb_files: Sequence[_AhbFile] = [
+    ahb_files: Sequence[_XmlInputFile] = [
         (p, date(2024, 10, 1), date(2025, 6, 6)) for p in (private_submodule_root / "FV2410").rglob("**/*AHB*.xml")
     ] + [(p, date(2025, 6, 6), None) for p in (private_submodule_root / "FV2504").rglob("**/*AHB*.xml")]
 
-    db_path = _build_ahb_db_with_diff_view(ahb_files)
+    recipe = "ahb_fv2410_fv2504_with_diff_view"
+    db_path = cached_db(f"{recipe}_{fingerprint(recipe, ahb_files)}", lambda: _build_ahb_db_with_diff_view(ahb_files))
     engine = create_engine(f"sqlite:///{db_path}")
     with Session(bind=engine) as session:
         yield session
@@ -110,12 +151,13 @@ def session_fv2510_fv2604_mscons_with_diff_view() -> Generator[Session, None, No
     if not is_private_submodule_checked_out():
         pytest.skip("Skipping test because of missing private submodule")
 
-    ahb_files: Sequence[_AhbFile] = [
+    ahb_files: Sequence[_XmlInputFile] = [
         (p, date(2025, 10, 1), date(2026, 4, 1))
         for p in (private_submodule_root / "FV2510").rglob("**/MSCONS_AHB*.xml")
     ] + [(p, date(2026, 4, 1), None) for p in (private_submodule_root / "FV2604").rglob("**/MSCONS_AHB*.xml")]
 
-    db_path = _build_ahb_db_with_diff_view(ahb_files)
+    recipe = "ahb_fv2510_fv2604_mscons_with_diff_view"
+    db_path = cached_db(f"{recipe}_{fingerprint(recipe, ahb_files)}", lambda: _build_ahb_db_with_diff_view(ahb_files))
     engine = create_engine(f"sqlite:///{db_path}")
     with Session(bind=engine) as session:
         yield session
