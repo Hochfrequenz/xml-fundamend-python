@@ -23,7 +23,7 @@ jobs:
           # https://github.com/organizations/Hochfrequenz/settings/secrets/dependabot/REPO_AND_READ_PACKAGES_PAT
           submodules: "recursive"
       - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
