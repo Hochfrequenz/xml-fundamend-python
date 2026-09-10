@@ -38,7 +38,7 @@ cli = [
 
 [dependency-groups]
 tests = [
-    "filelock==3.32.4",
+    "filelock==3.32.5",
     "pytest==9.1.1",
     "pytest-xdist==3.8.0",
     "syrupy==6.0.0"
