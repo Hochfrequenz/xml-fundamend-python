@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=2",
-    "efoli>=2.2.0"
+    "efoli>=2.4.1"
 ]
 dynamic = ["readme", "version"]
 
