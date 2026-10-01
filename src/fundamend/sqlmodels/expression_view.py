@@ -176,7 +176,7 @@ def create_and_fill_ahb_expression_table(session: Session, use_cpu_intensive_val
         ahb_expression_rows.append(
             AhbExpression(
                 edifact_format_version=row[0],
-                format=row[1],
+                format=EdifactFormat(row[1]),
                 expression=expression,
                 node_texts=node_texts,
                 anwendungshandbuch_primary_key=row[3],
