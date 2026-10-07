@@ -44,7 +44,7 @@ tests = [
     "syrupy==6.1.1"
 ]
 lint = [
-    "ruff==0.16.9"
+    "ruff==0.16.10"
 ]
 type_check = [
     "mypy==2.4.0",
