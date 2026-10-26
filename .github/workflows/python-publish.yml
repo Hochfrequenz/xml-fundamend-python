@@ -25,7 +25,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.3.0
         with:
-          python-version: "3.14"
+          python-version: "3.15"
       - name: Install dependencies
         run: uv sync --group tests --extra sqlmodels --extra ahbicht
       - name: Run tests
@@ -46,7 +46,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v10.3.0
         with:
-          python-version: "3.14"
+          python-version: "3.15"
       - name: Build wheel and source distributions
         run: uv build
       - name: Publish distribution 📦 to PyPI
