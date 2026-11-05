@@ -9,7 +9,7 @@ resolution-markers = [
 
 [[package]]
 name = "ahbicht"
-version = "2.2.1"
+version = "2.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "efoli" },
@@ -17,9 +17,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "pytz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/26/89/c1708b0a4efb4e42d5bcf50071bac70d6c5134c75ae87cf3144d836e9a4e/ahbicht-2.2.1.tar.gz", hash = "sha256:b89c1a9abb40e6a52633887af9d221270ae28f59dc9dee41fb99a30f36be47a0", size = 2114064, upload-time = "2026-07-22T22:42:10.146Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/5f/57c3c8428674ea5548a30e3d0be3443483171c1ffe0a580535e027988a3f/ahbicht-2.2.2.tar.gz", hash = "sha256:0ba6c89f9d480f9969c8bc201b33640b6e5aad3bba94566d2ae65b6dfb2ea639", size = 2126963, upload-time = "2026-10-26T22:27:46.965Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/d1/85a215a42ceb8e1e31639b3a804fd790fdf35b10c3c517e18dfc3387afd5/ahbicht-2.2.1-py3-none-any.whl", hash = "sha256:67fcd2d909408f543e415929e15766d865cc3f6e5afe451b7a1cebb085a0783d", size = 365341, upload-time = "2026-07-22T22:42:08.786Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/e8/db954efa363ef5a1deb4229ba0191045edb16e0f95a18ab68c42255e97ef/ahbicht-2.2.2-py3-none-any.whl", hash = "sha256:9c112a3caec911212a2c4b5eb2c71d6b7fa84a91398c8bd4ff4bfffc9e5e9724", size = 365206, upload-time = "2026-10-26T22:27:45.73Z" },
 ]
 
 [[package]]
