@@ -48,7 +48,7 @@ lint = [
     "ruff==0.17.5"
 ]
 type_check = [
-    "mypy==2.4.0",
+    "mypy==2.4.1",
     {include-group = "tests"}
 ]
 spell_check = [
