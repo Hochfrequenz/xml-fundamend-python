@@ -11,12 +11,14 @@ import uuid
 from collections.abc import Mapping
 from enum import StrEnum
 from functools import cache
+from pathlib import Path
 
 from efoli import EdifactFormat, EdifactFormatVersion
 from sqlalchemy import Index, inspect
 
 from fundamend.sqlmodels import AhbHierarchyMaterialized
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
+from fundamend.sqlmodels.internals import _execute_bare_sql
 
 try:
     from sqlmodel import Field, Session, SQLModel, UniqueConstraint, delete, select
@@ -189,3 +191,47 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
     session.add_all(usages)
     session.commit()
     _logger.info("Inserted %d rows into the table %s", len(usages), AhbConditionUsage.__tablename__)
+
+
+def create_ahb_condition_usage_view(session: Session) -> None:
+    """
+    Creates the view v_ahb_condition_usages: one row per AHB line (v_ahbtabellen) and condition key that the line uses,
+    directly (via is NULL) or through a package/UB condition (via is the outermost package/UB key).
+    Requires v_ahbtabellen (create_ahbtabellen_view) and ahb_condition_usages
+    (create_and_fill_ahb_condition_usage_table).
+    """
+    existing = set(inspect(session.get_bind()).get_table_names()) | set(inspect(session.get_bind()).get_view_names())
+    missing = {"v_ahbtabellen", AhbConditionUsage.__tablename__} - existing
+    if missing:
+        raise ValueError(
+            f"{sorted(missing)} missing. Call create_ahbtabellen_view and create_and_fill_ahb_condition_usage_table "
+            "before create_ahb_condition_usage_view."
+        )
+    _execute_bare_sql(
+        session=session, path_to_sql_commands=Path(__file__).parent / "create_ahb_condition_usage_view.sql"
+    )
+
+
+class AhbConditionUsageLine(SQLModel, table=True):
+    """
+    Read model for the view v_ahb_condition_usages. It's created by executing 'create_ahb_condition_usage_view(session)'
+    """
+
+    __tablename__ = "v_ahb_condition_usages"
+    id: str = Field(primary_key=True)  #: v_ahbtabellen id and usage id concatenated
+    format_version: EdifactFormatVersion = Field()
+    format: EdifactFormat = Field()
+    pruefidentifikator: str = Field()
+    description: str = Field()
+    direction: str = Field()
+    segmentgroup_key: str | None = Field()
+    segment_code: str | None = Field()
+    data_element: str | None = Field()
+    qualifier: str | None = Field()
+    line_name: str | None = Field()
+    line_ahb_status: str | None = Field()
+    sort_path: str = Field()
+    anwendungshandbuch_primary_key: uuid.UUID = Field()
+    condition_key: str = Field()
+    key_type: KeyType = Field()
+    via: str | None = Field()  #: None for direct use
