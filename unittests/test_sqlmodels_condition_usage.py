@@ -101,7 +101,9 @@ def _rows(db_path: Path) -> list[tuple[str, ...]]:
 def test_table_is_filled_and_deterministic() -> None:
     db_path = cached_ahb_db(_AHB_FILES, drop_raw_tables=False)
     first = _rows(db_path)
-    assert all(not logging.getLogger(name).filters for name in ("ahbicht", "ahbicht.expressions"))  # filter removed
+    assert all(
+        not logging.getLogger(name).filters for name in ("ahbicht", "ahbicht.expressions", "ahbicht.expressions.foo")
+    )  # filter removed
     assert first
     assert any(r[1] == "931" and r[3] == "UB1" for r in first)
     assert any(r[1] == "931" and r[3] == "" for r in first)
@@ -335,6 +337,7 @@ def test_log_filter_is_thread_local_and_removed() -> None:
         def emit(self, record: logging.LogRecord) -> None:
             seen.append(record.getMessage())
 
+    child_logger = logging.getLogger("ahbicht.expressions.foo")
     handler = _Collector(level=logging.DEBUG)
     logger.addHandler(handler)
     old_level = logger.level
@@ -347,6 +350,7 @@ def test_log_filter_is_thread_local_and_removed() -> None:
 
     def _resolve_and_log(expression: str, definitions: dict[str, str]) -> list[tuple[str, KeyType, str]]:
         logger.warning("filling thread")
+        child_logger.warning("filling thread child")
         thread = threading.Thread(target=_log_from_other_thread)
         thread.start()
         thread.join()
@@ -360,6 +364,7 @@ def test_log_filter_is_thread_local_and_removed() -> None:
                 create_and_fill_ahb_condition_usage_table(session)
         assert "other thread" in seen
         assert "filling thread" not in seen
+        assert "filling thread child" not in seen
         assert not logger.filters
         logger.warning("after")
         assert "after" in seen

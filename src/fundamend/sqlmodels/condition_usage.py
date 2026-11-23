@@ -203,7 +203,12 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
     # ahbicht logs warnings with tracebacks for every unparsable text like '--' (its parsing logger sets own level);
     # drop those records, but only the ones of this thread, so other threads' logging stays untouched
     log_filter = _CurrentThreadFilter()
-    ahbicht_loggers = [logging.getLogger(name) for name in ("ahbicht", "ahbicht.expressions")]
+    # filters of a logger don't see records that propagate up from its children, so attach it to all of them
+    ahbicht_loggers = [
+        logger
+        for name, logger in list(logging.root.manager.loggerDict.items())
+        if isinstance(logger, logging.Logger) and (name == "ahbicht" or name.startswith("ahbicht."))
+    ]
     for ahbicht_logger in ahbicht_loggers:
         ahbicht_logger.addFilter(log_filter)
     try:
