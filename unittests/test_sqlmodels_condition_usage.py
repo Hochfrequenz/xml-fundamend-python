@@ -1,5 +1,6 @@
 import logging
 import shutil
+import threading
 import uuid
 from datetime import date
 from pathlib import Path
@@ -99,9 +100,8 @@ def _rows(db_path: Path) -> list[tuple[str, ...]]:
 
 def test_table_is_filled_and_deterministic() -> None:
     db_path = cached_ahb_db(_AHB_FILES, drop_raw_tables=False)
-    levels = [logging.getLogger(name).level for name in ("ahbicht", "ahbicht.expressions")]
     first = _rows(db_path)
-    assert levels == [logging.getLogger(name).level for name in ("ahbicht", "ahbicht.expressions")]  # restored
+    assert all(not logging.getLogger(name).filters for name in ("ahbicht", "ahbicht.expressions"))  # filter removed
     assert first
     assert any(r[1] == "931" and r[3] == "UB1" for r in first)
     assert any(r[1] == "931" and r[3] == "" for r in first)
@@ -304,3 +304,84 @@ def test_create_condition_usages_from_submodule() -> None:
         create_and_fill_ahb_condition_usage_table(session)
         create_ahb_condition_usage_view(session)
         assert session.exec(select(AhbConditionUsageLine).limit(1)).first() is not None
+
+
+def test_nbsp_status_still_shows_up_in_view(tmp_path: Path) -> None:
+    nbsp = "\u00a0"
+    with _copy_db(tmp_path) as session:
+        # sql trims only spaces, so a trailing NBSP stays in line_ahb_status; the fill must keep it, too
+        session.execute(
+            text(
+                "UPDATE ahb_hierarchy_materialized SET dataelement_ahb_status = dataelement_ahb_status || :nbsp,"
+                " line_ahb_status = line_ahb_status || :nbsp WHERE line_ahb_status = 'X [931] [500] ∧ [UB1]'"
+            ),
+            {"nbsp": nbsp},
+        )
+        create_and_fill_ahb_expression_table(session)
+        create_ahbtabellen_view(session)
+        create_and_fill_ahb_condition_usage_table(session)
+        create_ahb_condition_usage_view(session)
+        lines = session.exec(
+            select(AhbConditionUsageLine).where(AhbConditionUsageLine.line_ahb_status == f"X [931] [500] ∧ [UB1]{nbsp}")
+        ).all()
+        assert lines
+
+
+def test_log_filter_is_thread_local_and_removed() -> None:
+    logger = logging.getLogger("ahbicht.expressions")
+    seen: list[str] = []
+
+    class _Collector(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            seen.append(record.getMessage())
+
+    handler = _Collector(level=logging.DEBUG)
+    logger.addHandler(handler)
+    old_level = logger.level
+    logger.setLevel(logging.DEBUG)
+
+    def _log_from_other_thread() -> None:
+        logger.warning("other thread")
+
+    original_resolve = condition_usage.resolve_condition_keys
+
+    def _resolve_and_log(expression: str, definitions: dict[str, str]) -> list[tuple[str, KeyType, str]]:
+        logger.warning("filling thread")
+        thread = threading.Thread(target=_log_from_other_thread)
+        thread.start()
+        thread.join()
+        return original_resolve(expression, definitions)
+
+    db_path = cached_ahb_db(_AHB_FILES, drop_raw_tables=False)
+    try:
+        with Session(bind=create_engine(f"sqlite:///{db_path}")) as session:
+            with pytest.MonkeyPatch.context() as monkeypatch:
+                monkeypatch.setattr(condition_usage, "resolve_condition_keys", _resolve_and_log)
+                create_and_fill_ahb_condition_usage_table(session)
+        assert "other thread" in seen
+        assert "filling thread" not in seen
+        assert not logger.filters
+        logger.warning("after")
+        assert "after" in seen
+    finally:
+        logger.removeHandler(handler)
+        logger.setLevel(old_level)
+
+
+def test_cache_is_cleared_at_start_of_fill(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str] = []
+
+    def _failing_parse(text_: str) -> tuple[tuple[str, KeyType], ...]:
+        calls.append(text_)
+        raise RuntimeError("transient")
+
+    _extract_keys_cached.cache_clear()
+    with monkeypatch.context() as patched:
+        patched.setattr(condition_usage, "_parse_keys", _failing_parse)
+        assert _extract_keys_cached("Muss [1]") is None  # a transient failure is cached now
+    assert _extract_keys_cached.cache_info().currsize == 1
+    db_path = cached_ahb_db(_AHB_FILES, drop_raw_tables=False)
+    with Session(bind=create_engine(f"sqlite:///{db_path}")) as session:
+        create_and_fill_ahb_condition_usage_table(session)
+    assert calls == ["Muss [1]"]
+    assert _extract_keys_cached("Muss [1]") is not None  # parsed afresh with the real parser

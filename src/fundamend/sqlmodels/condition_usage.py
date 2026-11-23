@@ -7,6 +7,7 @@ Import from fundamend.sqlmodels.condition_usage instead.
 
 import asyncio
 import logging
+import threading
 import uuid
 from collections.abc import Mapping
 from enum import StrEnum
@@ -143,6 +144,17 @@ def resolve_condition_keys(expression: str, definitions: Mapping[str, str]) -> l
     return sorted(result, key=lambda r: (r[0], r[1].value, r[2]))
 
 
+class _CurrentThreadFilter(logging.Filter):
+    """drops all log records that were emitted by the thread that created the filter"""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._thread_id = threading.get_ident()
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.thread != self._thread_id
+
+
 def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
     """
     creates and fills the ahb_condition_usages table from ahb_hierarchy_materialized.
@@ -156,6 +168,7 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
             f"The tables {sorted(missing)} are missing. Build the database with drop_raw_tables=False "
             "(create_db_and_populate_with_ahb_view)."
         )
+    _extract_keys_cached.cache_clear()  # failures are cached, too; don't let an earlier transient one stick
     rows: set[tuple[EdifactFormatVersion, str, str, uuid.UUID]] = set()  # (version, format, expression, ahb pk)
     for ahb_status_col in [
         AhbHierarchyMaterialized.segmentgroup_ahb_status,
@@ -170,8 +183,8 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
             AhbHierarchyMaterialized.anwendungshandbuch_primary_key,
         ).distinct()
         for version, edifact_format, status, ahb_pk in session.exec(stmt):
-            if version is not None and status is not None and status.strip() and ahb_pk is not None:
-                rows.add((EdifactFormatVersion(version), str(edifact_format), status.strip(), ahb_pk))
+            if version is not None and status is not None and status.strip(" ") and ahb_pk is not None:
+                rows.add((EdifactFormatVersion(version), str(edifact_format), status.strip(" "), ahb_pk))
     if not rows:
         raise ValueError(
             "No rows found in ahb_hierarchy_materialized table; Run `create_db_and_populate_with_ahb_view` before."
@@ -187,11 +200,12 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
             )
     usages: list[AhbConditionUsage] = []
     skipped = 0
-    # ahbicht logs warnings with tracebacks for every unparsable text like '--' (its parsing logger sets own level)
+    # ahbicht logs warnings with tracebacks for every unparsable text like '--' (its parsing logger sets own level);
+    # drop those records, but only the ones of this thread, so other threads' logging stays untouched
+    log_filter = _CurrentThreadFilter()
     ahbicht_loggers = [logging.getLogger(name) for name in ("ahbicht", "ahbicht.expressions")]
-    original_levels = [ahbicht_logger.level for ahbicht_logger in ahbicht_loggers]
     for ahbicht_logger in ahbicht_loggers:
-        ahbicht_logger.setLevel(logging.CRITICAL)
+        ahbicht_logger.addFilter(log_filter)
     try:
         # sorted by stable columns; the AHB primary key is a random uuid and is only the last tie breaker
         for version, edifact_format, expression, ahb_pk in sorted(rows, key=lambda r: (r[0], r[1], r[2], str(r[3]))):
@@ -214,8 +228,8 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
                 for key, key_type, via in resolved
             )
     finally:
-        for ahbicht_logger, original_level in zip(ahbicht_loggers, original_levels, strict=True):
-            ahbicht_logger.setLevel(original_level)
+        for ahbicht_logger in ahbicht_loggers:
+            ahbicht_logger.removeFilter(log_filter)
     if skipped == len(rows):
         raise ValueError(f"None of the {skipped} expressions could be parsed; the table was not filled.")
     AhbConditionUsage.__table__.create(session.get_bind(), checkfirst=True)  # type: ignore[attr-defined]
