@@ -6,8 +6,8 @@ DROP VIEW IF EXISTS v_ahb_condition_usages;
 
 CREATE VIEW v_ahb_condition_usages AS
 SELECT l.id || u.id                       as id, -- one line can use the same key directly and via UB, so the line id alone is not unique
-       l.format_version                   as format_version,
-       l.format                           as format,
+       u.edifact_format_version            as format_version, -- from u (not l), so that the lookup index on ahb_condition_usages can be used,
+       u.format                           as format,
        l.pruefidentifikator               as pruefidentifikator,
        l.description                      as description,
        l.direction                        as direction,
@@ -22,7 +22,10 @@ SELECT l.id || u.id                       as id, -- one line can use the same ke
        u.condition_key                    as condition_key,
        u.key_type                         as key_type,
        NULLIF(u.via, '')                  as via -- NULL for direct use
-FROM v_ahbtabellen AS l
-         JOIN ahb_condition_usages AS u
-              ON u.anwendungshandbuch_primary_key = l.anwendungshandbuch_primary_key
-                  AND u.expression = TRIM(l.line_ahb_status);
+-- line_ahb_status is already trimmed in ahb_hierarchy_materialized, like v_ahbtabellen joins ahb_expressions (no TRIM)
+FROM ahb_condition_usages AS u
+         CROSS JOIN v_ahbtabellen AS l -- CROSS JOIN forces sqlite to start at u (filtered by the lookup index)
+              ON u.edifact_format_version = l.format_version
+                  AND u.format = l.format
+                  AND u.anwendungshandbuch_primary_key = l.anwendungshandbuch_primary_key
+                  AND u.expression = l.line_ahb_status;

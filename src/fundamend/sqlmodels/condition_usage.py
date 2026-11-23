@@ -14,7 +14,7 @@ from functools import cache
 from pathlib import Path
 
 from efoli import EdifactFormat, EdifactFormatVersion
-from sqlalchemy import Index, inspect
+from sqlalchemy import Enum, Index, inspect, text
 
 from fundamend.sqlmodels import AhbHierarchyMaterialized
 from fundamend.sqlmodels.anwendungshandbuch import Paket, UbBedingung
@@ -44,6 +44,12 @@ class KeyType(StrEnum):
     UB_CONDITION = "ub_condition"  #: UB-Bedingung, e.g. UB1
 
 
+# by default, sqlalchemy stores the names (CONDITION) of enums; SQL consumers should see the values (condition)
+_KEY_TYPE_COLUMN = Enum(
+    KeyType, values_callable=lambda enum_class: [member.value for member in enum_class], native_enum=False
+)
+
+
 class AhbConditionUsage(SQLModel, table=True):
     """
     One row per (AHB, expression, condition key, via). 'via' is the empty string for direct use and the key of the
@@ -59,7 +65,8 @@ class AhbConditionUsage(SQLModel, table=True):
             "via",
             name="idx_ahb_condition_usages_unique",
         ),
-        Index("idx_ahb_condition_usages_lookup", "edifact_format_version", "format", "condition_key"),
+        # format is optional in the lookups, hence it comes after condition_key
+        Index("idx_ahb_condition_usages_lookup", "edifact_format_version", "condition_key", "format"),
         Index("idx_ahb_condition_usages_ahb_expression", "anwendungshandbuch_primary_key", "expression"),
     )
     id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
@@ -68,13 +75,12 @@ class AhbConditionUsage(SQLModel, table=True):
     format: EdifactFormat = Field()  #: the plain edifact format, e.g. 'UTILMD'
     expression: str = Field()  #: stripped expression, e.g. 'Muss [1] U [2]'
     condition_key: str = Field()  #: as returned by ahbicht, without brackets, e.g. '931', '2P', 'UB1'
-    key_type: KeyType = Field()
+    key_type: KeyType = Field(sa_type=_KEY_TYPE_COLUMN)  # stored as 'condition', 'package', 'ub_condition'
     via: str = Field(default="")  #: '' for direct use, else the outermost package/UB key through which it is used
 
 
-@cache
-def _extract_keys_cached(text: str) -> tuple[tuple[str, KeyType], ...]:
-    """parses the text once and returns its keys (deterministically ordered) with their type"""
+def _parse_keys(text: str) -> tuple[tuple[str, KeyType], ...]:
+    """parses the text (uncached) and returns its keys (deterministically ordered) with their type"""
     extract = asyncio.run(extract_categorized_keys(text))
     result: list[tuple[str, KeyType]] = []
     result.extend(
@@ -86,15 +92,31 @@ def _extract_keys_cached(text: str) -> tuple[tuple[str, KeyType], ...]:
     return tuple(result)
 
 
+@cache
+def _extract_keys_cached(text: str) -> tuple[tuple[str, KeyType], ...] | None:
+    """
+    Parses each distinct text exactly once. Returns None if the text cannot be parsed (e.g. '--'); failures are cached
+    too (functools.cache would not store exceptions) and logged once.
+    """
+    try:
+        return _parse_keys(text)
+    except Exception as error:  # pylint:disable=broad-exception-caught
+        # the parser raises different exception types (SyntaxError, lark errors, ...); '--' is a common definition
+        _logger.info("The text '%s' could not be parsed: %s", text, error)
+        return None
+
+
 def resolve_condition_keys(expression: str, definitions: Mapping[str, str]) -> list[tuple[str, KeyType, str]]:
     """
     Returns the sorted, distinct (condition_key, key_type, via) tuples of the expression.
     `definitions` maps the package/UB keys of one AHB to their definition texts.
     Direct use has via=''; keys that are reached through a package/UB condition get the outermost such key as via.
-    Raises the parser's exception if the expression cannot be parsed.
+    Raises a ValueError if the expression cannot be parsed.
     """
     result: set[tuple[str, KeyType, str]] = set()
     top_level = _extract_keys_cached(expression)
+    if top_level is None:
+        raise ValueError(f"The expression '{expression}' could not be parsed.")
     for key, key_type in top_level:
         result.add((key, key_type, ""))
     for root_key, root_type in top_level:
@@ -108,11 +130,8 @@ def resolve_condition_keys(expression: str, definitions: Mapping[str, str]) -> l
             if definition is None:
                 _logger.info("There is no definition for the key '%s'", current)
                 continue
-            try:
-                children = _extract_keys_cached(definition)
-            except Exception as error:  # pylint:disable=broad-exception-caught
-                # e.g. '--' for packages that are not further defined; the parser raises different exception types
-                _logger.info("The definition of '%s' could not be parsed: %s", current, error)
+            children = _extract_keys_cached(definition)
+            if children is None:  # e.g. '--' for packages that are not further defined
                 continue
             for child_key, child_type in children:
                 if child_key in visited:
@@ -167,25 +186,38 @@ def create_and_fill_ahb_condition_usage_table(session: Session) -> None:
                 ub_bedingung.text
             )
     usages: list[AhbConditionUsage] = []
-    # sorted by stable columns; the AHB primary key is a random uuid and is only the last tie breaker
-    for version, edifact_format, expression, ahb_pk in sorted(rows, key=lambda r: (r[0], r[1], r[2], str(r[3]))):
-        try:
-            resolved = resolve_condition_keys(expression, definitions_by_ahb.get(ahb_pk, {}))
-        except Exception as error:  # pylint:disable=broad-exception-caught
-            _logger.info("The expression '%s' could not be parsed: %s", expression, error)
-            continue
-        usages.extend(
-            AhbConditionUsage(
-                anwendungshandbuch_primary_key=ahb_pk,
-                edifact_format_version=version,
-                format=EdifactFormat(edifact_format),
-                expression=expression,
-                condition_key=key,
-                key_type=key_type,
-                via=via,
+    skipped = 0
+    # ahbicht logs warnings with tracebacks for every unparsable text like '--' (its parsing logger sets own level)
+    ahbicht_loggers = [logging.getLogger(name) for name in ("ahbicht", "ahbicht.expressions")]
+    original_levels = [ahbicht_logger.level for ahbicht_logger in ahbicht_loggers]
+    for ahbicht_logger in ahbicht_loggers:
+        ahbicht_logger.setLevel(logging.CRITICAL)
+    try:
+        # sorted by stable columns; the AHB primary key is a random uuid and is only the last tie breaker
+        for version, edifact_format, expression, ahb_pk in sorted(rows, key=lambda r: (r[0], r[1], r[2], str(r[3]))):
+            try:
+                resolved = resolve_condition_keys(expression, definitions_by_ahb.get(ahb_pk, {}))
+            except ValueError as error:
+                _logger.warning("Skipping the expression '%s': %s", expression, error)
+                skipped += 1
+                continue
+            usages.extend(
+                AhbConditionUsage(
+                    anwendungshandbuch_primary_key=ahb_pk,
+                    edifact_format_version=version,
+                    format=EdifactFormat(edifact_format),
+                    expression=expression,
+                    condition_key=key,
+                    key_type=key_type,
+                    via=via,
+                )
+                for key, key_type, via in resolved
             )
-            for key, key_type, via in resolved
-        )
+    finally:
+        for ahbicht_logger, original_level in zip(ahbicht_loggers, original_levels, strict=True):
+            ahbicht_logger.setLevel(original_level)
+    if skipped == len(rows):
+        raise ValueError(f"None of the {skipped} expressions could be parsed; the table was not filled.")
     AhbConditionUsage.__table__.create(session.get_bind(), checkfirst=True)  # type: ignore[attr-defined]
     session.exec(delete(AhbConditionUsage))  # makes the function idempotent
     session.add_all(usages)
@@ -200,13 +232,25 @@ def create_ahb_condition_usage_view(session: Session) -> None:
     Requires v_ahbtabellen (create_ahbtabellen_view) and ahb_condition_usages
     (create_and_fill_ahb_condition_usage_table).
     """
-    existing = set(inspect(session.get_bind()).get_table_names()) | set(inspect(session.get_bind()).get_view_names())
-    missing = {"v_ahbtabellen", AhbConditionUsage.__tablename__} - existing
-    if missing:
+    inspector = inspect(session.get_bind())
+    if "v_ahbtabellen" not in inspector.get_view_names():
+        raise ValueError("The view v_ahbtabellen is missing. Call create_ahbtabellen_view before.")
+    if (
+        AhbConditionUsage.__tablename__ not in inspector.get_table_names()
+        or session.exec(select(AhbConditionUsage.id).limit(1)).first() is None
+    ):
         raise ValueError(
-            f"{sorted(missing)} missing. Call create_ahbtabellen_view and create_and_fill_ahb_condition_usage_table "
-            "before create_ahb_condition_usage_view."
+            f"The table {AhbConditionUsage.__tablename__} is missing or empty. "
+            "Call create_and_fill_ahb_condition_usage_table before."
         )
+    # the view joins ahb_hierarchy_materialized on (anwendungshandbuch_primary_key, line_ahb_status); without this index
+    # sqlite uses idx_line_ahb_status alone, which matches the rows of _all_ AHBs for common expressions like 'X'
+    session.execute(
+        text(
+            "CREATE INDEX IF NOT EXISTS idx_ahm_ahb_pk_line_ahb_status "
+            "ON ahb_hierarchy_materialized (anwendungshandbuch_primary_key, line_ahb_status)"
+        )
+    )
     _execute_bare_sql(
         session=session, path_to_sql_commands=Path(__file__).parent / "create_ahb_condition_usage_view.sql"
     )
@@ -233,5 +277,5 @@ class AhbConditionUsageLine(SQLModel, table=True):
     sort_path: str = Field()
     anwendungshandbuch_primary_key: uuid.UUID = Field()
     condition_key: str = Field()
-    key_type: KeyType = Field()
+    key_type: KeyType = Field(sa_type=_KEY_TYPE_COLUMN)
     via: str | None = Field()  #: None for direct use

@@ -1,18 +1,21 @@
+import logging
 import shutil
+import uuid
 from datetime import date
 from pathlib import Path
 
 import pytest
-from lark.exceptions import LarkError
 from sqlalchemy import text
 from sqlmodel import Session, create_engine, select
 from syrupy.assertion import SnapshotAssertion
 
-from fundamend.sqlmodels import create_ahbtabellen_view
+from fundamend.sqlmodels import condition_usage, create_ahbtabellen_view
+from fundamend.sqlmodels.anwendungshandbuch import Paket
 from fundamend.sqlmodels.condition_usage import (
     AhbConditionUsage,
     AhbConditionUsageLine,
     KeyType,
+    _extract_keys_cached,
     create_ahb_condition_usage_view,
     create_and_fill_ahb_condition_usage_table,
     resolve_condition_keys,
@@ -61,6 +64,7 @@ def test_cycle_terminates() -> None:
     rows = resolve_condition_keys("Muss [UB1]", {"UB1": "[2P]", "2P": "[UB1] U [7]"})
     assert ("7", KeyType.CONDITION, "UB1") in rows
     assert ("2P", KeyType.PACKAGE, "UB1") in rows
+    assert not any(key == via for key, _, via in rows)  # no self-row like (UB1, ub_condition, UB1)
 
 
 def test_undefined_key_has_no_children() -> None:
@@ -72,7 +76,7 @@ def test_dash_definition_has_no_children() -> None:
 
 
 def test_unparseable_expression_raises() -> None:
-    with pytest.raises((SyntaxError, LarkError)):
+    with pytest.raises(ValueError):
         resolve_condition_keys("Muss [[ U", {})
 
 
@@ -95,10 +99,15 @@ def _rows(db_path: Path) -> list[tuple[str, ...]]:
 
 def test_table_is_filled_and_deterministic() -> None:
     db_path = cached_ahb_db(_AHB_FILES, drop_raw_tables=False)
+    levels = [logging.getLogger(name).level for name in ("ahbicht", "ahbicht.expressions")]
     first = _rows(db_path)
+    assert levels == [logging.getLogger(name).level for name in ("ahbicht", "ahbicht.expressions")]  # restored
     assert first
     assert any(r[1] == "931" and r[3] == "UB1" for r in first)
     assert any(r[1] == "931" and r[3] == "" for r in first)
+    with create_engine(f"sqlite:///{db_path}").connect() as connection:  # SQL consumers see the values, not the names
+        stored = {r[0] for r in connection.execute(text("SELECT DISTINCT key_type FROM ahb_condition_usages"))}
+    assert stored <= {"condition", "package", "ub_condition"} and "condition" in stored
     assert _rows(db_path) == first  # building again (on the same db) yields identical rows
 
 
@@ -126,9 +135,130 @@ def test_view_requires_prerequisites(tmp_path: Path) -> None:
     shutil.copy(cached_ahb_db(_AHB_FILES, drop_raw_tables=False), db_path)  # don't touch a potentially cached db
     engine = create_engine(f"sqlite:///{db_path}")
     with Session(bind=engine) as session:
-        session.execute(text("DROP TABLE IF EXISTS v_ahbtabellen"))  # sqlmodel created it as a table first
-        with pytest.raises(ValueError, match="v_ahbtabellen"):
+        with pytest.raises(ValueError, match="v_ahbtabellen"):  # not yet a view (at most an empty table)
             create_ahb_condition_usage_view(session)
+        create_and_fill_ahb_expression_table(session)
+        create_ahbtabellen_view(session)
+        with pytest.raises(ValueError, match="ahb_condition_usages"):  # not filled yet
+            create_ahb_condition_usage_view(session)
+
+
+def test_two_definition_maps_give_different_children() -> None:
+    expression = "Muss [UB1]"
+    first = resolve_condition_keys(expression, {"UB1": "[25]"})
+    second = resolve_condition_keys(expression, {"UB1": "[26]"})
+    assert ("25", KeyType.CONDITION, "UB1") in first and ("26", KeyType.CONDITION, "UB1") not in first
+    assert ("26", KeyType.CONDITION, "UB1") in second and ("25", KeyType.CONDITION, "UB1") not in second
+
+
+def test_failing_definition_is_parsed_only_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str] = []
+
+    def _failing_parse(text: str) -> tuple[tuple[str, KeyType], ...]:
+        calls.append(text)
+        raise SyntaxError("nope")
+
+    _extract_keys_cached.cache_clear()
+    monkeypatch.setattr(condition_usage, "_parse_keys", _failing_parse)
+    try:
+        for expression in ["Muss [1P]", "Muss [1P] U [2P]", "Muss [1P] O [3P]"]:
+            with pytest.raises(ValueError):  # the expressions are unparseable with the patched parser
+                resolve_condition_keys(expression, {"1P": "--"})
+        assert sorted(calls) == ["Muss [1P]", "Muss [1P] O [3P]", "Muss [1P] U [2P]"]  # each text once
+        calls.clear()
+        _extract_keys_cached("--")
+        _extract_keys_cached("--")
+        assert calls == ["--"]
+    finally:
+        _extract_keys_cached.cache_clear()
+
+
+def _copy_db(tmp_path: Path) -> Session:
+    db_path = tmp_path / "copy.sqlite"
+    shutil.copy(cached_ahb_db(_AHB_FILES, drop_raw_tables=False), db_path)
+    return Session(bind=create_engine(f"sqlite:///{db_path}"))
+
+
+def test_padded_statuses_still_show_up_in_view(tmp_path: Path) -> None:
+    with _copy_db(tmp_path) as session:
+        # line_ahb_status in ahb_hierarchy_materialized is trimmed already, only the raw *_ahb_status columns are not
+        assert (
+            session.execute(
+                text("SELECT COUNT(*) FROM v_ahbtabellen WHERE line_ahb_status != TRIM(line_ahb_status)")
+            ).scalar()
+            == 0
+        )
+        session.execute(
+            text(
+                "UPDATE ahb_hierarchy_materialized SET dataelement_ahb_status = '  ' || dataelement_ahb_status || ' '"
+                " WHERE dataelement_ahb_status IS NOT NULL"
+            )
+        )
+        create_and_fill_ahb_expression_table(session)
+        create_ahbtabellen_view(session)
+        create_and_fill_ahb_condition_usage_table(session)
+        create_ahb_condition_usage_view(session)
+        usages = session.exec(select(AhbConditionUsage)).all()
+        assert usages and all(u.expression == u.expression.strip() for u in usages)
+        lines = session.exec(select(AhbConditionUsageLine).where(AhbConditionUsageLine.condition_key == "931")).all()
+        assert any(line.via == "UB1" for line in lines) and any(line.via is None for line in lines)
+
+
+def test_package_is_resolved_in_db(tmp_path: Path) -> None:
+    with _copy_db(tmp_path) as session:
+        ahb_pk, line_id = session.execute(
+            text(
+                "SELECT anwendungshandbuch_primary_key, id FROM ahb_hierarchy_materialized"
+                " WHERE line_ahb_status = 'X [931] [500] ∧ [UB1]' LIMIT 1"
+            )
+        ).one()
+        session.execute(
+            text(
+                "UPDATE ahb_hierarchy_materialized SET dataelement_ahb_status = 'Muss [9P]',"
+                " line_ahb_status = 'Muss [9P]'"
+                " WHERE id = :id"
+            ),
+            {"id": line_id},
+        )
+        session.add(Paket(nummer="9P", text="[77] U [78]", anwendungshandbuch_primary_key=uuid.UUID(ahb_pk)))
+        session.commit()
+        create_and_fill_ahb_expression_table(session)
+        create_ahbtabellen_view(session)
+        create_and_fill_ahb_condition_usage_table(session)
+        create_ahb_condition_usage_view(session)
+        lines = session.exec(
+            select(AhbConditionUsageLine).where(AhbConditionUsageLine.line_ahb_status == "Muss [9P]")
+        ).all()
+        assert {(line.condition_key, line.key_type, line.via) for line in lines} == {
+            ("9P", KeyType.PACKAGE, None),
+            ("77", KeyType.CONDITION, "9P"),
+            ("78", KeyType.CONDITION, "9P"),
+        }
+
+
+def test_view_uses_lookup_index() -> None:
+    with _view_session() as session:
+        url = session.get_bind().engine.url
+    # a fresh engine and connection, like the consumer has (the pool would hand out the connection that ran the DDL
+    # and a plan computed on that one can be stale)
+    with create_engine(url).connect() as connection:
+        for where in [
+            "format_version = 'FV2310' AND condition_key = '931'",
+            "format_version = 'FV2310' AND condition_key = '931' AND format = 'UTILTS'",
+            "format_version = 'FV2310' AND condition_key = '931' AND pruefidentifikator = '25001'",
+        ]:
+            plan = " ".join(
+                str(row[3])
+                for row in connection.execute(
+                    text(
+                        f"EXPLAIN QUERY PLAN SELECT * FROM v_ahb_condition_usages WHERE {where}"
+                        " ORDER BY pruefidentifikator, sort_path"
+                    )
+                )
+            )
+            assert "idx_ahb_condition_usages_lookup" in plan, plan
+            assert "SCAN" not in plan, plan
+            # a temp b-tree for the final ORDER BY over the (small) result set is fine; scans are not
 
 
 def test_view_direct_and_via() -> None:
