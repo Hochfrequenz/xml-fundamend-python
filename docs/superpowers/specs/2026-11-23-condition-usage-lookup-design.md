@@ -136,22 +136,23 @@ ahb-tabellen (follow the existing `search_ahb_lines` tool).
 
 ## Decisions after the builder check (2026-11-23; these override the sections above where they differ)
 
-1. **Format columns.** The usage table keeps the plain EDIFACT format in `format` (like every other table) and adds
-   `detailed_format` (`UTILMDS`, `UTILMDG`, `UTILMDW` or the plain format). The view exposes both. The MCP `format`
-   filter matches either column, so `UTILMD` finds all UTILMD lines and `UTILMDS` only Strom.
-2. **AHB with Prüfidentifikatoren of several detailed formats.** No raise (it would abort the whole DB build). Log a
-   warning and use the plain format as `detailed_format` for that AHB. Lookups by key still work because the join
-   key is the AHB primary key, not the format. The build script in xml-migs-and-ahbs logs whether this happens on real
-   data, and the PR states the result.
-3. **Prüfidentifikator.** The usage table is Prüfidentifikator-independent. Prüfidentifikator, its description, the
+1. **No detailed-format column.** fundamend has no detailed format (the `format` of an AHB comes from the XML tag
+   `M_UTILMD`), and none is needed: the table is keyed by `anwendungshandbuch_primary_key`, which already keeps
+   UTILMD Strom and Gas apart (one AHB each). `format` in the table and view is the plain format, like everywhere
+   else. The detailed format is derived from the Prüfidentifikator where it is needed: in ahb-tabellen with
+   `getFormatOfPruefidentifikator` from `@hochfrequenz/efoli` (the frontend already uses it in
+   `pruefi-format.utils.ts`). The MCP `format` filter: a plain format (`UTILMD`) filters in SQL; a detailed format
+   (`UTILMDS`) filters in SQL by its plain format and then by `getFormatOfPruefidentifikator(pruefi)`.
+   This replaces `detailed_format` in the table above and drops the "AHB maps to several detailed formats" error.
+2. **Prüfidentifikator.** The usage table is Prüfidentifikator-independent. Prüfidentifikator, its description, the
    `pruefi` filter and the grouping come from the `v_ahbtabellen` side of the view. The MCP `limit` and the total
    count are about lines (one line = one row of `v_ahbtabellen`). Each line lists all its usages of the key.
-4. **Plain conditions are leaves.** Their texts are natural language. Only packages and UB conditions are resolved.
-5. **Direct and indirect use on the same line.** Both are kept: one row per distinct `via`. The tool shows a line
+3. **Plain conditions are leaves.** Their texts are natural language. Only packages and UB conditions are resolved.
+4. **Direct and indirect use on the same line.** Both are kept: one row per distinct `via`. The tool shows a line
    once, with all ways it reaches the key (e.g. `direct`, `via UB1`). In the table, direct use is stored as
    `via = ''` (not NULL), because SQLite does not enforce uniqueness for NULLs. The view exposes
    `NULLIF(via, '') AS via`, so consumers see `null` for direct use.
-6. **Key spelling.** `condition_key` holds the keys exactly as `extract_categorized_keys` returns them, without
+5. **Key spelling.** `condition_key` holds the keys exactly as `extract_categorized_keys` returns them, without
    brackets (verify the spelling of package and UB keys in a test). The MCP tool strips brackets and whitespace from
    its input before matching. No range or other normalization.
-7. **The old `bedingung` text search** in `v_ahbtabellen` stays as it is (non-goal).
+6. **The old `bedingung` text search** in `v_ahbtabellen` stays as it is (non-goal).
