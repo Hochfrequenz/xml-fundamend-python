@@ -278,6 +278,29 @@ ORDER BY sort_path;
 
 </details>
 
+<details>
+<summary>Finde heraus, wo eine Bedingung (z.B. [931]) verwendet wird, auch über Pakete und UB-Bedingungen</summary>
+<br>
+
+Die View `v_ahb_condition_usages` listet pro AHB-Zeile und Bedingung auf, wo die Bedingung vorkommt: direkt in der Zeile oder indirekt über ein Paket (z.B. `[2P]`) bzw. eine UB-Bedingung (z.B. `[UB1]`; transitiv aufgelöst).
+Die Spalte `via` ist `NULL` bei direkter Verwendung, sonst der äußerste Paket-/UB-Schlüssel. Nutzt eine Zeile `[931]` direkt und via `[UB1]`, erscheint sie zweimal.
+Das Befüllen der Tabelle `ahb_condition_usages` braucht die materialisierte Hierarchie (`ahb_hierarchy_materialized`) und eine mit `drop_raw_tables=False` gebaute Datenbank (Pakete und UB-Bedingungen werden gebraucht). Die View braucht `v_ahbtabellen` und die gefüllte Tabelle. Sie legt außerdem den Index `idx_ahm_ahb_pk_line_ahb_status` auf `ahb_hierarchy_materialized` an (`IF NOT EXISTS`), damit der Join ohne Scan läuft.
+Die Datei `condition_usage.py` importiert ahbicht und wird deshalb nicht in `fundamend.sqlmodels` re-exportiert:
+```python
+from fundamend.sqlmodels.condition_usage import (
+    create_and_fill_ahb_condition_usage_table,
+    create_ahb_condition_usage_view,
+)
+create_and_fill_ahb_condition_usage_table(session)  # braucht ahb_hierarchy_materialized und drop_raw_tables=False
+create_ahb_condition_usage_view(session)  # braucht v_ahbtabellen, also vorher create_ahbtabellen_view(session)
+```
+```sql
+SELECT pruefidentifikator, line_ahb_status, via FROM v_ahb_condition_usages
+WHERE format_version = 'FV2504' AND format = 'UTILMD' AND condition_key = '931' ORDER BY pruefidentifikator, sort_path, via;
+```
+
+</details>
+
 #### Befüllen einer Datenbank mit MIG-Informationen
 Analog zu den AHBs lassen sich auch MIGs in eine Datenbank überführen und "flach" ziehen.
 Da MIGs die vollständige Nachrichtenstruktur beschreiben (Segmentgruppen, Segmente, Datenelementgruppen, Datenelemente und Codes), ist die Hierarchie oft tiefer als bei AHBs.
