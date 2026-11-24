@@ -53,7 +53,9 @@ def _drop_temporary_helper_indexes(session: Session) -> None:
     try:
         session.rollback()  # the failed transaction must be closed before we can run the DDL
         index_names = session.execute(
-            sqlalchemy.text("SELECT name FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_ahbmat\\_%' ESCAPE '\\'")
+            sqlalchemy.text(
+                "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_ahbmat\\_%' ESCAPE '\\'"
+            )
         ).scalars()
         for index_name in list(index_names):
             session.execute(sqlalchemy.text(f'DROP INDEX IF EXISTS "{index_name}"'))

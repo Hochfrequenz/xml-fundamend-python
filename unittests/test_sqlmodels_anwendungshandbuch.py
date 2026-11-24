@@ -17,8 +17,7 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.sqlmodels import ahbview
-from fundamend.sqlmodels import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import AhbHierarchyMaterialized, ahbview, create_ahb_view, create_db_and_populate_with_ahb_view
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
 
 from .conftest import apply_throwaway_sqlite_pragmas, cached_ahb_db, is_private_submodule_checked_out
