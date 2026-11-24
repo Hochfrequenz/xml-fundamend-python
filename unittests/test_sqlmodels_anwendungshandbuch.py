@@ -17,7 +17,13 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.sqlmodels import AhbHierarchyMaterialized, ahbview, create_ahb_view, create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import (
+    AhbHierarchyMaterialized,
+    ahbview,
+    create_ahb_view,
+    create_db_and_populate_with_ahb_view,
+    internals,
+)
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
 
 from .conftest import apply_throwaway_sqlite_pragmas, cached_ahb_db, is_private_submodule_checked_out
@@ -81,9 +87,11 @@ def test_sqlmodels_single_anwendungshandbuch_with_ahb_view(sqlite_session: Sessi
 
 
 def _count_temporary_helper_indexes(session: Session) -> int:
-    return session.execute(
-        text("SELECT count(*) FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_%' ESCAPE '\\'")
-    ).scalar_one()
+    return int(
+        session.execute(
+            text("SELECT count(*) FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_%' ESCAPE '\\'")
+        ).scalar_one()
+    )
 
 
 def test_create_ahb_view_removes_temporary_indexes_on_failure(
@@ -100,7 +108,7 @@ def test_create_ahb_view_removes_temporary_indexes_on_failure(
     broken_sql_path.write_text(
         original_sql.replace(marker, "SELECT * FROM this_table_does_not_exist;\n" + marker, 1), encoding="utf-8"
     )
-    real_execute = ahbview._execute_bare_sql  # pylint:disable=protected-access
+    real_execute = internals._execute_bare_sql  # pylint:disable=protected-access
     monkeypatch.setattr(
         ahbview,
         "_execute_bare_sql",
