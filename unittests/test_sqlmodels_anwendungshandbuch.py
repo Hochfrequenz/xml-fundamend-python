@@ -117,6 +117,10 @@ def test_create_ahb_view_removes_temporary_indexes_on_failure(
     with pytest.raises(sqlalchemy.exc.OperationalError, match="this_table_does_not_exist"):
         create_ahb_view(session=sqlite_session)
     assert _count_temporary_helper_indexes(sqlite_session) == 0
+    # a retry on the same connection must succeed, i.e. no temporary table of the failed run may be left over
+    monkeypatch.undo()
+    create_ahb_view(session=sqlite_session)
+    assert _count_temporary_helper_indexes(sqlite_session) == 0
 
 
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:

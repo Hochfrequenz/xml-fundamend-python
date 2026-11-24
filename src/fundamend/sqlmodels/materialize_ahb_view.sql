@@ -18,7 +18,6 @@ DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_deg_seg;
 DROP INDEX IF EXISTS _tmp_ahbmat_seg_sg_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_seg_af_id;
-DROP INDEX IF EXISTS _tmp_ahbmat_sgl_parent;
 DROP INDEX IF EXISTS _tmp_ahbmat_sgl_child;
 DROP INDEX IF EXISTS _tmp_ahbmat_sg_af_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_code_de;
@@ -29,7 +28,6 @@ CREATE INDEX _tmp_ahbmat_de_seg_id ON dataelement (segment_primary_key, data_ele
 CREATE INDEX _tmp_ahbmat_deg_seg ON dataelementgroup (segment_primary_key, position);
 CREATE INDEX _tmp_ahbmat_seg_sg_id ON segment (segmentgroup_primary_key, id);
 CREATE INDEX _tmp_ahbmat_seg_af_id ON segment (anwendungsfall_primary_key, id);
-CREATE INDEX _tmp_ahbmat_sgl_parent ON segmentgrouplink (parent_id, child_id);
 CREATE INDEX _tmp_ahbmat_sgl_child ON segmentgrouplink (child_id, parent_id);
 CREATE INDEX _tmp_ahbmat_sg_af_id ON segmentgroup (anwendungsfall_primary_key, id);
 CREATE INDEX _tmp_ahbmat_code_de ON code (data_element_primary_key, position, value);
@@ -727,6 +725,8 @@ CREATE INDEX idx_hierarchy_sort_path_per_ahb ON ahb_hierarchy_materialized (sort
 -- which means subqueries in the SET clause see already-modified rows, breaking self-referencing counters.
 CREATE INDEX _tmp_ahbmat_hier_idpath ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version, id);
 
+-- a failed earlier run on the same connection may have left this TEMP table behind (its DROP is rolled back)
+DROP TABLE IF EXISTS _id_path_counter_fix;
 CREATE TEMP TABLE _id_path_counter_fix AS
 SELECT id,
        id_path || '#' || ROW_NUMBER() OVER (
@@ -767,7 +767,6 @@ DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_deg_seg;
 DROP INDEX IF EXISTS _tmp_ahbmat_seg_sg_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_seg_af_id;
-DROP INDEX IF EXISTS _tmp_ahbmat_sgl_parent;
 DROP INDEX IF EXISTS _tmp_ahbmat_sgl_child;
 DROP INDEX IF EXISTS _tmp_ahbmat_sg_af_id;
 DROP INDEX IF EXISTS _tmp_ahbmat_code_de;
