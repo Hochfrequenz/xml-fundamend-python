@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+import sqlalchemy
 from efoli import EdifactFormatVersion
 from pydantic import RootModel
 from sqlalchemy import func, text
@@ -16,7 +17,13 @@ from syrupy.assertion import SnapshotAssertion
 from fundamend import AhbReader
 from fundamend.models.anwendungshandbuch import Anwendungshandbuch as PydanticAnwendunghandbuch
 from fundamend.models.kommunikationsrichtung import Kommunikationsrichtung
-from fundamend.sqlmodels import AhbHierarchyMaterialized, create_ahb_view, create_db_and_populate_with_ahb_view
+from fundamend.sqlmodels import (
+    AhbHierarchyMaterialized,
+    ahbview,
+    create_ahb_view,
+    create_db_and_populate_with_ahb_view,
+    internals,
+)
 from fundamend.sqlmodels import Anwendungshandbuch as SqlAnwendungshandbuch
 
 from .conftest import apply_throwaway_sqlite_pragmas, cached_ahb_db, is_private_submodule_checked_out
@@ -76,6 +83,44 @@ def test_sqlmodels_single_anwendungshandbuch_with_ahb_view(sqlite_session: Sessi
     last_row = results[-1]
     assert first_row.path == "Nachrichten-Kopfsegment"
     assert last_row.path == "Nachrichten-Endesegment > Nachrichten-Referenznummer"
+    assert _count_temporary_helper_indexes(sqlite_session) == 0
+
+
+def _count_temporary_helper_indexes(session: Session) -> int:
+    return int(
+        session.execute(
+            text("SELECT count(*) FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_%' ESCAPE '\\'")
+        ).scalar_one()
+    )
+
+
+def test_create_ahb_view_removes_temporary_indexes_on_failure(
+    sqlite_session: Session, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    ahb = AhbReader(
+        Path(__file__).parent / "example_files" / "UTILTS_AHB_1.1d_Konsultationsfassung_2024_04_02.xml"
+    ).read()
+    _ = _load_anwendungshandbuch_ahb_to_and_from_db(sqlite_session, ahb)
+    original_sql = (Path(ahbview.__file__).parent / "materialize_ahb_view.sql").read_text(encoding="utf-8")
+    marker = "-- Clean up temporary qualifier tables"
+    assert marker in original_sql
+    broken_sql_path = tmp_path / "broken.sql"
+    broken_sql_path.write_text(
+        original_sql.replace(marker, "SELECT * FROM this_table_does_not_exist;\n" + marker, 1), encoding="utf-8"
+    )
+    real_execute = internals._execute_bare_sql  # pylint:disable=protected-access
+    monkeypatch.setattr(
+        ahbview,
+        "_execute_bare_sql",
+        lambda session, path_to_sql_commands: real_execute(session=session, path_to_sql_commands=broken_sql_path),
+    )
+    with pytest.raises(sqlalchemy.exc.OperationalError, match="this_table_does_not_exist"):
+        create_ahb_view(session=sqlite_session)
+    assert _count_temporary_helper_indexes(sqlite_session) == 0
+    # a retry on the same connection must succeed, i.e. no temporary table of the failed run may be left over
+    monkeypatch.undo()
+    create_ahb_view(session=sqlite_session)
+    assert _count_temporary_helper_indexes(sqlite_session) == 0
 
 
 def test_sqlmodels_all_anwendungshandbuch(sqlite_session: Session) -> None:
