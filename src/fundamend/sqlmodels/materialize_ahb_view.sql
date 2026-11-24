@@ -12,27 +12,27 @@ DROP TABLE IF EXISTS ahb_hierarchy_materialized;
 -- We create the helper indexes here and drop them again at the end of this script, so the final set of indexes
 -- in the database is exactly the same as before.
 -- ============================================================================
-DROP INDEX IF EXISTS _tmp_de_seg_deg;
-DROP INDEX IF EXISTS _tmp_de_deg_id;
-DROP INDEX IF EXISTS _tmp_de_seg_id;
-DROP INDEX IF EXISTS _tmp_deg_seg;
-DROP INDEX IF EXISTS _tmp_seg_sg_id;
-DROP INDEX IF EXISTS _tmp_seg_af_id;
-DROP INDEX IF EXISTS _tmp_sgl_parent;
-DROP INDEX IF EXISTS _tmp_sgl_child;
-DROP INDEX IF EXISTS _tmp_sg_af_id;
-DROP INDEX IF EXISTS _tmp_code_de;
-DROP INDEX IF EXISTS _tmp_hier_idpath;
-CREATE INDEX _tmp_de_seg_deg ON dataelement (segment_primary_key, data_element_group_primary_key, position);
-CREATE INDEX _tmp_de_deg_id ON dataelement (data_element_group_primary_key, id);
-CREATE INDEX _tmp_de_seg_id ON dataelement (segment_primary_key, data_element_group_primary_key, id);
-CREATE INDEX _tmp_deg_seg ON dataelementgroup (segment_primary_key, position);
-CREATE INDEX _tmp_seg_sg_id ON segment (segmentgroup_primary_key, id);
-CREATE INDEX _tmp_seg_af_id ON segment (anwendungsfall_primary_key, id);
-CREATE INDEX _tmp_sgl_parent ON segmentgrouplink (parent_id, child_id);
-CREATE INDEX _tmp_sgl_child ON segmentgrouplink (child_id, parent_id);
-CREATE INDEX _tmp_sg_af_id ON segmentgroup (anwendungsfall_primary_key, id);
-CREATE INDEX _tmp_code_de ON code (data_element_primary_key, position, value);
+DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_deg;
+DROP INDEX IF EXISTS _tmp_ahbmat_de_deg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_deg_seg;
+DROP INDEX IF EXISTS _tmp_ahbmat_seg_sg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_seg_af_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_sgl_parent;
+DROP INDEX IF EXISTS _tmp_ahbmat_sgl_child;
+DROP INDEX IF EXISTS _tmp_ahbmat_sg_af_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_code_de;
+DROP INDEX IF EXISTS _tmp_ahbmat_hier_idpath;
+CREATE INDEX _tmp_ahbmat_de_seg_deg ON dataelement (segment_primary_key, data_element_group_primary_key, position);
+CREATE INDEX _tmp_ahbmat_de_deg_id ON dataelement (data_element_group_primary_key, id);
+CREATE INDEX _tmp_ahbmat_de_seg_id ON dataelement (segment_primary_key, data_element_group_primary_key, id);
+CREATE INDEX _tmp_ahbmat_deg_seg ON dataelementgroup (segment_primary_key, position);
+CREATE INDEX _tmp_ahbmat_seg_sg_id ON segment (segmentgroup_primary_key, id);
+CREATE INDEX _tmp_ahbmat_seg_af_id ON segment (anwendungsfall_primary_key, id);
+CREATE INDEX _tmp_ahbmat_sgl_parent ON segmentgrouplink (parent_id, child_id);
+CREATE INDEX _tmp_ahbmat_sgl_child ON segmentgrouplink (child_id, parent_id);
+CREATE INDEX _tmp_ahbmat_sg_af_id ON segmentgroup (anwendungsfall_primary_key, id);
+CREATE INDEX _tmp_ahbmat_code_de ON code (data_element_primary_key, position, value);
 
 -- ============================================================================
 -- Pre-compute semantic qualifiers for segments, segment groups, and data elements.
@@ -725,7 +725,7 @@ CREATE INDEX idx_hierarchy_sort_path_per_ahb ON ahb_hierarchy_materialized (sort
 -- number and order of identical siblings doesn't change between versions.
 -- NOTE: We pre-compute counter values in a temp table because SQLite's UPDATE processes rows sequentially,
 -- which means subqueries in the SET clause see already-modified rows, breaking self-referencing counters.
-CREATE INDEX _tmp_hier_idpath ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version, id);
+CREATE INDEX _tmp_ahbmat_hier_idpath ON ahb_hierarchy_materialized (id_path, pruefidentifikator, edifact_format_version, id);
 
 CREATE TEMP TABLE _id_path_counter_fix AS
 SELECT id,
@@ -761,17 +761,17 @@ DROP TABLE IF EXISTS _de_qual;
 DROP TABLE IF EXISTS _de_needs_qual;
 
 -- Drop the temporary helper indexes again
-DROP INDEX IF EXISTS _tmp_de_seg_deg;
-DROP INDEX IF EXISTS _tmp_de_deg_id;
-DROP INDEX IF EXISTS _tmp_de_seg_id;
-DROP INDEX IF EXISTS _tmp_deg_seg;
-DROP INDEX IF EXISTS _tmp_seg_sg_id;
-DROP INDEX IF EXISTS _tmp_seg_af_id;
-DROP INDEX IF EXISTS _tmp_sgl_parent;
-DROP INDEX IF EXISTS _tmp_sgl_child;
-DROP INDEX IF EXISTS _tmp_sg_af_id;
-DROP INDEX IF EXISTS _tmp_code_de;
-DROP INDEX IF EXISTS _tmp_hier_idpath;
+DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_deg;
+DROP INDEX IF EXISTS _tmp_ahbmat_de_deg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_de_seg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_deg_seg;
+DROP INDEX IF EXISTS _tmp_ahbmat_seg_sg_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_seg_af_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_sgl_parent;
+DROP INDEX IF EXISTS _tmp_ahbmat_sgl_child;
+DROP INDEX IF EXISTS _tmp_ahbmat_sg_af_id;
+DROP INDEX IF EXISTS _tmp_ahbmat_code_de;
+DROP INDEX IF EXISTS _tmp_ahbmat_hier_idpath;
 
 -- if the unique part of the following indexes raises an integrity error, this is handled by the calling python code
 -- column order optimized for v_ahb_formatversion_diff/v_ahb_pruefi_diff queries: filter by (version, pruefi) first, then lookup by id_path/path

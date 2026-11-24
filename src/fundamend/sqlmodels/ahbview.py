@@ -43,12 +43,39 @@ from fundamend.sqlmodels.internals import _execute_bare_sql
 _logger = logging.getLogger(__name__)
 
 
+def _drop_temporary_helper_indexes(session: Session) -> None:
+    """
+    Best-effort cleanup after a failed run of materialize_ahb_view.sql.
+    The helper indexes on the raw tables are created outside of any open transaction and are therefore committed
+    right away by the sqlite3 driver. If a later statement fails, they would stay in the user's database.
+    Never raises, so that it cannot mask the original exception.
+    """
+    try:
+        session.rollback()  # the failed transaction must be closed before we can run the DDL
+        index_names = session.execute(
+            sqlalchemy.text("SELECT name FROM sqlite_master WHERE type='index' AND name LIKE '\\_tmp\\_ahbmat\\_%' ESCAPE '\\'")
+        ).scalars()
+        for index_name in list(index_names):
+            session.execute(sqlalchemy.text(f'DROP INDEX IF EXISTS "{index_name}"'))
+        session.commit()
+    except Exception:  # pylint:disable=broad-exception-caught
+        _logger.warning("Could not remove the temporary helper indexes (_tmp_ahbmat_*)", exc_info=True)
+        try:
+            session.rollback()
+        except Exception:  # pylint:disable=broad-exception-caught
+            pass
+
+
 def create_ahb_view(session: Session) -> None:
     """
     Create a materialized view for the Anwendungshandbücher using a SQLAlchemy session.
     Warning: This is only tested for SQLite!
     """
-    _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "materialize_ahb_view.sql")
+    try:
+        _execute_bare_sql(session=session, path_to_sql_commands=Path(__file__).parent / "materialize_ahb_view.sql")
+    except BaseException:
+        _drop_temporary_helper_indexes(session)
+        raise
 
     number_of_inserted_rows = session.scalar(
         select(func.count(AhbHierarchyMaterialized.id))  # type: ignore[arg-type] # pylint:disable=not-callable #
