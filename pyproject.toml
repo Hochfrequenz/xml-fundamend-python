@@ -42,7 +42,7 @@ tests = [
     "filelock==4.3.0",
     "pytest==9.2.0",
     "pytest-xdist==3.8.0",
-    "syrupy==7.0.2"
+    "syrupy==7.0.3"
 ]
 lint = [
     "ruff==0.17.5"
